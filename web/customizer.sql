@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: localhost:3306
--- Generation Time: Feb 24, 2023 at 07:35 PM
+-- Generation Time: Feb 28, 2023 at 06:21 PM
 -- Server version: 8.0.32-0ubuntu0.20.04.2
 -- PHP Version: 7.4.3-4ubuntu2.17
 
@@ -37,6 +37,13 @@ CREATE TABLE `art_category` (
   `created_at` timestamp NULL DEFAULT NULL,
   `updated_at` timestamp NULL DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `art_category`
+--
+
+INSERT INTO `art_category` (`id`, `user_id`, `name`, `backgroud_image`, `status`, `created_at`, `updated_at`) VALUES
+(1, 1, 'Emojis', 'http://localhost/phpmyadmin/tbl_change.php?db=customizer&table=art_category', 1, '2023-02-27 12:32:11', '2023-02-27 12:32:17');
 
 -- --------------------------------------------------------
 
@@ -156,6 +163,48 @@ CREATE TABLE `settings` (
 -- --------------------------------------------------------
 
 --
+-- Table structure for table `shopify_sessions`
+--
+
+CREATE TABLE `shopify_sessions` (
+  `id` varchar(255) NOT NULL,
+  `shop` varchar(255) NOT NULL,
+  `state` varchar(255) NOT NULL,
+  `isOnline` int NOT NULL,
+  `expires` int DEFAULT NULL,
+  `scope` varchar(1024) DEFAULT NULL,
+  `accessToken` varchar(255) DEFAULT NULL,
+  `onlineAccessInfo` varchar(255) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `shopify_sessions`
+--
+
+INSERT INTO `shopify_sessions` (`id`, `shop`, `state`, `isOnline`, `expires`, `scope`, `accessToken`, `onlineAccessInfo`) VALUES
+('offline_prakash-test-1.myshopify.com', 'prakash-test-1.myshopify.com', '566298320423128', 0, NULL, 'write_order_edits,write_products,write_orders,write_draft_orders,read_customers,write_checkouts,write_payment_terms', 'shpua_6c02e222a47e5fc3768fb6387973dc8f', NULL);
+
+-- --------------------------------------------------------
+
+--
+-- Table structure for table `shopify_sessions_migrations`
+--
+
+CREATE TABLE `shopify_sessions_migrations` (
+  `migration_name` varchar(255) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+
+--
+-- Dumping data for table `shopify_sessions_migrations`
+--
+
+INSERT INTO `shopify_sessions_migrations` (`migration_name`) VALUES
+('migrateScopeFieldToVarchar1024'),
+('migrateScopeFieldToVarchar1024');
+
+-- --------------------------------------------------------
+
+--
 -- Table structure for table `text_settings`
 --
 
@@ -222,6 +271,12 @@ ALTER TABLE `product_settings`
   ADD PRIMARY KEY (`id`);
 
 --
+-- Indexes for table `shopify_sessions`
+--
+ALTER TABLE `shopify_sessions`
+  ADD PRIMARY KEY (`id`);
+
+--
 -- Indexes for table `text_settings`
 --
 ALTER TABLE `text_settings`
@@ -241,7 +296,7 @@ ALTER TABLE `text_settings_old`
 -- AUTO_INCREMENT for table `art_category`
 --
 ALTER TABLE `art_category`
-  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT;
+  MODIFY `id` bigint UNSIGNED NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- AUTO_INCREMENT for table `art_sub_category`

@@ -1,0 +1,155 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model art_category {
+  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id         BigInt?   @db.UnsignedBigInt
+  name            String?   @db.VarChar(50)
+  backgroud_image String?   @db.Text
+  status          Int?      @db.TinyInt
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+}
+
+model art_sub_category {
+  id              BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  art_category_id BigInt?   @db.UnsignedBigInt
+  name            String?   @db.VarChar(50)
+  created_at      DateTime? @db.Timestamp(0)
+  updated_at      DateTime? @db.Timestamp(0)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model art_sub_category_list {
+  id                  BigInt    @db.UnsignedBigInt
+  art_sub_category_id BigInt    @db.UnsignedBigInt
+  name                String?   @db.VarChar(50)
+  image_src           String?   @db.Text
+  created_at          DateTime? @db.Timestamp(0)
+  updated_at          DateTime? @db.Timestamp(0)
+
+  @@ignore
+}
+
+model art_sub_category_sub_list {
+  id                       BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  art_sub_category_list_id BigInt?   @db.UnsignedBigInt
+  image_src                String?   @db.Text
+  created_at               DateTime? @db.Timestamp(0)
+  updated_at               DateTime? @db.Timestamp(0)
+}
+
+model product_settings {
+  id                 BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  user_id            BigInt?
+  product_id         BigInt?
+  product_title      String?   @db.VarChar(255)
+  product_image      String?   @db.Text
+  product_color      String?   @db.VarChar(50)
+  front_image_left   Int?
+  front_image_top    Int?
+  front_crop_width   Int?
+  front_crop_height  String?   @db.VarChar(50)
+  front_image_width  String?   @db.VarChar(50)
+  front_image_height String?   @db.VarChar(50)
+  front_scale_x      String?   @db.VarChar(50)
+  front_scale_y      String?   @db.VarChar(50)
+  back_image_left    String?   @db.VarChar(50)
+  back_image_top     String?   @db.VarChar(50)
+  back_crop_width    String?   @db.VarChar(50)
+  back_crop_height   String?   @db.VarChar(50)
+  back_image_width   String?   @db.VarChar(50)
+  back_image_height  String?   @db.VarChar(50)
+  back_scale_x       String?   @db.VarChar(50)
+  back_scale_y       String?   @db.VarChar(50)
+  left_image_left    String?   @db.VarChar(50)
+  left_image_top     String?   @db.VarChar(50)
+  left_crop_width    String?   @db.VarChar(50)
+  left_crop_height   String?   @db.VarChar(50)
+  left_image_width   String?   @db.VarChar(50)
+  left_image_height  String?   @db.VarChar(50)
+  left_scale_x       String?   @db.VarChar(50)
+  left_scale_y       String?   @db.VarChar(50)
+  right_image_left   String?   @db.VarChar(50)
+  right_image_top    String?   @db.VarChar(50)
+  right_crop_width   String?   @db.VarChar(50)
+  right_crop_height  String?   @db.VarChar(50)
+  right_image_width  String?   @db.VarChar(50)
+  right_image_height String?   @db.VarChar(50)
+  right_scale_x      String?   @db.VarChar(50)
+  right_scale_y      String?   @db.VarChar(50)
+  created_at         DateTime? @db.Timestamp(0)
+  updated_at         DateTime? @db.Timestamp(0)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model settings {
+  id                 BigInt
+  user_id            BigInt?   @db.UnsignedBigInt
+  text               String?   @db.VarChar(20)
+  use_greek_letter   Int?      @default(1) @db.TinyInt
+  font_setting       Int?      @default(1) @db.TinyInt
+  text_color_setting Int?      @default(1) @db.TinyInt
+  rotation_setting   Int?      @default(1) @db.TinyInt
+  outline_setting    Int?      @default(1) @db.TinyInt
+  text_shape_setting Int?      @default(1) @db.TinyInt
+  text_size_setting  Int?      @default(1) @db.TinyInt
+  upload_video       Int?      @default(1) @db.TinyInt
+  status             Int?      @default(1) @db.TinyInt
+  created_at         DateTime? @db.Timestamp(0)
+  updated_at         DateTime? @db.Timestamp(0)
+
+  @@ignore
+}
+
+model shopify_sessions {
+  id               String  @id @db.VarChar(255)
+  shop             String  @db.VarChar(255)
+  state            String  @db.VarChar(255)
+  isOnline         Int
+  expires          Int?
+  scope            String? @db.VarChar(1024)
+  accessToken      String? @db.VarChar(255)
+  onlineAccessInfo String? @db.VarChar(255)
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by the Prisma Client.
+model shopify_sessions_migrations {
+  migration_name String @db.VarChar(255)
+
+  @@ignore
+}
+
+model text_settings {
+  id                 BigInt    @id @db.UnsignedBigInt
+  user_id            BigInt    @db.UnsignedBigInt
+  font_style         String?   @db.VarChar(50)
+  font_color         String?   @db.VarChar(50)
+  text_outline_color String?   @db.VarChar(50)
+  created_at         DateTime? @db.Timestamp(0)
+  updated_at         DateTime? @db.Timestamp(0)
+}
+
+model text_settings_old {
+  id                           BigInt    @id @default(autoincrement()) @db.UnsignedBigInt
+  text                         String?   @db.VarChar(20)
+  use_greek_letter             Int?      @default(0) @db.TinyInt
+  text_font_name               String?   @db.VarChar(20)
+  text_font_value              String?   @db.VarChar(20)
+  text_color                   String?   @db.VarChar(20)
+  text_rotation                Int?
+  text_outline_thickness       Int?
+  text_outline_thickness_color String?   @db.VarChar(20)
+  text_shape                   String?   @db.VarChar(20)
+  text_shape_size              String?   @db.VarChar(20)
+  text_size                    Int?
+  status                       Int?      @default(1) @db.TinyInt
+  created_at                   DateTime? @db.Timestamp(0)
+  updated_at                   DateTime? @db.Timestamp(0)
+}
