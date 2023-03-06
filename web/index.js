@@ -229,6 +229,53 @@ app.delete("/api/delete/art_sub_category_sub_list/:id", (req, res) => {
   })
 });
 
+// Get setting list
+app.get("/api/get-setting", (req, res) => {
+  res.send(res.locals.shopify.session);
+  // mysqlConnection.query(`select * from settings WHERE id=${req.body.user_id}`, 
+  // function(err, result) {
+  //     if(err) throw err
+  //     res.status(200).send(result)
+  // });
+});
+
+// Create setting
+app.post("/api/setting/create", async (req, res) => {
+  mysqlConnection.query('INSERT INTO settings SET ?', { 
+    user_id: req.body.user_id, 
+    text: req.body.text, 
+    use_greek_letter: req.body.use_greek_letter, 
+    font_setting: req.body.font_setting, 
+    text_color_setting: req.body.text_color_setting, 
+    rotation_setting: req.body.rotation_setting, 
+    outline_setting: req.body.outline_setting, 
+    text_shape_setting: req.body.text_shape_setting, 
+    text_size_setting: req.body.text_size_setting,
+    upload_video: req.body.upload_video
+  }, function (error, results, fields) {
+    if (error) throw error;
+    res.status(200).send(results)
+  });
+});
+
+// Delete setting by id
+app.delete("/api/delete/setting/:id", (req, res) => {
+  mysqlConnection.query(`DELETE FROM settings WHERE id=${req.params.id}`, function (error, results, fields) {
+    if (error) throw error;
+    if (results.affectedRows > 0) {
+      res.status(200).send({
+        "data": results,
+        "message": "Deleted success!",
+      });
+    } else {
+      res.status(200).send({
+        "data": [],
+        "message": `Invalid art sub category sub list id ${req.params.id}`,
+      });
+    }
+  })
+});
+
 // ...................................
 
 app.use(serveStatic(STATIC_PATH, { index: false }));
