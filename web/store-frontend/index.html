@@ -1,0 +1,416 @@
+<!DOCTYPE html>
+    <html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <meta http-equiv="X-UA-Compatible" content="ie=edge">
+        <title>Customiser</title>
+        <link rel="stylesheet" type="text/css" href="./assets/css/style.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css" integrity="sha512-SzlrxWUlpfuzQ+pcUCosxcglQRNAq/DZjVsC0lE40xsADsfeQoEypE+enwcOiGjk/bSuGGKHEyjSoQ1zVisanQ==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    </head>
+    <body>
+
+    <div class="main_wrapper">
+         <div class="customise_settings_wrapper">
+
+            <div class="settings_title_wrapper">
+                <ul>
+                    <!-- <li>
+                        <span class="icon h4"><i class="fa-solid fa-arrow-right"></i></span>
+                        <span class="Default">Default</span>
+                    </li> -->
+                    <li onclick="ChooseSettingtab('text','textSettings')" class="text_tab">
+                        <span class="icon h4"><i class="fa-solid fa-t"></i></span>
+                        <span class="text">Text</span>
+                    </li>
+                    <li onclick="ChooseSettingtab('art','artSettings')" class="art_tab">
+                        <span class="icon h4"><i class="fa-solid fa-image"></i></span>
+                        <span class="text">Add Art</span>
+                    </li>
+                    <li onclick="ChooseSettingtab('upload','uploadSettings')" class="upload_tab">
+                        <span class="icon h4"><i class="fa-solid fa-cloud-arrow-up"></i></span>
+                        <span class="text">Uploads</span>
+                    </li>
+                    <li onclick="ChooseSettingtab('product_color','productColorSettings')" class="product_color_tab">
+                        <span class="icon h4"><i class="fa-solid fa-droplet"></i></span>
+                        <span class="text">Product Color</span>
+                    </li>
+                    <li onclick="ChooseSettingtab('names','namesSettings')" class="names_tab">
+                        <span class="icon h4"><i class="fa-solid fa-cloud-arrow-up"></i></span>
+                        <span class="text">Add Numbers</span>
+                    </li>
+                    <li onclick="ChooseSettingtab('notes','notesSettings')" class="notes_tab">
+                        <span class="icon h4"><i class="fa-solid fa-file"></i></span>
+                        <span class="text">Notes</span>
+                    </li>
+                </ul>
+            </div>
+            <div class="settings_content_wrapper">
+                <div id="defaultSettings" class="ct_default_tab ct_content_tab active_tab">
+                    <div class="settings_header">
+                        <h4>What’s next for you?</h4>
+                    </div>
+                    <div class="settings_body">
+                        <div class="default_options">
+                            <div onclick="ChooseSettingtab('text','textSettings')" class="choose_text">
+                                <img src="assets/images/picture.png">
+                                <h6>Add Text</h6>
+                            </div>
+                            <div onclick="ChooseSettingtab('art','artSettings')" class="choose_art">
+                                <img src="assets/images/imageee.png">
+                                <h6>Add Art</h6>
+                            </div>
+                            <div onclick="ChooseSettingtab('upload','uploadSettings')" class="choose_upload">
+                                <img src="assets/images/uplodimg.png">
+                                <h6>Upload</h6>
+                            </div>
+                            <div onclick="ChooseSettingtab('product_color','productColorSettings')" class="choose_product">
+                                <img src="assets/images/pictureimg.png">
+                                <h6>Change Product</h6>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div id="textSettings" class="ct_content_tab">
+                    <div id="addTextTab">
+                        <div class="settings_header text_header">
+                            <span class="close_content_tab">
+                                <i class="fa fa-close"></i>
+                            </span>
+                            <h4>Add Text</h4>
+                        </div>
+                        <div class="settings_body text_body">
+                            <input type="text" id="textContent" name="text" placeholder="Enter text here.." />
+                            <div class="text_cta_wrapper">
+                                <div class="checkbox_greek">
+                                    <input type="checkbox" id="enable_greek_font" name="enable_greek_font" onclick="greekFontCheck()" />
+                                    <label for="enable_greek_font">Use Greek Letters</label>
+                                </div>
+                                <div class="btn_wrapper">
+                                    <button id="addTextContent" class="theme_btn">Add To Design</button>
+                                </div>
+                            </div>
+                            <div class="enable_gkl_wrapper">
+                                <p>Use the chart below to enter your Greek letters, then click ‘Add to Design’ to see them on your product.</p>
+
+                                    <ul class="greek_letters_wrap">
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Α')"><span class="ct_greek_text">Α</span><span class="ct_name">Alpha</span><span class="ct_roman_text">A</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Β')"><span class="ct_greek_text">Β</span><span class="ct_name">Beta</span><span class="ct_roman_text">B</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Γ')"><span class="ct_greek_text">Γ</span><span class="ct_name">Gamma</span><span class="ct_roman_text">G</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Δ')"><span class="ct_greek_text">Δ</span><span class="ct_name">Delta</span><span class="ct_roman_text">D</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Ε')"><span class="ct_greek_text">Ε</span><span class="ct_name">Epsilon</span><span class="ct_roman_text">E</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Ζ')"><span class="ct_greek_text">Ζ</span><span class="ct_name">Zeta</span><span class="ct_roman_text">Z</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Η')"><span class="ct_greek_text">Η</span><span class="ct_name">Eta</span><span class="ct_roman_text">H</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Θ')"><span class="ct_greek_text">Θ</span><span class="ct_name">Theta</span><span class="ct_roman_text">Q</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Ι')"><span class="ct_greek_text">Ι</span><span class="ct_name">Iota</span><span class="ct_roman_text">I</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Κ')"><span class="ct_greek_text">Κ</span><span class="ct_name">Kappa</span><span class="ct_roman_text">K</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Λ')"><span class="ct_greek_text">Λ</span><span class="ct_name">Lambda</span><span class="ct_roman_text">L</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Μ')"><span class="ct_greek_text">Μ</span><span class="ct_name">Mu</span><span class="ct_roman_text">M</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Ν')"><span class="ct_greek_text">Ν</span><span class="ct_name">Nu</span><span class="ct_roman_text">N</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Ξ')"><span class="ct_greek_text">Ξ</span><span class="ct_name">Xi</span><span class="ct_roman_text">X</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Ο')"><span class="ct_greek_text">Ο</span><span class="ct_name">Omicron</span><span class="ct_roman_text">O</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Π')"><span class="ct_greek_text">Π</span><span class="ct_name">Pi</span><span class="ct_roman_text">P</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Ρ')"><span class="ct_greek_text">Ρ</span><span class="ct_name">Rho</span><span class="ct_roman_text">R</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Σ')"><span class="ct_greek_text">Σ</span><span class="ct_name">Sigma</span><span class="ct_roman_text">S</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Τ')"><span class="ct_greek_text">Τ</span><span class="ct_name">Tau</span><span class="ct_roman_text">T</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Υ')"><span class="ct_greek_text">Υ</span><span class="ct_name">Upsilon</span><span class="ct_roman_text">U</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Φ')"><span class="ct_greek_text">Φ</span><span class="ct_name">Phi</span><span class="ct_roman_text">F</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Χ')"><span class="ct_greek_text">Χ</span><span class="ct_name">Chi</span><span class="ct_roman_text">C</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Ψ')"><span class="ct_greek_text">Ψ</span><span class="ct_name">Psi</span><span class="ct_roman_text">Y</span></div></li>
+                                        <li class=""><div class="ct_green_btn" onclick="addGreekLetter('Ω')"><span class="ct_greek_text">Ω</span><span class="ct_name">Omega</span><span class="ct_roman_text">W</span></div></li>
+                                    </ul>
+
+                            </div>
+                            
+                        </div>
+                    </div>
+                    <div id="editTextTab">
+                        <div class="settings_header text_header">
+                            <span class="close_content_tab">
+                                <i class="fa fa-close"></i>
+                            </span>
+                            <h4>Edit Text</h4>
+                        </div>
+                        <div class="settings_body text_body">
+                            <p>Settings come here....</p>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="artSettings" class="ct_content_tab">
+                    <div class="settings_header art_header">
+                        <span class="back_btn">
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11.4 20.1"><path d="M10 20.1c-.4 0-.7-.1-1-.4L.4 11c-.3-.2-.4-.6-.4-1s.1-.7.4-1L9 .4c.5-.5 1.4-.5 2 0s.5 1.4 0 2L3.4 10l7.7 7.7c.5.5.5 1.4 0 2-.3.3-.7.4-1.1.4z"></path></svg>
+                        </span>
+                        <span class="close_content_tab">
+                            <i class="fa fa-close"></i>
+                        </span>
+                        <h4>Artwork Categories</h4>
+                    </div>
+                    <div class="settings_body art_body">
+                        <div class="art_serach_wrapper">
+                            <input type="text" name="art_search" id="artSearch" class="art_search_input" placeholder="Search For Artwork" />
+                        </div>
+                        <div class="art_design_wrapper">
+                            <ul class="parent" level="0">
+                                <li>
+                                    <div class="open_child_options title_image" style="background-color: #a65aa1;">
+                                        <img src="assets/images/face.svg" />
+                                        <span>Emojis</span>
+                                    </div>
+                                    <ul class="child_1 art_category_option emojis_child" level="1" parent_menu="Artwork Categories">
+                                        <li>
+                                            <div class="open_child_options art_sub_title">*Most Popular*</div>
+                                            <ul class="child_2 art_img_option most_popular_child" level="2" parent_menu="Emojis">
+                                                <li>
+                                                    <span>
+                                                        <img src="assets/images/most_popular_img1.png" />
+                                                    </span>
+                                                </li>
+                                                <li>
+                                                    <span>
+                                                        <img src="assets/images/most_popular_img2.png" />
+                                                    </span>
+                                                </li>
+                                                <li>
+                                                    <span>
+                                                        <img src="assets/images/most_popular_img3.png" />
+                                                    </span>
+                                                </li>
+                                                <li>
+                                                    <span>
+                                                        <img src="assets/images/most_popular_img4.png" />
+                                                    </span>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li>
+                                            <div class="open_child_options art_sub_title">Smileys</div>
+                                            <ul class="child_2 art_category_option smileys_child" level="2" parent_menu="Emojis">
+                                                <li>
+                                                    <div class="art_sub_title">category 1</div>
+                                                </li>
+                                                <li>
+                                                    <div class="art_sub_title">category 2</div>
+                                                </li>
+                                                <li>
+                                                    <div class="art_sub_title">category 3</div>
+                                                </li>
+                                                <li>
+                                                    <div class="art_sub_title">category 4</div>
+                                                </li>
+                                            </ul>
+                                        </li>
+                                        <li>People</li>
+                                        <li>Hands</li>
+                                        <li>Animals</li>
+                                    </ul>
+                                </li>
+                                <li>
+                                    <div class="title_image" style="background-color:rgb(56, 81, 163)"><span>Shapes & Symbols</span></div>
+                                </li>
+                                <li>
+                                    <div class="title_image" style="background-color: rgb(92, 179, 170);"><span>Sports & Games</span></div>
+                                </li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="uploadSettings" class="ct_content_tab">
+                    <div class="settings_header upload_header">
+                        <span class="close_content_tab">
+                            <i class="fa fa-close"></i>
+                        </span>
+                        <h4>Upload</h4>
+                    </div>
+                    <div class="settings_body upload_body">
+                        <h4>Choose a file to upload</h4>
+                        <div class="upload_input_wrapper">
+                            <input type="file" name="upload_file" id="uploadFile">
+                            <p>The higher the resolution, the better your upload will look on your gear.</p>
+                            <img src="assets/images/drop_img.svg">
+                            <h5>Drag & Drop or <br/> 
+                                <span>Browse</span>  Your Computer
+                            </h5>
+                        </div>   
+                        <div class="file_info_wrap">
+                            <h6>Preferred file types (Max size: 5 MB)</h6>
+                            <p>These types of files look amazing when printed:</p>
+                            <ul class="supported_file_wrapper">
+                                <li>.JPG</li>
+                                <li>.JPEG</li>
+                                <li>.PNG</li>
+                                <li class="fav_type">.PDF</li>
+                                <li class="fav_type">.AI</li>
+                                <li class="fav_type">.EPS</li>
+                                <li>.GIF</li>
+                                <li>.BMP</li>
+                                <li>.PSD</li>
+                            </ul>
+                            <p class="file_right_content">*.PDF, .AI, .EPS are our favorites</p>
+                            <br/>
+                            <h6>Other file types</h6>
+                            <p>Have a different type of file? Email it to us and we’ll have it ready for you to use in a few business hours.</p>
+                        </div>                     
+                    </div>
+                </div>
+
+                <div id="productColorSettings" class="ct_content_tab">
+                    <div class="settings_header prd_color_header">
+                        <span class="close_content_tab">
+                            <i class="fa fa-close"></i>
+                        </span>
+                        <h4>Choose Your Product Color</h4>
+                    </div>
+                    <div class="settings_body prd_color_body">
+                         <h4>Colors:</h4>
+                         <div class="prd_color_option">
+                            <div class="red" style="background-color:#000000">
+                                 <input type="radio" name="product_color" value="#000000" checked="checked" />
+                                 <span class="check_icon"><i class="fa fa-check"></i></span>
+                             </div>
+                             <div class="red" style="background-color:#ff0000">
+                                 <input type="radio" name="product_color" value="#ff0000" />
+                                 <span class="check_icon"><i class="fa fa-check"></i></span>
+                             </div>
+                             <div class="green" style="background-color:#00ff00">
+                                 <input type="radio" name="product_color" value="#00ff00" />
+                                 <span class="check_icon"><i class="fa fa-check"></i></span>
+                             </div>
+                             <div class="blue" style="background-color:#0000ff">
+                                 <input type="radio" name="product_color" value="#0000ff" />
+                                 <span class="check_icon"><i class="fa fa-check"></i></span>
+                             </div>
+                             <div class="orange" style="background-color:rgb(228, 94, 42)">
+                                 <input type="radio" name="product_color" value="rgb(228, 94, 42)" />
+                                 <span class="check_icon"><i class="fa fa-check"></i></span>
+                             </div>
+                             <div class="purple" style="background-color:rgb(84, 55, 116)">
+                                 <input type="radio" name="product_color" value="rgb(84, 55, 116)" />
+                                 <span class="check_icon"><i class="fa fa-check"></i></span>
+                             </div>
+                             <div class="gray" style="background-color:rgb(175, 175, 175)">
+                                 <input type="radio" name="product_color" value="rgb(175, 175, 175)" />
+                                 <span class="check_icon"><i class="fa fa-check"></i></span>
+                             </div>
+                         </div>   
+                         <hr class="divider_line" />
+                         <h4>Size:</h4>
+                         <div class="prd_size_option">
+                             <span class="size_label">S</span>
+                             <span class="size_label">M</span>
+                             <span class="size_label">L</span>
+                             <span class="size_label">XL</span>
+                             <span class="size_label">XXL</span>
+                         </div>                       
+                    </div>
+                </div>
+
+                <div id="namesSettings" class="ct_content_tab">
+                    <div class="settings_header names_header">
+                        <span class="close_content_tab">
+                            <i class="fa fa-close"></i>
+                        </span>
+                        <h4>Names and Numbers Tools</h4>
+                    </div>
+                    <div class="settings_body names_body">
+                        <div class="nm_info_card">
+                            <img src="assets/images/nameandnumber.jpg" />
+                            <div class="nm_info_card_text">
+                                <p>Use personalized Names & Numbers for projects like team jerseys where you need a unique name and/or number for each item.</p>
+                                <button class="theme_btn">Add Names and Numbers</button>
+                            </div>
+                        </div>
+                        <div class="nm_form_card">
+                            
+                        </div>                       
+                    </div>
+                </div>
+
+                <div id="notesSettings" class="ct_content_tab">
+                    <div class="settings_header notes_header">
+                        <span class="close_content_tab">
+                            <i class="fa fa-close"></i>
+                        </span>
+                        <h4>Notes</h4>
+                    </div>
+                    <div class="settings_body notes_body">
+                         <h6>Leave a note for our production team.</h6>
+                        <p>Your note will be seen when we receive your order.</p>
+                        <div class="note_text_wrapper">
+                            <textarea rows="6" placeholder="Your note"></textarea>
+                            <button class="theme_btn">Save Note</button>
+                        </div>
+                        <div class="note_request_wrap">
+                            <p><strong>Use notes to request:</strong></p>
+                            <p>Special artwork instructions</p>
+                            <p>Pantone color matching codes (PMS)</p>
+                            <p>Art rotations and touch-ups</p>
+                            <p>Sleeve printing</p> 
+                        </div>                   
+                    </div>
+                </div>
+
+            </div>
+
+          <!--   <label for="tshirt-design">T-Shirt Design:</label>
+            <select id="tshirt-design">
+                <option value="">Select one of our designs ...</option>
+                <option value="assets/images/batman.png">Batman</option>
+            </select>
+            <br><br>
+            <label for="tshirt-color">T-Shirt Color:</label>
+            <select id="tshirt-color">
+                <option value="#fff">White</option>
+                <option value="#000">Black</option>
+                <option value="#f00">Red</option>
+                <option value="#008000">Green</option>
+                <option value="#ff0">Yellow</option>
+            </select>
+
+            <br><br>
+            <label for="tshirt-custompicture">Upload your own design:</label>
+            <input type="file" id="tshirt-custompicture" /> -->
+
+        </div>
+        <div class="customise_product_wrapper">
+            <!-- Create the container of the tool -->
+            <div id="tshirt-div">
+                <!-- 
+                    Initially, the image will have the background tshirt that has transparency
+                    So we can simply update the color with CSS or JavaScript dinamically
+                -->
+                <img id="tshirt-backgroundpicture" src="assets/images/background-t-shirt.png"/>
+
+                <div id="drawingArea" class="drawing-area">                 
+                    <div class="canvas-container">
+                        <canvas id="tshirt-canvas" width="200" height="300"></canvas>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- <p>To remove a loaded picture on the T-Shirt select it and press the <kbd>DEL</kbd> key.</p> -->
+            <!-- The select that will allow the user to pick one of the static designs -->
+        </div>
+
+
+
+       
+    </div>
+        
+    <div class="context_menu_wrap">
+        <ul>
+            <li>Cut</li>
+            <li>Copy</li>
+            <li>Paste</li>
+        </ul>
+    </div>
+        
+        <script src="https://code.jquery.com/jquery-3.6.3.js"></script>
+        <!-- Include Fabric.js in the page -->
+        <script src="assets/js/fabric.min.js"></script>
+        <script src="assets/js/custom.js"></script>
+        <script src="assets/js/custom-canvas.js"></script>
+    </body>
+</html>
