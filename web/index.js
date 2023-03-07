@@ -74,7 +74,7 @@ app.get("/api/products/create", async (_req, res) => {
 
 // Get art category list
 app.get("/api/art_category", (req, res) => {
-  mysqlConnection.query('select * from art_category', function(err, result) {
+  mysqlConnection.query(`select * from art_category WHERE id=${res.locals.shopify.session.id}`, function(err, result) {
       if(err) throw err
       res.status(200).send(result)
   });
@@ -83,7 +83,7 @@ app.get("/api/art_category", (req, res) => {
 // Create art category
 app.post("/api/art_category/create", async (req, res) => {
   mysqlConnection.query('INSERT INTO art_category SET ?', { 
-    user_id: req.body.user_id, 
+    user_id: res.locals.shopify.session.id, 
     name: req.body.name, 
     backgroud_image: req.body.backgroud_image
   }, function (error, results, fields) {
@@ -231,18 +231,17 @@ app.delete("/api/delete/art_sub_category_sub_list/:id", (req, res) => {
 
 // Get setting list
 app.get("/api/get-setting", (req, res) => {
-  res.send(res.locals.shopify.session);
-  // mysqlConnection.query(`select * from settings WHERE id=${req.body.user_id}`, 
-  // function(err, result) {
-  //     if(err) throw err
-  //     res.status(200).send(result)
-  // });
+  mysqlConnection.query(`select * from settings WHERE id=${res.locals.shopify.session.id}`, 
+  function(err, result) {
+      if(err) throw err
+      res.status(200).send(result)
+  });
 });
 
 // Create setting
 app.post("/api/setting/create", async (req, res) => {
   mysqlConnection.query('INSERT INTO settings SET ?', { 
-    user_id: req.body.user_id, 
+    user_id: res.locals.shopify.session.id, 
     text: req.body.text, 
     use_greek_letter: req.body.use_greek_letter, 
     font_setting: req.body.font_setting, 
@@ -276,6 +275,78 @@ app.delete("/api/delete/setting/:id", (req, res) => {
   })
 });
 
+// Get product list
+app.get("/api/get-product", (req, res) => {
+  mysqlConnection.query(`select * from products WHERE id=${res.locals.shopify.session.id}`, 
+  function(err, result) {
+      if(err) throw err
+      res.status(200).send(result)
+  });
+});
+
+// Create product with setting
+app.post("/api/create-product", async (req, res) => {
+  mysqlConnection.query('INSERT INTO product SET ?', { 
+    user_id: res.locals.shopify.session.id, 
+    product_id: req.body.product_id, 
+    product_title: req.body.product_title, 
+    product_image: req.body.product_image, 
+    product_color: req.body.product_color, 
+    front_image_left: req.body.front_image_left, 
+    front_image_top: req.body.front_image_top, 
+    front_crop_width: req.body.front_crop_width, 
+    front_crop_height: req.body.front_crop_height,
+    front_image_width: req.body.front_image_width,
+    front_image_height: req.body.front_image_height,
+    front_scale_x: req.body.front_scale_x,
+    front_scale_y: req.body.front_scale_y,
+    back_image_left: req.body.back_image_left,
+    back_image_top: req.body.back_image_top,
+    back_crop_width: req.body.back_crop_width,
+    back_crop_height: req.body.back_crop_height,
+    back_image_width: req.body.back_image_width,
+    back_image_height: req.body.back_image_height,
+    back_scale_x: req.body.back_scale_x,
+    back_scale_y: req.body.back_scale_y,
+    left_image_left: req.body.left_image_left,
+    left_image_top: req.body.left_image_top,
+    left_crop_width: req.body.left_crop_width,
+    left_crop_height: req.body.left_crop_height,
+    left_image_width: req.body.left_image_width,
+    left_image_height: req.body.left_image_height,
+    left_scale_x: req.body.left_scale_x,
+    left_scale_y: req.body.left_scale_y,
+    right_image_left: req.body.right_image_left,
+    right_image_top: req.body.right_image_top,
+    right_crop_width: req.body.right_crop_width,
+    right_crop_height: req.body.right_crop_height,
+    right_image_width: req.body.right_image_width,
+    right_image_height: req.body.right_image_height,
+    right_scale_x: req.body.right_scale_x,
+    right_scale_y: req.body.right_scale_y
+  }, function (error, results, fields) {
+    if (error) throw error;
+    res.status(200).send(results)
+  });
+});
+
+// Delete setting by id
+app.delete("/api/delete-product/:id", (req, res) => {
+  mysqlConnection.query(`DELETE FROM products WHERE id=${req.params.id}`, function (error, results, fields) {
+    if (error) throw error;
+    if (results.affectedRows > 0) {
+      res.status(200).send({
+        "data": results,
+        "message": "Deleted success!",
+      });
+    } else {
+      res.status(200).send({
+        "data": [],
+        "message": `Invalid product id ${req.params.id}`,
+      });
+    }
+  })
+});
 // ...................................
 
 app.use(serveStatic(STATIC_PATH, { index: false }));
