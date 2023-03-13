@@ -1,10 +1,50 @@
-let canvas = new fabric.Canvas('tshirt-canvas');
+var canvas = new fabric.Canvas('tshirt-canvas', {
+    fireRightClick: true,
+    stopContextMenu: true
+});
 
 //Disable context menu
 fabric.util.addListener(document.getElementsByClassName('upper-canvas')[0], 'contextmenu', function(e) {
     e.preventDefault();
-    
 });
+
+// delete object code START
+var deleteIcon = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjAiIHk9IjAiIHZpZXdCb3g9IjAgMCAxNyAxNyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PGNpcmNsZSBmaWxsPSIjRkZGIiBjeD0iOC41IiBjeT0iOC41IiByPSI4LjUiPjwvY2lyY2xlPjxnIGZpbGw9IiNlZTM1MjQiPjxwYXRoIGQ9Im0xMS4xMyA0Ljk3LTYuMTYgNi4xNmMtLjI1LjI1LS4yNS42NSAwIC45cy42NS4yNS45IDBsNi4xNi02LjE2Yy4yNS0uMjUuMjUtLjY1IDAtLjlhLjYzNC42MzQgMCAwIDAtLjkgMCI+PC9wYXRoPjxwYXRoIGQ9Ik0xMi4wMyAxMS4xNCA1Ljg2IDQuOTdhLjYzNC42MzQgMCAwIDAtLjkgMGMtLjI1LjI1LS4yNS42NSAwIC45bDYuMTYgNi4xNmMuMjUuMjUuNjUuMjUuOSAwIC4yNi0uMjQuMjYtLjY1LjAxLS44OSI+PC9wYXRoPjwvZz48L3N2Zz4=';
+
+var img = document.createElement('img');
+img.src = deleteIcon;
+
+fabric.Textbox.prototype.controls.deleteControl = new fabric.Control({
+    x: -0.5,
+    y: -0.5,
+    offsetY: -16,
+    offsetX: -16,
+    cursorStyle: 'pointer',
+    mouseUpHandler: deleteObject,
+    render: renderIcon,
+    cornerSize: 24
+});
+
+function deleteObject(eventData, transform){
+  var target = transform.target;
+  var canvas = target.canvas;
+  canvas.remove(target);
+  canvas.requestRenderAll();
+  $('.top_layer').css("display","block");
+  $('.child_layer').css("display","none");
+}
+
+function renderIcon(ctx, left, top, styleOverride, fabricObject) {
+  var size = this.cornerSize;
+  ctx.save();
+  ctx.translate(left, top);
+  ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle));
+  ctx.drawImage(img, -size / 2, -size / 2, size, size);
+  ctx.restore();
+}
+
+// delete object code END
+
 
 canvas.on('mouse:down', function(options) {
   if(options.target) {
@@ -16,8 +56,23 @@ canvas.on('mouse:down', function(options) {
     $('#textSettings').addClass("active_tab");
 
     $('#addTextTab').css("display","none");
+    $('#editTextContent').val(options.target.text);
     $('#editTextTab').css("display","block");
+    $('.selected_font_name').text(options.target.fontFamily);
+  }else{
+    $('#editTextTab').css("display","none");
+    $('#addTextTab').css("display","block");
   }
+
+  console.log("event => ", options.e);
+  if(options.e.button === 2) {
+        console.log("right click");
+        var top_pos = options.e.layerY + 10;
+        var left_pos = options.e.layerX + 10;
+        $('.context_menu_wrap').css({"display":"block", "top": top_pos, "left": left_pos});
+    }else{
+        $('.context_menu_wrap').css("display","none");
+    }
 });
 
 canvas.on('object:moving', function (e) {
@@ -77,17 +132,128 @@ $("#addTextContent").click(function(){
     	    fontSize: 26,
     	    fontFamily: 'Arial',
     	    textAlign: 'left', 
-    	    fontWeight:'bold', 
+    	    fontWeight:'normal', 
     	    width: tempData.width, // for 20 characters
             editable: false
 	    });
+        textBox.setControlsVisibility({
+            tl: false,
+            bl: false,
+            tr: false,
+            br: true,
+            ml: false,
+            mb: false,
+            mr: false,
+            mt: false,
+            mtr: true
+        });
 
 	    canvas.add(textBox);
+        canvas.setActiveObject(textBox);
 	    canvas.renderAll();
 	    $("#textContent").val("");
+        $('#addTextTab').css("display","none");
+        $('#editTextContent').val(text_val);
+        $('#editTextTab').css("display","block");
 	}
 })
-       
+
+
+$("#editTextContent").keyup(function(){
+    var text_val = $(this).val();
+    console.log("value is => ", text_val);
+
+    var selectedObject = canvas.getActiveObject();
+    if(text_val == ''){
+        selectedObject.set('text', 'No Text');
+    }else{
+        selectedObject.set('text', text_val);    
+    }
+    
+    canvas.renderAll(); 
+})
+
+function changeTextFont(font){
+    var selectedObject = canvas.getActiveObject();
+    selectedObject.set('fontFamily', font);
+    $('.selected_font_name').text(font);
+    canvas.renderAll(); 
+}
+function changeTextColor(color, name){
+    var selectedObject = canvas.getActiveObject();
+    selectedObject.set('fill', color);
+    $('.selected_color_name').text(name);
+    canvas.renderAll(); 
+}
+
+// text Rotation js
+function changeRangeValue(val){
+    document.getElementById("rotatTextRangeSlide").value = isNaN(parseInt(val, 10)) ? 0 : parseInt(val, 10);
+    // showValue1(val);
+    // var selectedObject = canvas.getActiveObject();
+    // selectedObject.set('angle', parseFloat(val));
+    // canvas.renderAll();
+}
+function changeInputValue(val){
+    document.getElementById("rotatTextNumber").value = isNaN(parseInt(val, 10)) ? 0 : parseInt(val, 10);
+    // showValue1(val);
+    // var selectedObject = canvas.getActiveObject();
+    // selectedObject.set('angle', parseFloat(val));
+    // canvas.renderAll();
+}
+
+
+function Cut() {
+    // clone what are you copying since you
+    // may want copy and paste on different moment.
+    // and you do not want the changes happened
+    // later to reflect on the copy.
+    canvas.getActiveObject().clone(function(cloned) {
+        _clipboard = cloned;
+    });
+    canvas.remove(canvas.getActiveObject())
+}
+function Delete() {
+    canvas.remove(canvas.getActiveObject())
+}
+
+
+function Copy() {
+    // clone what are you copying since you
+    // may want copy and paste on different moment.
+    // and you do not want the changes happened
+    // later to reflect on the copy.
+    canvas.getActiveObject().clone(function(cloned) {
+        _clipboard = cloned;
+    });
+}
+function Paste() {
+    // clone again, so you can do multiple copies.
+    _clipboard.clone(function(clonedObj) {
+        canvas.discardActiveObject();
+        clonedObj.set({
+            left: clonedObj.left + 10,
+            top: clonedObj.top + 10,
+            evented: true,
+        });
+        if (clonedObj.type === 'activeSelection') {
+            // active selection needs a reference to the canvas.
+            clonedObj.canvas = canvas;
+            clonedObj.forEachObject(function(obj) {
+                canvas.add(obj);
+            });
+            // this should solve the unselectability
+            clonedObj.setCoords();
+        } else {
+            canvas.add(clonedObj);
+        }
+        _clipboard.top += 10;
+        _clipboard.left += 10;
+        canvas.setActiveObject(clonedObj);
+        canvas.requestRenderAll();
+    });
+}
+
 
 function updateTshirtImage(imageURL){
     fabric.Image.fromURL(imageURL, function(img) {                   
@@ -100,43 +266,43 @@ function updateTshirtImage(imageURL){
 }
 
 // Update the TShirt color according to the selected color by the user
-document.getElementById("tshirt-color").addEventListener("change", function(){
-    document.getElementById("tshirt-div").style.backgroundColor = this.value;
-}, false);
+// document.getElementById("tshirt-color").addEventListener("change", function(){
+//     document.getElementById("tshirt-div").style.backgroundColor = this.value;
+// }, false);
 
 // Update the TShirt color according to the selected color by the user
-document.getElementById("tshirt-design").addEventListener("change", function(){
+// document.getElementById("tshirt-design").addEventListener("change", function(){
 
-    // Call the updateTshirtImage method providing as first argument the URL
-    // of the image provided by the select
-    updateTshirtImage(this.value);
-}, false);
+//     // Call the updateTshirtImage method providing as first argument the URL
+//     // of the image provided by the select
+//     updateTshirtImage(this.value);
+// }, false);
 
 // When the user clicks on upload a custom picture
-document.getElementById('tshirt-custompicture').addEventListener("change", function(e){
-    var reader = new FileReader();
+// document.getElementById('tshirt-custompicture').addEventListener("change", function(e){
+//     var reader = new FileReader();
     
-    reader.onload = function (event){
-        var imgObj = new Image();
-        imgObj.src = event.target.result;
+//     reader.onload = function (event){
+//         var imgObj = new Image();
+//         imgObj.src = event.target.result;
 
-        // When the picture loads, create the image in Fabric.js
-        imgObj.onload = function () {
-            var img = new fabric.Image(imgObj);
+//         // When the picture loads, create the image in Fabric.js
+//         imgObj.onload = function () {
+//             var img = new fabric.Image(imgObj);
 
-            img.scaleToHeight(300);
-            img.scaleToWidth(300); 
-            canvas.centerObject(img);
-            canvas.add(img);
-            canvas.renderAll();
-        };
-    };
+//             img.scaleToHeight(300);
+//             img.scaleToWidth(300); 
+//             canvas.centerObject(img);
+//             canvas.add(img);
+//             canvas.renderAll();
+//         };
+//     };
 
-    // If the user selected a picture, load it
-    if(e.target.files[0]){
-        reader.readAsDataURL(e.target.files[0]);
-    }
-}, false);
+//     // If the user selected a picture, load it
+//     if(e.target.files[0]){
+//         reader.readAsDataURL(e.target.files[0]);
+//     }
+// }, false);
 
 // When the user selects a picture that has been added and press the DEL key
 // The object will be removed !
