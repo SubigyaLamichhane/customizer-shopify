@@ -1,7 +1,7 @@
 {
   "name": "customizer-app",
   "version": "1.0.0",
-  "main": "web/index.js",
+  "main": "web/index.ts",
   "license": "UNLICENSED",
   "scripts": {
     "shopify": "shopify",
@@ -12,8 +12,8 @@
     "deploy": "shopify app deploy"
   },
   "dependencies": {
-    "@shopify/app": "3.43.0",
-    "@shopify/cli": "3.43.0"
+    "@shopify/app": "^3.23.0",
+    "@shopify/cli": "^3.23.0"
   },
   "author": "tis-79"
 }

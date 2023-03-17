@@ -22,7 +22,9 @@ import { Session } from '@shopify/shopify-api';
 
 const prisma = new PrismaClient();
 
-const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
+console.log(process.env.BACKEND_PORT, 'hello', process.env.PORT);
+
+// const PORT = parseInt(process.env.BACKEND_PORT || process.env.PORT, 10);
 
 const STATIC_PATH =
   process.env.NODE_ENV === "production"
@@ -230,24 +232,27 @@ app.delete("/api/delete-art-sub-category-sub-list/:id", (req, res) => {
 });
 
 // Get setting
-app.get("/api/get-setting", (req, res) => {
-  try {
-    mysqlConnection.query(`SELECT * FROM settings WHERE session_id='${res.locals.shopify.session.id}'`, function (error, results, fields) {
-      if (error) throw error;
-      res.status(200).send({
-        "status": true,
-        "message": "Data fetched!",
-        "data": results
-      });
-    });
-  } catch (e) {
-    res.status(404).send({
-      "status": false,
-      "message": e.message,
-      "data": []
-    });
-  }
-});
+// app.get("/api/get-setting", (req, res) => {
+//   try {
+//     mysqlConnection.query(`SELECT * FROM settings WHERE session_id='${res.locals.shopify.session.id}'`, function (error, results, fields) {
+//       if (error) throw error;
+//       res.status(200).send({
+//         "status": true,
+//         "message": "Data fetched!",
+//         "data": results
+//       });
+//     });
+//   } catch (e) {
+//     res.status(404).send({
+//       "status": false,
+//       "message": e.message,
+//       "data": []
+//     });
+//   }
+// });
+
+// import setting from './src/routes/settings';
+// app.use("/api/setting", setting);
 
 // Add setting
 app.post("/api/add-setting", async (req, res) => {
