@@ -281,7 +281,7 @@ app.delete("/api/delete-art-sub-category-sub-list/:id", (req: Request, res: Resp
 // Get setting
 app.get("/api/get-setting", (req: Request, res: Response) => {
     try {
-        let query: string = `SELECT * FROM settings WHERE session_id='${res.locals.shopify.session.id}'`;
+        let query: string = `SELECT * FROM settings WHERE session_id='${res.locals.shopify.session.id}' LIMIT 1`;
         mysqlConnection.query(query, function (error: any, results: any, fields: any) {
             if (error) throw error;
             res.status(200).send({
@@ -300,7 +300,7 @@ app.get("/api/get-setting", (req: Request, res: Response) => {
 });
 
 // Add setting
-app.post("/api/add-setting", (req: Request, res: Response) => {
+app.post("/api/save-setting", (req: Request, res: Response) => {
     try {
         let session_id: string = res.locals.shopify.session.id;
         let visible_add_art: number = req.body.visible_add_art;

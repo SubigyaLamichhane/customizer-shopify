@@ -1,6 +1,7 @@
 import { BrowserRouter } from "react-router-dom";
 import { NavigationMenu } from "@shopify/app-bridge-react";
 import Routes from "./Routes";
+import "./assets/style.css";
 
 import {
   AppBridgeProvider,
@@ -13,6 +14,8 @@ export default function App() {
   // See documentation for <Routes /> for more info
   const pages = import.meta.globEager("./pages/**/!(*.test.[jt]sx)*.([jt]sx)");
 
+  const API_URL = "https://dea7-103-21-55-66.in.ngrok.io";
+  
   return (
     <PolarisProvider>
       <BrowserRouter>
@@ -24,9 +27,17 @@ export default function App() {
                   label: "Page name",
                   destination: "/pagename",
                 },
+                {
+                  label: "Settings",
+                  destination: "/settings",
+                },
+                // {
+                //   label: "Products",
+                //   destination: "/products",
+                // },
               ]}
             />
-            <Routes pages={pages} />
+            <Routes pages={pages} API_URL={API_URL} />
           </QueryProvider>
         </AppBridgeProvider>
       </BrowserRouter>
