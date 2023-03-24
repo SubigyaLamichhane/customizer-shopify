@@ -1,3 +1,7 @@
+
+
+let canvasObj = {};
+
 function ChooseSettingtab(tab, name){
 	$('.ct_content_tab').removeClass("active_tab");
 	$('.settings_title_wrapper>ul>li').removeClass("active");
@@ -15,7 +19,6 @@ $('.close_content_tab').click(function(){
 	$('.child_layer').css("display","none");
 	$('.art_design_wrapper>.parent ul').removeClass("active_art_tab");
 });
-
 
 // greek translate letters
 const convertLang = (str) => {
@@ -97,8 +100,10 @@ $(".open_child_options").click(function (){
 	if(child_tab.length == 1){
 	   var heading_text = $(this).text();
 		$('.art_header h4').text(heading_text);
-		heading_text = heading_text.replace(/[^a-zA-Z ]/g, "");
+		heading_text = heading_text.replace(/[^a-zA-Z0-9 ]/g, "");
+    console.log('heading text => ', heading_text);
 		heading_text = heading_text.trim().toLowerCase().replaceAll(" ", "_");
+    heading_text = heading_text.replace("__", "_");
 		$('.art_header .back_btn').css("display","block");
 		$('.art_header .back_btn').attr("current-option",heading_text);
 		$('.art_header .back_btn').attr("level",child_level);
@@ -121,8 +126,10 @@ $(".art_header .back_btn").click(function() {
 	}else{
 		$('.'+current_attr+'_child').removeClass("active_art_tab");
 		$('.art_header h4').text(pre_menu_text);
-		pre_menu_text = pre_menu_text.replace(/[^a-zA-Z ]/g, "");
+    console.log('heading text => ', pre_menu_text);
+		pre_menu_text = pre_menu_text.replace(/[^a-zA-Z0-9 ]/g, "");
 		pre_menu_text = pre_menu_text.trim().toLowerCase().replaceAll(" ", "_");
+    pre_menu_text = pre_menu_text.replace("__", "_");
 		$('.art_header .back_btn').attr("current-option", pre_menu_text);
 		$(this).attr("level", current_level);
 	}
@@ -131,6 +138,7 @@ $(".art_header .back_btn").click(function() {
 
 setTimeout(function(){
   $.measureText = function(html, fontOptions) { 
+  	// console.log(fontOptions)
     fontOptions = $.extend({
       fontSize: '1em',
       fontStyle: 'normal',
@@ -164,7 +172,7 @@ var fonts_name = 'ABeeZee|Abel|Aclonica|Acme|Actor|Adamina|Akronim|Aladin|Alata|
 const font_array = fonts_name.split("|");
 var font_html = ``;
 for(var i = 0; font_array.length-1 > i; i++){
-  font_html += `<li onClick="changeTextFont('`+font_array[i]+`')" style="font-family:`+font_array[i]+`">Test<small style="font-family:arial">`+font_array[i]+`</small></li>`;
+  font_html += `<li onClick="changeTextFont('`+font_array[i]+`')"><span class="active_text" style="font-family:`+font_array[i]+`">Test</span><small style="font-family:arial">`+font_array[i]+`</small></li>`;
 }
 setTimeout(function(){
    $('ul#allFonts').html(font_html);
@@ -192,37 +200,162 @@ $('.close_color_tab').click(function(){
 $('.back_color_btn').click(function(){
 	$('.text_color_wrapper').css("display","none");
 });
-$('.color_box>input.text_color_input').hover(function() {
+$('.color_box>input[name="text_color_input"]').hover(function() {
 	var color_code = $(this).attr('data-color-code');
 	var color_name = $(this).attr('data-color-name');
 	$('.selected_color>.color_box').css('background-color',color_code);
 	$('.selected_color>.color_name').text(color_name);
 });
-$(".color_box>input.text_color_input").mouseenter(function() {
+$(".color_box>input[name='text_color_input']").mouseenter(function() {
     var color_code = $(this).attr('data-color-code');
 	var color_name = $(this).attr('data-color-name');
 	$('.selected_color>.color_box').css('background-color',color_code);
 	$('.selected_color>.color_name').text(color_name);
-	$(this).parent().find('::after').css("opacity","1");
 }).mouseleave(function() {
-    var selected_color = $(".color_box>input.text_color_input:checked").attr('data-color-code');
-    var selected_name = $(".color_box>input.text_color_input:checked").attr('data-color-name');
+    var selected_color = $(".color_box>input[name='text_color_input']:checked").attr('data-color-code');
+    var selected_name = $(".color_box>input[name='text_color_input']:checked").attr('data-color-name');
     $('.selected_color>.color_box').css('background-color',selected_color);
 	$('.selected_color>.color_name').text(selected_name);
 });
 
 
+// text outline js
+function openTextOutlineTab() {
+	$('.text_outline_wrapper').css("display","block");
+}
+$('.close_outline_tab').click(function(){
+	$('.text_outline_wrapper').css("display","none");
+});
+$('.back_outline_btn').click(function(){
+	$('.text_outline_wrapper').css("display","none");
+});
+$('.color_box>input[name="text_outline_input"]').hover(function() {
+	var color_code = $(this).attr('data-color-code');
+	var color_name = $(this).attr('data-color-name');
+	$('.selected_outline_color>.color_box').css('background-color',color_code);
+	$('.selected_outline_color>.color_name').text(color_name);
+});
+$(".color_box>input[name='text_outline_input']").mouseenter(function() {
+    var color_code = $(this).attr('data-color-code');
+	var color_name = $(this).attr('data-color-name');
+	$('.selected_outline_color>.color_box').css('background-color',color_code);
+	$('.selected_outline_color>.color_name').text(color_name);
+}).mouseleave(function() {
+    var selected_color = $(".color_box>input[name='text_outline_input']:checked").attr('data-color-code');
+    var selected_name = $(".color_box>input[name='text_outline_input']:checked").attr('data-color-name');
+    $('.selected_outline_color>.color_box').css('background-color',selected_color);
+	$('.selected_outline_color>.color_name').text(selected_name);
+});
+
+
+// Text shape js
+
+function openTextShapeTab(){
+	$('.text_shape_wrapper').css("display","block");
+}
+$('.close_shape_tab').click(function(){
+	$('.text_shape_wrapper').css("display","none");
+});
+$('.back_shape_btn').click(function(){
+	$('.text_shape_wrapper').css("display","none");
+});
 
 
 
+// Change Art color js
+function openArtColorTab() {
+	$('.art_colors_wrapper').css("display","block");
+}
+$('.close_art_color_tab').click(function(){
+	$('.art_colors_wrapper').css("display","none");
+});
+$('.back_art_color_btn').click(function(){
+	$('.art_colors_wrapper').css("display","none");
+});
+$('.color_box>input[name="art_color_input"]').hover(function() {
+	var color_code = $(this).attr('data-color-code');
+	var color_name = $(this).attr('data-color-name');
+	$('.selected_art_color>.color_box').css('background-color',color_code);
+	$('.selected_art_color>.color_name').text(color_name);
+});
+$(".color_box>input[name='art_color_input']").mouseenter(function() {
+    var color_code = $(this).attr('data-color-code');
+	var color_name = $(this).attr('data-color-name');
+	$('.selected_art_color>.color_box').css('background-color',color_code);
+	$('.selected_art_color>.color_name').text(color_name);
+}).mouseleave(function() {
+    var selected_color = $(".color_box>input[name='art_color_input']:checked").attr('data-color-code');
+    var selected_name = $(".color_box>input[name='art_color_input']:checked").attr('data-color-name');
+    $('.selected_art_color>.color_box').css('background-color',selected_color);
+	$('.selected_art_color>.color_name').text(selected_name);
+});
 
 
+// Change Image color js
+function openImageColorTab() {
+	$('.image_color_wrapper').css("display","block");
+}
+$('.close_image_color_tab').click(function(){
+	$('.image_color_wrapper').css("display","none");
+});
+$('.back_image_color_btn').click(function(){
+	$('.image_color_wrapper').css("display","none");
+});
+$('.color_box>input[name="image_color_input"]').hover(function() {
+	var color_code = $(this).attr('data-color-code');
+	var color_name = $(this).attr('data-color-name');
+	$('.selected_image_color>.color_box').css('background-color',color_code);
+	$('.selected_image_color>.color_name').text(color_name);
+});
+$(".color_box>input[name='image_color_input']").mouseenter(function() {
+    var color_code = $(this).attr('data-color-code');
+	var color_name = $(this).attr('data-color-name');
+	$('.selected_image_color>.color_box').css('background-color',color_code);
+	$('.selected_image_color>.color_name').text(color_name);
+}).mouseleave(function() {
+    var selected_color = $(".color_box>input[name='image_color_input']:checked").attr('data-color-code');
+    var selected_name = $(".color_box>input[name='image_color_input']:checked").attr('data-color-name');
+    $('.selected_image_color>.color_box').css('background-color',selected_color);
+	$('.selected_image_color>.color_name').text(selected_name);
+});
 
 
+// change product variant 
+function changeProductVariant(val){
+	var front_thumb_img = $('.product_variant[data-variant="'+val+'"][data-style="front"]').attr('data-src');
+	var back_thumb_img = $('.product_variant[data-variant="'+val+'"][data-style="back"]').attr('data-src');
+	var right_thumb_img = $('.product_variant[data-variant="'+val+'"][data-style="right"]').attr('data-src');
+	var left_thumb_img = $('.product_variant[data-variant="'+val+'"][data-style="left"]').attr('data-src');
+
+	$('input[name="canvas_view_type"][view_type="front"]').length;
+
+	if($('input[name="canvas_view_type"][view_type="front"]').length > 0){
+		$('input[name="canvas_view_type"][view_type="front"]+.canvas_type_box img').attr('src', front_thumb_img);
+	}
+	if($('input[name="canvas_view_type"][view_type="back"]').length > 0){
+		$('input[name="canvas_view_type"][view_type="back"]+.canvas_type_box img').attr('src', back_thumb_img);
+	}
+	if($('input[name="canvas_view_type"][view_type="right"]').length > 0){
+		$('input[name="canvas_view_type"][view_type="right"]+.canvas_type_box img').attr('src', right_thumb_img);
+	}
+	if($('input[name="canvas_view_type"][view_type="left"]').length > 0){
+		$('input[name="canvas_view_type"][view_type="left"]+.canvas_type_box img').attr('src', left_thumb_img);
+	}
 
 
+	// console.log(" front length : ", $('input[name="canvas_view_type"][view_type="front"]').length);
 
+	// console.log(" Side length : ", $('input[name="canvas_view_type"][view_type="side"]').length);
 
+	
+	// $('input[name="canvas_view_type"]+.canvas_type_box img').attr('src', back_thumb_img);
+	// $('input[name="canvas_view_type"]+.canvas_type_box img').attr('src', right_thumb_img);
+	// $('input[name="canvas_view_type"]+.canvas_type_box img').attr('src', left_thumb_img);
+
+	var canvas_view_type = $('.canvas_view_input[name="canvas_view_type"]:checked').attr('view_type')
+	var selected_variant_img = $('.product_variant[data-variant="'+val+'"][data-style="'+canvas_view_type+'"]').attr('data-src');
+	$('#customiserImage').attr('src', selected_variant_img);
+}
 
 
 

@@ -14,7 +14,7 @@ export default function App() {
   // See documentation for <Routes /> for more info
   const pages = import.meta.globEager("./pages/**/!(*.test.[jt]sx)*.([jt]sx)");
 
-  const API_URL = "https://dea7-103-21-55-66.in.ngrok.io";
+  const API_URL = "https://aeca-103-21-55-66.in.ngrok.io/api";
   
   return (
     <PolarisProvider>
@@ -31,10 +31,10 @@ export default function App() {
                   label: "Settings",
                   destination: "/settings",
                 },
-                // {
-                //   label: "Products",
-                //   destination: "/products",
-                // },
+                {
+                  label: "Products",
+                  destination: "/products",
+                },
               ]}
             />
             <Routes pages={pages} API_URL={API_URL} />

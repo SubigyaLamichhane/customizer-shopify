@@ -138,7 +138,7 @@
                             <div class="test_settings_options">
                                 <div class="all_fonts_wrapper">
                                     <h4 onclick="openFontsTab()">Fonts <span class="selected_font_name">Arial</span></h4>
-                                    <div class="all_font_list_wrapper">
+                                    <div class="all_font_list_wrapper child_layer">
                                         <div class="settings_header font_header">
                                             <span class="back_font_btn">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11.4 20.1"><path d="M10 20.1c-.4 0-.7-.1-1-.4L.4 11c-.3-.2-.4-.6-.4-1s.1-.7.4-1L9 .4c.5-.5 1.4-.5 2 0s.5 1.4 0 2L3.4 10l7.7 7.7c.5.5.5 1.4 0 2-.3.3-.7.4-1.1.4z"></path></svg>
@@ -156,7 +156,7 @@
                                 </div>
                                 <div class="all_colors_wrapper">
                                     <h4 onclick="openTextColorTab()">Text Color <span class="selected_color_name">Black</span></h4>
-                                    <div class="text_color_wrapper">
+                                    <div class="text_color_wrapper child_layer">
                                         <div class="settings_header text_color_header">
                                             <span class="back_color_btn">
                                                 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11.4 20.1"><path d="M10 20.1c-.4 0-.7-.1-1-.4L.4 11c-.3-.2-.4-.6-.4-1s.1-.7.4-1L9 .4c.5-.5 1.4-.5 2 0s.5 1.4 0 2L3.4 10l7.7 7.7c.5.5.5 1.4 0 2-.3.3-.7.4-1.1.4z"></path></svg>
@@ -178,19 +178,26 @@
                                                 <div class="color_box" style="background-color: #000;">
                                                     <input type="radio" name="text_color_input" class="text_color_input" data-color-code="#000000" data-color-name="black" onclick="changeTextColor('#000000','black')" checked />
                                                     <span class="check_icon"><i class="fa fa-check"></i></span>
+                                                    <span class="box_outline"></span>
                                                 </div>
                                                 <div class="color_box" style="background-color: #36454F;">
                                                     <input type="radio" name="text_color_input" class="text_color_input" data-color-code="#36454F" data-color-name="Charcoal" onclick="changeTextColor('#36454F','Charcoal')"  />
                                                     <span class="check_icon"><i class="fa fa-check"></i></span>
+                                                    <span class="box_outline"></span>
                                                 </div>
                                                 <div class="color_box" style="background-color: #FF69B4;">
                                                     <input type="radio" name="text_color_input" class="text_color_input" data-color-code="#FF69B4" data-color-name="Hot Pink" onclick="changeTextColor('#FF69B4','Hot Pink')" />
                                                     <span class="check_icon"><i class="fa fa-check"></i></span>
+                                                    <span class="box_outline"></span>
                                                 </div>
                                                 <div class="color_box" style="background-color: #4169e1;">
                                                     <input type="radio" name="text_color_input" class="text_color_input" data-color-code="#4169e1" data-color-name="Royal" onclick="changeTextColor('#4169e1','Royal')" />
                                                     <span class="check_icon"><i class="fa fa-check"></i></span>
+                                                    <span class="box_outline"></span>
                                                 </div>
+                                            </div>
+                                            <div class="btn_wrapper">
+                                                <button class="theme_btn close_color_tab">Done</button>
                                             </div>
                                         </div>
                                     </div>
@@ -203,28 +210,138 @@
                                     <input type="number" id="rotatTextNumber" min="-180" max="180" onkeyup="changeRangeValue(this.value)" value="0" />
                                 </div>
                                 <div class="object_outline_wrapper">
-                                    <h4>Outline <span class="selected_outline_name">none</span></h4>
+                                    <h4 onclick="openTextOutlineTab()">Outline <span class="selected_outline_name">none</span></h4>
+                                    <div class="text_outline_wrapper child_layer">
+                                        <div class="settings_header text_outline_header">
+                                            <span class="back_outline_btn">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11.4 20.1"><path d="M10 20.1c-.4 0-.7-.1-1-.4L.4 11c-.3-.2-.4-.6-.4-1s.1-.7.4-1L9 .4c.5-.5 1.4-.5 2 0s.5 1.4 0 2L3.4 10l7.7 7.7c.5.5.5 1.4 0 2-.3.3-.7.4-1.1.4z"></path></svg>
+                                            </span>
+                                            <span class="close_outline_tab">
+                                                <i class="fa fa-close"></i>
+                                            </span>
+                                            <h4>Text Outline</h4>
+                                        </div>
+                                        <div class="text_outline_body">
+                                            
+                                            <div class="outline_thickness_container">
+                                                <h4>Choose outline thickness</h4>
+                                                <div class="ol_txt_thickness_slider_wrap">
+                                                    <input type="range" min="0" max="10" value="2" step="2" id="textOutlineThickness" name="text_outline_tick" onchange="changeTextOutlineThick()">
+                                                    <span class="ol_none_txt">Very Thin</span>
+                                                    <span class="ol_thick_txt">Very Thick</span>
+                                                    <span class="outline_step ol_step_1"></span>
+                                                    <span class="outline_step ol_step_2"></span>
+                                                    <span class="outline_step ol_step_3"></span>
+                                                    <span class="outline_step ol_step_4"></span>
+                                                    <span class="outline_step ol_step_5"></span>
+                                                    <span class="outline_step ol_step_6"></span>
+                                                </div>
+                                            </div>
+                                            <div class="outline_color_container">
+                                                <h4>Choose outline color</h4>
+                                                <div class="selected_outline_color">
+                                                    <div class="color_box" style="background-color: #000;">
+                                                        <span class="box_outline" style="opacity:1"></span>                                                   
+                                                    </div>
+                                                    <span class="color_name">Black</span>
+                                                </div>
+                                                <div class="all_colors_list all_outline_colors_list">
+                                                    <div class="color_box" style="background-color: transparent;border:1px solid #cacaca;">
+                                                        <input type="radio" name="text_outline_input" class="text_color_input" data-color-code="#00000000" data-color-name="none" onclick="changeTxtOutlineColor('#00000000','none')" checked />
+                                                        <span class="check_icon" style="color:#000"><i class="fa fa-close"></i></span>
+                                                        <span class="box_outline"></span>
+                                                    </div>
+                                                    <div class="color_box" style="background-color: #EBA006;">
+                                                        <input type="radio" name="text_outline_input" class="text_color_input" data-color-code="#EBA006" data-color-name="Athletic Gold" onclick="changeTxtOutlineColor('#EBA006','black')" />
+                                                        <span class="check_icon"><i class="fa fa-check"></i></span>
+                                                        <span class="box_outline"></span>
+                                                    </div>
+                                                    <div class="color_box" style="background-color: #36454F;">
+                                                        <input type="radio" name="text_outline_input" class="text_color_input" data-color-code="#36454F" data-color-name="Charcoal" onclick="changeTxtOutlineColor('#36454F','Charcoal')"  />
+                                                        <span class="check_icon"><i class="fa fa-check"></i></span>
+                                                        <span class="box_outline"></span>
+                                                    </div>
+                                                    <div class="color_box" style="background-color: #FF69B4;">
+                                                        <input type="radio" name="text_outline_input" class="text_color_input" data-color-code="#FF69B4" data-color-name="Hot Pink" onclick="changeTxtOutlineColor('#FF69B4','Hot Pink')" />
+                                                        <span class="check_icon"><i class="fa fa-check"></i></span>
+                                                        <span class="box_outline"></span>
+                                                    </div>
+                                                    <div class="color_box" style="background-color: #4169e1;">
+                                                        <input type="radio" name="text_outline_input" class="text_color_input" data-color-code="#4169e1" data-color-name="Royal" onclick="changeTxtOutlineColor('#4169e1','Royal')" />
+                                                        <span class="check_icon"><i class="fa fa-check"></i></span>
+                                                        <span class="box_outline"></span>
+                                                    </div>
+                                                </div>
+                                                <div class="btn_wrapper btn_group_wrapper">
+                                                    <button onclick="removeTxtOutline()" class="button remove_ol_btn">Remove Outline</button>
+                                                    <button class="theme_btn close_outline_tab">Done</button>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                                <div class="text_shape_wrapper">
-                                    <h4>Text Shape <span class="selected_font_name">none</span></h4>
+                                <div class="all_shapes_wrapper">
+                                    <h4 onclick="openTextShapeTab()">Text Shape <span class="selected_shape_name">none</span></h4>
+                                    <div class="text_shape_wrapper child_layer">
+                                        <div class="settings_header text_shape_header">
+                                            <span class="back_shape_btn">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11.4 20.1"><path d="M10 20.1c-.4 0-.7-.1-1-.4L.4 11c-.3-.2-.4-.6-.4-1s.1-.7.4-1L9 .4c.5-.5 1.4-.5 2 0s.5 1.4 0 2L3.4 10l7.7 7.7c.5.5.5 1.4 0 2-.3.3-.7.4-1.1.4z"></path></svg>
+                                            </span>
+                                            <span class="close_shape_tab">
+                                                <i class="fa fa-close"></i>
+                                            </span>
+                                            <h4>Text Shape</h4>
+                                        </div>
+                                        <div class="text_shape_body">
+                                            <h4>Choose Text Shape</h4>
+                                            <div class="shape_type_list">
+                                                <div class="txt_shape_container normal_text" onclick='changeTextEffect("normal")'>
+                                                    <p>Normal</p>
+                                                </div>
+                                                <div class="txt_shape_container curve_text" onclick='changeTextEffect("curve")'>
+                                                    <p>Curve</p>
+                                                </div>
+                                                <div class="txt_shape_container arch_text" onclick='changeTextEffect("arch")'>
+                                                    <p>Arch</p>
+                                                </div>
+                                                <div class="txt_shape_container bridge_text" onclick='changeTextEffect("bridge")'>
+                                                    <p>Bridge</p>
+                                                </div>
+                                                <div class="txt_shape_container valley_text" onclick='changeTextEffect("valley")'>
+                                                    <p>Valley</p>
+                                                </div>
+                                                <div class="txt_shape_container pinch_text" onclick='changeTextEffect("pinch")'>
+                                                    <p>Pinch</p>
+                                                </div>
+                                            </div>
+                                            <div class="btn_wrapper btn_group_wrapper">
+                                                <button onclick="removeTxtShape()" class="button remove_shape_btn">Remove Shape</button>
+                                                <button class="theme_btn close_shape_tab">Done</button>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                                 <div class="text_size_wrapper">
-                                    <p>Text Size</p>
+                                    <p>
+                                        <strong>Text Size</strong>
+                                        <small>Enter font size in pixel format.</small>
+                                    </p>
+                                    <input type="number" id="textFontSize" min="10" onchange="changeTxtFontSize(this.value)" value="26" />
                                 </div>
                                 <div class="object_normal_settings">
                                     <div class="object_center_option">
-                                        <span>
+                                        <span onclick="centerTextObject()">
                                             <img src="assets/images/center-object-icon.svg" />
                                             <small>center</small>
                                         </span>
                                     </div>
                                     <div class="text_alignment_option">
                                         <div class="options">
-                                            <span>
+                                            <span class="disable">
                                                 <img src="assets/images/left-align-icon.svg" />
                                             </span>
-                                            <span><img src="assets/images/center-align-icon.svg" /></span>
-                                            <span><img src="assets/images/right-align-icon.svg" /></span>
+                                            <span class=""><img src="assets/images/center-align-icon.svg" /></span>
+                                            <span class="disable"><img src="assets/images/right-align-icon.svg" /></span>
                                         </div>
                                         <small>Text Alignment</small>
                                     </div>
@@ -235,122 +352,503 @@
                 </div>
 
                 <div id="artSettings" class="ct_content_tab">
-                    <div class="settings_header art_header">
-                        <span class="back_btn">
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11.4 20.1"><path d="M10 20.1c-.4 0-.7-.1-1-.4L.4 11c-.3-.2-.4-.6-.4-1s.1-.7.4-1L9 .4c.5-.5 1.4-.5 2 0s.5 1.4 0 2L3.4 10l7.7 7.7c.5.5.5 1.4 0 2-.3.3-.7.4-1.1.4z"></path></svg>
-                        </span>
-                        <span class="close_content_tab">
-                            <i class="fa fa-close"></i>
-                        </span>
-                        <h4>Artwork Categories</h4>
-                    </div>
-                    <div class="settings_body art_body">
-                        <div class="art_serach_wrapper">
-                            <input type="text" name="art_search" id="artSearch" class="art_search_input" placeholder="Search For Artwork" />
+                    <div id="addArtTab" class="top_layer">
+                        <div class="settings_header art_header">
+                            <span class="back_btn">
+                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11.4 20.1"><path d="M10 20.1c-.4 0-.7-.1-1-.4L.4 11c-.3-.2-.4-.6-.4-1s.1-.7.4-1L9 .4c.5-.5 1.4-.5 2 0s.5 1.4 0 2L3.4 10l7.7 7.7c.5.5.5 1.4 0 2-.3.3-.7.4-1.1.4z"></path></svg>
+                            </span>
+                            <span class="close_content_tab">
+                                <i class="fa fa-close"></i>
+                            </span>
+                            <h4>Artwork Categories</h4>
                         </div>
-                        <div class="art_design_wrapper">
-                            <ul class="parent" level="0">
-                                <li>
-                                    <div class="open_child_options title_image" style="background-color: #a65aa1;">
-                                        <img src="assets/images/face.svg" />
-                                        <span>Emojis</span>
+                        <div class="settings_body art_body">
+                            <div class="art_serach_wrapper">
+                                <input type="text" name="art_search" id="artSearch" class="art_search_input" placeholder="Search For Artwork" />
+                            </div>
+                            <div class="art_design_wrapper">
+                                <ul class="parent" level="0">
+                                    <li>
+                                        <div class="open_child_options title_image" style="background-color: #a65aa1;">
+                                            <img src="assets/images/face.svg" />
+                                            <span>Emojis</span>
+                                        </div>
+                                        <ul class="child_1 art_category_option emojis_child" level="1" parent_menu="Artwork Categories">
+                                            <li>
+                                                <div class="open_child_options art_sub_title">*Most Popular*</div>
+                                                <ul class="child_2 art_img_option most_popular_child" level="2" parent_menu="Emojis">
+                                                    <li onclick="addArtDesign('assets/images/most_popular_img1.png')">
+                                                        <span>
+                                                            <img src="assets/images/most_popular_img1.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/most_popular_img2.png')">
+                                                        <span>
+                                                            <img src="assets/images/most_popular_img2.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/most_popular_img3.png')">
+                                                        <span>
+                                                            <img src="assets/images/most_popular_img3.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/most_popular_img4.png')">
+                                                        <span>
+                                                            <img src="assets/images/most_popular_img4.png" />
+                                                        </span>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li>
+                                                <div class="open_child_options art_sub_title">Smileys</div>
+                                                <ul class="child_2 art_category_option smileys_child" level="2" parent_menu="Emojis">
+                                                    <li>
+                                                        <div class="open_child_options art_sub_title">category 1</div>
+                                                        <ul class="child_3 art_img_option category_1_child" level="3" parent_menu="Smileys">
+                                                            <li onclick="addArtDesign('assets/images/most_popular_img3.png')">
+                                                                <span>
+                                                                    <img src="assets/images/most_popular_img3.png" />
+                                                                </span>
+                                                            </li>
+                                                            <li onclick="addArtDesign('assets/images/most_popular_img4.png')">
+                                                                <span>
+                                                                    <img src="assets/images/most_popular_img4.png" />
+                                                                </span>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                    <li>
+                                                        <div class="open_child_options art_sub_title">category 2</div>
+                                                        <ul class="child_3 art_img_option category_2_child" level="3" parent_menu="Smileys">
+                                                            <li onclick="addArtDesign('assets/images/most_popular_img1.png')">
+                                                                <span>
+                                                                    <img src="assets/images/most_popular_img1.png" />
+                                                                </span>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                    <li>
+                                                        <div class="open_child_options art_sub_title">category 3</div>
+                                                        <ul class="child_3 art_img_option category_3_child" level="3" parent_menu="Smileys">
+                                                            <li onclick="addArtDesign('assets/images/most_popular_img2.png')">
+                                                                <span>
+                                                                    <img src="assets/images/most_popular_img2.png" />
+                                                                </span>
+                                                            </li>
+                                                            <li onclick="addArtDesign('assets/images/most_popular_img3.png')">
+                                                                <span>
+                                                                    <img src="assets/images/most_popular_img3.png" />
+                                                                </span>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                    <li>
+                                                        <div class="open_child_options art_sub_title">category 4</div>
+                                                        <ul class="child_3 art_img_option category_4_child" level="3" parent_menu="Smileys">
+                                                            <li onclick="addArtDesign('assets/images/most_popular_img1.png')">
+                                                                <span>
+                                                                    <img src="assets/images/most_popular_img1.png" />
+                                                                </span>
+                                                            </li>
+                                                            <li onclick="addArtDesign('assets/images/most_popular_img2.png')">
+                                                                <span>
+                                                                    <img src="assets/images/most_popular_img2.png" />
+                                                                </span>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li>
+                                                <div class="open_child_options art_sub_title">People</div>
+                                                <ul class="child_2 art_img_option people_child" level="2" parent_menu="Emojis">
+                                                    <li onclick="addArtDesign('assets/images/people1.png')">
+                                                        <span>
+                                                            <img src="assets/images/people1.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/people2.png')">
+                                                        <span>
+                                                            <img src="assets/images/people2.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/people3.png')">
+                                                        <span>
+                                                            <img src="assets/images/people3.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/people4.png')">
+                                                        <span>
+                                                            <img src="assets/images/people4.png" />
+                                                        </span>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li>
+                                                <div class="open_child_options art_sub_title">Hands</div>
+                                                <ul class="child_2 art_img_option hands_child" level="2" parent_menu="Emojis">
+                                                    <li onclick="addArtDesign('assets/images/hand1.png')">
+                                                        <span>
+                                                            <img src="assets/images/hand1.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/hand2.png')">
+                                                        <span>
+                                                            <img src="assets/images/hand2.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/hand3.png')">
+                                                        <span>
+                                                            <img src="assets/images/hand3.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/hand4.png')">
+                                                        <span>
+                                                            <img src="assets/images/hand4.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/hand5.png')">
+                                                        <span>
+                                                            <img src="assets/images/hand5.png" />
+                                                        </span>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li>
+                                                <div class="open_child_options art_sub_title">Animals</div>
+                                                <ul class="child_2 art_img_option animals_child" level="2" parent_menu="Emojis">
+                                                    <li onclick="addArtDesign('assets/images/animal1.png')">
+                                                        <span>
+                                                            <img src="assets/images/animal1.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/animal2.png')">
+                                                        <span>
+                                                            <img src="assets/images/animal2.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/animal3.png')">
+                                                        <span>
+                                                            <img src="assets/images/animal3.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/animal4.png')">
+                                                        <span>
+                                                            <img src="assets/images/animal4.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/animal5.png')">
+                                                        <span>
+                                                            <img src="assets/images/animal5.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/animal6.png')">
+                                                        <span>
+                                                            <img src="assets/images/animal6.png" />
+                                                        </span>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <div class="open_child_options title_image" style="background-color:rgb(56, 81, 163)">
+                                            <img src="assets/images/face.svg" />
+                                            <span>Shapes & Symbols</span>
+                                        </div>
+                                        <ul class="child_1 art_category_option shapes_symbols_child" level="1" parent_menu="Artwork Categories">
+                                            <li>
+                                                <div class="open_child_options art_sub_title">*Most Popular Symbols*</div>
+                                                <ul class="child_2 art_img_option most_popular_symbols_child" level="2" parent_menu="Shapes & Symbols">
+                                                    <li onclick="addArtDesign('assets/images/most_popular_img1.png')">
+                                                        <span>
+                                                            <img src="assets/images/most_popular_img1.png" />
+                                                        </span>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li>
+                                                <div class="open_child_options art_sub_title">Astrology</div>
+                                                <ul class="child_2 art_category_option astrology_child" level="2" parent_menu="Shapes & Symbols">
+                                                    <li>
+                                                        <div class="open_child_options art_sub_title">General Astrology</div>
+                                                        <ul class="child_3 art_img_option general_astrology_child" level="3" parent_menu="Astrology">
+                                                            <li onclick="addArtDesign('assets/images/most_popular_img3.png')">
+                                                                <span>
+                                                                    <img src="assets/images/most_popular_img3.png" />
+                                                                </span>
+                                                            </li>
+                                                            <li onclick="addArtDesign('assets/images/most_popular_img4.png')">
+                                                                <span>
+                                                                    <img src="assets/images/most_popular_img4.png" />
+                                                                </span>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                    <li>
+                                                        <div class="open_child_options art_sub_title">Capricon</div>
+                                                        <ul class="child_3 art_img_option capricon_child" level="3" parent_menu="Astrology">
+                                                            <li onclick="addArtDesign('assets/images/most_popular_img1.png')">
+                                                                <span>
+                                                                    <img src="assets/images/most_popular_img1.png" />
+                                                                </span>
+                                                            </li>
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                            <li>
+                                                <div class="open_child_options art_sub_title">Anchor</div>
+                                                <ul class="child_2 art_img_option anchor_child" level="2" parent_menu="Shapes & Symbols">
+                                                    <li onclick="addArtDesign('assets/images/people1.png')">
+                                                        <span>
+                                                            <img src="assets/images/people1.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/people2.png')">
+                                                        <span>
+                                                            <img src="assets/images/people2.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/people3.png')">
+                                                        <span>
+                                                            <img src="assets/images/people3.png" />
+                                                        </span>
+                                                    </li>
+                                                    <li onclick="addArtDesign('assets/images/people4.png')">
+                                                        <span>
+                                                            <img src="assets/images/people4.png" />
+                                                        </span>
+                                                    </li>
+                                                </ul>
+                                            </li>
+                                        </ul>
+                                    </li>
+                                    <li>
+                                        <div class="title_image" style="background-color: rgb(92, 179, 170);"><span>Sports & Games</span></div>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="editArtTab" class="child_layer">
+                        <div class="settings_header art_header">
+                            <span class="close_content_tab">
+                                <i class="fa fa-close"></i>
+                            </span>
+                            <h5>Edit Art</h5>
+                        </div>
+                        <div class="settings_body art_body">
+                            <div class="edit_art_settings_wrap">
+                                <div class="normal_customisation_options">
+                                    <div class="art_object_center">
+                                        <span onclick="centerArtObject()">
+                                            <img src="assets/images/center-object-icon.svg" />
+                                            <small>Center</small>
+                                        </span>
                                     </div>
-                                    <ul class="child_1 art_category_option emojis_child" level="1" parent_menu="Artwork Categories">
-                                        <li>
-                                            <div class="open_child_options art_sub_title">*Most Popular*</div>
-                                            <ul class="child_2 art_img_option most_popular_child" level="2" parent_menu="Emojis">
-                                                <li>
-                                                    <span>
-                                                        <img src="assets/images/most_popular_img1.png" />
-                                                    </span>
-                                                </li>
-                                                <li>
-                                                    <span>
-                                                        <img src="assets/images/most_popular_img2.png" />
-                                                    </span>
-                                                </li>
-                                                <li>
-                                                    <span>
-                                                        <img src="assets/images/most_popular_img3.png" />
-                                                    </span>
-                                                </li>
-                                                <li>
-                                                    <span>
-                                                        <img src="assets/images/most_popular_img4.png" />
-                                                    </span>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li>
-                                            <div class="open_child_options art_sub_title">Smileys</div>
-                                            <ul class="child_2 art_category_option smileys_child" level="2" parent_menu="Emojis">
-                                                <li>
-                                                    <div class="art_sub_title">category 1</div>
-                                                </li>
-                                                <li>
-                                                    <div class="art_sub_title">category 2</div>
-                                                </li>
-                                                <li>
-                                                    <div class="art_sub_title">category 3</div>
-                                                </li>
-                                                <li>
-                                                    <div class="art_sub_title">category 4</div>
-                                                </li>
-                                            </ul>
-                                        </li>
-                                        <li>People</li>
-                                        <li>Hands</li>
-                                        <li>Animals</li>
-                                    </ul>
-                                </li>
-                                <li>
-                                    <div class="title_image" style="background-color:rgb(56, 81, 163)"><span>Shapes & Symbols</span></div>
-                                </li>
-                                <li>
-                                    <div class="title_image" style="background-color: rgb(92, 179, 170);"><span>Sports & Games</span></div>
-                                </li>
-                            </ul>
+                                    <div class="art_flip_option">
+                                        <div class="options">
+                                            <span onclick="flipXArt()">
+                                                <img src="assets/images/flip_x.svg" />
+                                            </span>
+                                            <span onclick="flipYArt()"><img src="assets/images/flip_y.svg" /></span>
+                                        </div>
+                                        <small>Flip</small>
+                                    </div>
+                                    <div class="art_rotation_option">
+                                        <p><strong>Rotation</strong></p>
+                                        <div class="range_slider_wrap">
+                                            <input type="range" min="-180" max="180" id="rotatArtRangeSlide" name="rotation_slider" value="0" step="1" oninput="changeArtInputValue(this.value)" />
+                                        </div>
+                                        <input type="number" id="rotatArtNumber" min="-180" max="180" onkeyup="changeArtRangeValue(this.value)" value="0" />
+                                    </div>
+                                </div>
+                                <div class="edit_art_color_wrapper">
+                                    <h4 onclick="openArtColorTab()">Edit Color <span class="selected_art_color_name">none</span></h4>
+                                    <div class="art_colors_wrapper">
+                                        <div class="settings_header art_colors_header">
+                                            <span class="back_art_color_btn">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11.4 20.1"><path d="M10 20.1c-.4 0-.7-.1-1-.4L.4 11c-.3-.2-.4-.6-.4-1s.1-.7.4-1L9 .4c.5-.5 1.4-.5 2 0s.5 1.4 0 2L3.4 10l7.7 7.7c.5.5.5 1.4 0 2-.3.3-.7.4-1.1.4z"></path></svg>
+                                            </span>
+                                            <span class="close_art_color_tab">
+                                                <i class="fa fa-close"></i>
+                                            </span>
+                                            <h4>Art Colors</h4>
+                                        </div>
+                                        <div class="art_colors_body">
+                                            <div class="art_color_container">
+                                                <h4>Select a color</h4>
+                                                <div class="selected_art_color">
+                                                    <div class="color_box" style="background-color: #000;">
+                                                        <span class="box_outline" style="opacity:1"></span>                                                   
+                                                    </div>
+                                                    <span class="color_name">Black</span>
+                                                </div>
+                                                <div class="all_colors_list all_art_colors_list">
+                                                    <div class="color_box" style="background-color: transparent;border:1px solid #cacaca;">
+                                                        <input type="radio" name="art_color_input" class="text_color_input" data-color-code="#00000000" data-color-name="none" onclick="changeArtColor('#00000000','none')" checked />
+                                                        <span class="check_icon" style="color:#000"><i class="fa fa-close"></i></span>
+                                                        <span class="box_outline"></span>
+                                                    </div>
+                                                    <div class="color_box" style="background-color: #EBA006;">
+                                                        <input type="radio" name="art_color_input" class="text_color_input" data-color-code="#EBA006" data-color-name="Athletic Gold" onclick="changeArtColor('#EBA006','black')" />
+                                                        <span class="check_icon"><i class="fa fa-check"></i></span>
+                                                        <span class="box_outline"></span>
+                                                    </div>
+                                                    <div class="color_box" style="background-color: #36454F;">
+                                                        <input type="radio" name="art_color_input" class="text_color_input" data-color-code="#36454F" data-color-name="Charcoal" onclick="changeArtColor('#36454F','Charcoal')"  />
+                                                        <span class="check_icon"><i class="fa fa-check"></i></span>
+                                                        <span class="box_outline"></span>
+                                                    </div>
+                                                    <div class="color_box" style="background-color: #FF69B4;">
+                                                        <input type="radio" name="art_color_input" class="text_color_input" data-color-code="#FF69B4" data-color-name="Hot Pink" onclick="changeArtColor('#FF69B4','Hot Pink')" />
+                                                        <span class="check_icon"><i class="fa fa-check"></i></span>
+                                                        <span class="box_outline"></span>
+                                                    </div>
+                                                    <div class="color_box" style="background-color: #4169e1;">
+                                                        <input type="radio" name="art_color_input" class="text_color_input" data-color-code="#4169e1" data-color-name="Royal" onclick="changeArtColor('#4169e1','Royal')" />
+                                                        <span class="check_icon"><i class="fa fa-check"></i></span>
+                                                        <span class="box_outline"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
 
                 <div id="uploadSettings" class="ct_content_tab">
-                    <div class="settings_header upload_header">
-                        <span class="close_content_tab">
-                            <i class="fa fa-close"></i>
-                        </span>
-                        <h4>Upload</h4>
+                    <div id="addUploadTab" class="top_layer">
+                        <div class="settings_header upload_header">
+                            <span class="close_content_tab">
+                                <i class="fa fa-close"></i>
+                            </span>
+                            <h4>Upload</h4>
+                        </div>
+                        <div class="settings_body upload_body">
+                            <h4>Choose a file to upload</h4>
+                            <div class="upload_input_wrapper">
+                                <input type="file" name="upload_file" id="uploadFile">
+                                <p>The higher the resolution, the better your upload will look on your gear.</p>
+                                <img src="assets/images/drop_img.svg">
+                                <h5>Drag & Drop or <br/> 
+                                    <span>Browse</span>  Your Computer
+                                </h5>
+                            </div>   
+                            <div class="file_info_wrap">
+                                <h6>Preferred file types (Max size: 5 MB)</h6>
+                                <p>These types of files look amazing when printed:</p>
+                                <ul class="supported_file_wrapper">
+                                    <li>.JPG</li>
+                                    <li>.JPEG</li>
+                                    <li>.PNG</li>
+                                  <!--  <li class="fav_type">.PDF</li>
+                                    <li class="fav_type">.AI</li>
+                                    <li class="fav_type">.EPS</li>
+                                     <li>.GIF</li>
+                                    <li>.BMP</li>
+                                    <li>.PSD</li> -->
+                                </ul>
+                                <!-- <p class="file_right_content">*.PDF, .AI, .EPS are our favorites</p> -->
+                                <br/>
+                                <h6>Other file types</h6>
+                                <p>Have a different type of file? Email it to us and we’ll have it ready for you to use in a few business hours.</p>
+                            </div>                     
+                        </div>
                     </div>
-                    <div class="settings_body upload_body">
-                        <h4>Choose a file to upload</h4>
-                        <div class="upload_input_wrapper">
-                            <input type="file" name="upload_file" id="uploadFile">
-                            <p>The higher the resolution, the better your upload will look on your gear.</p>
-                            <img src="assets/images/drop_img.svg">
-                            <h5>Drag & Drop or <br/> 
-                                <span>Browse</span>  Your Computer
-                            </h5>
-                        </div>   
-                        <div class="file_info_wrap">
-                            <h6>Preferred file types (Max size: 5 MB)</h6>
-                            <p>These types of files look amazing when printed:</p>
-                            <ul class="supported_file_wrapper">
-                                <li>.JPG</li>
-                                <li>.JPEG</li>
-                                <li>.PNG</li>
-                                <li class="fav_type">.PDF</li>
-                                <li class="fav_type">.AI</li>
-                                <li class="fav_type">.EPS</li>
-                                <li>.GIF</li>
-                                <li>.BMP</li>
-                                <li>.PSD</li>
-                            </ul>
-                            <p class="file_right_content">*.PDF, .AI, .EPS are our favorites</p>
-                            <br/>
-                            <h6>Other file types</h6>
-                            <p>Have a different type of file? Email it to us and we’ll have it ready for you to use in a few business hours.</p>
-                        </div>                     
+                    <div id="editUploadTab" class="child_layer">
+                        <div class="settings_header art_header">
+                            <span class="close_content_tab">
+                                <i class="fa fa-close"></i>
+                            </span>
+                            <h5>Edit Upload</h5>
+                        </div>
+                        <div class="settings_body art_body">
+                            <div class="edit_upload_settings_wrap">
+                                <div class="normal_customisation_options">
+                                    <div class="art_object_center">
+                                        <span onclick="centerArtObject()">
+                                            <img src="assets/images/center-object-icon.svg" />
+                                            <small>Center</small>
+                                        </span>
+                                    </div>
+                                    <div class="art_flip_option">
+                                        <div class="options">
+                                            <span onclick="flipXArt()">
+                                                <img src="assets/images/flip_x.svg" />
+                                            </span>
+                                            <span onclick="flipYArt()"><img src="assets/images/flip_y.svg" /></span>
+                                        </div>
+                                        <small>Flip</small>
+                                    </div>
+                                    <div class="art_rotation_option">
+                                        <p><strong>Rotation</strong></p>
+                                        <div class="range_slider_wrap">
+                                            <input type="range" min="-180" max="180" id="rotatArtRangeSlide" name="rotation_slider" value="0" step="1" oninput="changeArtInputValue(this.value)" />
+                                        </div>
+                                        <input type="number" id="rotatArtNumber" min="-180" max="180" onkeyup="changeArtRangeValue(this.value)" value="0" />
+                                    </div>
+                                </div>
+                                <div class="edit_image_color_wrapper">
+                                    <h4 onclick="openImageColorTab()">Edit Color <span class="selected_image_color_name">none</span></h4>
+                                    <div class="image_color_wrapper">
+                                        <div class="settings_header image_colors_header">
+                                            <span class="back_image_color_btn">
+                                                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 11.4 20.1"><path d="M10 20.1c-.4 0-.7-.1-1-.4L.4 11c-.3-.2-.4-.6-.4-1s.1-.7.4-1L9 .4c.5-.5 1.4-.5 2 0s.5 1.4 0 2L3.4 10l7.7 7.7c.5.5.5 1.4 0 2-.3.3-.7.4-1.1.4z"></path></svg>
+                                            </span>
+                                            <span class="close_image_color_tab">
+                                                <i class="fa fa-close"></i>
+                                            </span>
+                                            <h4>Upload Colors</h4>
+                                        </div>
+                                        <div class="image_colors_body">
+                                            <div class="image_color_container">
+                                                <h4>Select a color</h4>
+                                                <div class="selected_image_color">
+                                                    <div class="color_box" style="background-color: #000;">
+                                                        <span class="box_outline" style="opacity:1"></span>                                                   
+                                                    </div>
+                                                    <span class="color_name">Black</span>
+                                                </div>
+                                                <div class="all_colors_list all_image_colors_list">
+                                                    <div class="color_box" style="background-color: transparent;border:1px solid #cacaca;">
+                                                        <input type="radio" name="image_color_input" class="text_color_input" data-color-code="#00000000" data-color-name="none" onclick="changeImageColor('#00000000','none')" checked />
+                                                        <span class="check_icon" style="color:#000"><i class="fa fa-close"></i></span>
+                                                        <span class="box_outline"></span>
+                                                    </div>
+                                                    <div class="color_box" style="background-color: #EBA006;">
+                                                        <input type="radio" name="image_color_input" class="text_color_input" data-color-code="#EBA006" data-color-name="Athletic Gold" onclick="changeImageColor('#EBA006','black')" />
+                                                        <span class="check_icon"><i class="fa fa-check"></i></span>
+                                                        <span class="box_outline"></span>
+                                                    </div>
+                                                    <div class="color_box" style="background-color: #36454F;">
+                                                        <input type="radio" name="image_color_input" class="text_color_input" data-color-code="#36454F" data-color-name="Charcoal" onclick="changeImageColor('#36454F','Charcoal')"  />
+                                                        <span class="check_icon"><i class="fa fa-check"></i></span>
+                                                        <span class="box_outline"></span>
+                                                    </div>
+                                                    <div class="color_box" style="background-color: #FF69B4;">
+                                                        <input type="radio" name="image_color_input" class="text_color_input" data-color-code="#FF69B4" data-color-name="Hot Pink" onclick="changeImageColor('#FF69B4','Hot Pink')" />
+                                                        <span class="check_icon"><i class="fa fa-check"></i></span>
+                                                        <span class="box_outline"></span>
+                                                    </div>
+                                                    <div class="color_box" style="background-color: #4169e1;">
+                                                        <input type="radio" name="image_color_input" class="text_color_input" data-color-code="#4169e1" data-color-name="Royal" onclick="changeImageColor('#4169e1','Royal')" />
+                                                        <span class="check_icon"><i class="fa fa-check"></i></span>
+                                                        <span class="box_outline"></span>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+
                 </div>
 
                 <div id="productColorSettings" class="ct_content_tab">
@@ -363,32 +861,16 @@
                     <div class="settings_body prd_color_body">
                          <h4>Colors:</h4>
                          <div class="prd_color_option">
-                            <div class="red" style="background-color:#000000">
-                                 <input type="radio" name="product_color" value="#000000" checked="checked" />
+                            <div class="prd_color_box" style="background-color:#ffffff">
+                                 <input type="radio" name="product_color" value="#ffffff" data-variant-name="white" checked="checked" onchange="changeProductVariant('white')" />
                                  <span class="check_icon"><i class="fa fa-check"></i></span>
                              </div>
-                             <div class="red" style="background-color:#ff0000">
-                                 <input type="radio" name="product_color" value="#ff0000" />
+                             <div class="prd_color_box" style="background-color:#ff0000">
+                                 <input type="radio" name="product_color" value="#ff0000" data-variant-name="red" onchange="changeProductVariant('red')" />
                                  <span class="check_icon"><i class="fa fa-check"></i></span>
                              </div>
-                             <div class="green" style="background-color:#00ff00">
-                                 <input type="radio" name="product_color" value="#00ff00" />
-                                 <span class="check_icon"><i class="fa fa-check"></i></span>
-                             </div>
-                             <div class="blue" style="background-color:#0000ff">
-                                 <input type="radio" name="product_color" value="#0000ff" />
-                                 <span class="check_icon"><i class="fa fa-check"></i></span>
-                             </div>
-                             <div class="orange" style="background-color:rgb(228, 94, 42)">
-                                 <input type="radio" name="product_color" value="rgb(228, 94, 42)" />
-                                 <span class="check_icon"><i class="fa fa-check"></i></span>
-                             </div>
-                             <div class="purple" style="background-color:rgb(84, 55, 116)">
-                                 <input type="radio" name="product_color" value="rgb(84, 55, 116)" />
-                                 <span class="check_icon"><i class="fa fa-check"></i></span>
-                             </div>
-                             <div class="gray" style="background-color:rgb(175, 175, 175)">
-                                 <input type="radio" name="product_color" value="rgb(175, 175, 175)" />
+                             <div class="prd_color_box" style="background-color:#004731">
+                                 <input type="radio" name="product_color" value="#004731" data-variant-name="green" onchange="changeProductVariant('green')" />
                                  <span class="check_icon"><i class="fa fa-check"></i></span>
                              </div>
                          </div>   
@@ -472,18 +954,68 @@
 
         </div>
         <div class="customise_product_wrapper">
+
+            <div class="canvas_view_options">
+                <div class="view_style front_option">
+                    <input type="radio" name="canvas_view_type" view_type="front" onchange="changeCanvasType('front')" class="canvas_view_input" checked />
+                    <div class="canvas_type_box">
+                        <img src="assets/images/tshirt-white.png" />
+                        <span>Front</span>
+                    </div>
+                </div>
+                <div class="view_style back_option">
+                    <input type="radio" name="canvas_view_type" view_type="back" onchange="changeCanvasType('back')" class="canvas_view_input" />
+                    <div class="canvas_type_box">
+                        <img src="assets/images/tshirt-white-back.png" />
+                        <span>Back</span>
+                    </div>
+                </div>
+                <div class="view_style sleeve_right">
+                    <input type="radio" name="canvas_view_type" view_type="right" onchange="changeCanvasType('right')" class="canvas_view_input" />
+                    <div class="canvas_type_box">
+                        <img src="assets/images/tshirt-white-right-sleeve.png" />
+                        <span>R. Sleeve</span>
+                    </div>
+                </div>
+                <div class="view_style sleeve_left">
+                    <input type="radio" name="canvas_view_type" view_type="left" onchange="changeCanvasType('left')" class="canvas_view_input" />
+                    <div class="canvas_type_box">
+                        <img src="assets/images/tshirt-white-left-sleeve.png" />
+                        <span>L. Sleeve</span>
+                    </div>
+                </div>
+            </div>
+
             <!-- Create the container of the tool -->
-            <div id="tshirt-div">
-                <!-- 
-                    Initially, the image will have the background tshirt that has transparency
-                    So we can simply update the color with CSS or JavaScript dinamically
-                -->
-                <img id="tshirt-backgroundpicture" src="assets/images/background-t-shirt.png"/>
+            <div id="customiserContainer">
+                
+                <img id="customiserImage" src="assets/images/tshirt-white.png"/>
+                <!-- ---- red variant images -->
+                <input type="hidden" class="product_variant" data-style="front" data-variant="red" data-src="assets/images/tshirt-red.png">
+                <input type="hidden" class="product_variant" data-style="back" data-variant="red" data-src="assets/images/tshirt-red-back.png">
+                <input type="hidden" class="product_variant" data-style="right" data-variant="red" data-src="assets/images/tshirt-red-right-sleeve.png">
+                <input type="hidden" class="product_variant" data-style="left" data-variant="red" data-src="assets/images/tshirt-red-left-sleeve.png">
+
+                <!-- ---- green variant images -->
+                <input type="hidden" class="product_variant" data-style="front" data-variant="green" data-src="assets/images/tshirt-green.png">
+                <input type="hidden" class="product_variant" data-style="back" data-variant="green" data-src="assets/images/tshirt-green-back.png">
+                <input type="hidden" class="product_variant" data-style="right" data-variant="green" data-src="assets/images/tshirt-green-right-sleeve.png">
+                <input type="hidden" class="product_variant" data-style="left" data-variant="green" data-src="assets/images/tshirt-green-left-sleeve.png">
+
+                <!-- ---- white variant images -->
+                <input type="hidden" class="product_variant" data-style="front" data-variant="white" data-src="assets/images/tshirt-white.png">
+                <input type="hidden" class="product_variant" data-style="back" data-variant="white" data-src="assets/images/tshirt-white-back.png">
+                <input type="hidden" class="product_variant" data-style="right" data-variant="white" data-src="assets/images/tshirt-white-right-sleeve.png">
+                <input type="hidden" class="product_variant" data-style="left" data-variant="white" data-src="assets/images/tshirt-white-left-sleeve.png">
+
+                <div class="customiseLoader">
+                    <img src="assets/images/loader-white.gif">
+                </div>
 
                 <div id="drawingArea" class="drawing-area">                 
-                    <div class="canvas-container">
-                        <canvas id="tshirt-canvas" width="200" height="300"></canvas>
-
+                    <div class="canvas-container custom_canvas" style="display:block" id="frontCanvasWrap">
+                        <canvas id="front-canvas" width="200" height="300"></canvas>
+                    </div>
                         <div class="context_menu_wrap" oncontextmenu="return false;">
                             <ul>
                                 <li onclick="Cut();">Cut</li>
@@ -492,6 +1024,20 @@
                                 <li onclick="Delete()">Delete</li>
                             </ul>
                         </div>
+                        <div class="delete_icon_wrap canvas_action_icons">
+                            <img src="assets/images/delete-icon.svg"/>
+                        </div>
+                        <div class="scale_icon_wrap canvas_action_icons" ondrag="reSizeObject()" draggable="true">
+                            <img src="assets/images/scale-icon.svg"/>
+                        </div>
+                    <div class="canvas-container custom_canvas" id="backCanvasWrap">
+                        <canvas id="back-canvas" width="200" height="300"></canvas>
+                    </div>
+                    <div class="canvas-container custom_canvas" id="leftCanvasWrap">
+                        <canvas id="left-canvas" width="80" height="80"></canvas>
+                    </div>
+                    <div class="canvas-container custom_canvas" id="rightCanvasWrap">
+                        <canvas id="right-canvas" width="80" height="80"></canvas>
                     </div>
                 </div>
             </div>
@@ -504,8 +1050,17 @@
         <script src="https://cdn.jsdelivr.net/gh/s-yadav/contextMenu.js/contextMenu.min.js"></script>
         <!-- Include Fabric.js in the page -->
         <script src="assets/js/fabric.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/1.8.349/pdf.min.js"></script>
         <!-- <script src="assets/js/icons.js"></script> -->
         <script src="assets/js/custom.js"></script>
         <script src="assets/js/custom-canvas.js"></script>
+
     </body>
 </html>
+
+
+
+
+
+
+

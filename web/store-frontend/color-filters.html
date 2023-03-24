@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        
+    </style>
+</head>
+<body>
+    <script src="assets/js/fabric.min.js"></script>
+<button id="hue">Change to random color</button>
+<button id="reset">Reset</button>
+<canvas id="c" width=600 height=600 ></canvas>
+    <script type="text/javascript">
+        var canvas = new fabric.StaticCanvas('c');
+var image;
+var imgEl = document.createElement('img');
+imgEl.crossOrigin = 'anonymous';
+imgEl.onload = function() {
+  image = new fabric.Image(imgEl);
+  image.filters = [new fabric.Image.filters.HueRotation()];
+  canvas.add(image);
+}
+imgEl.src = 'https://cdn4.buysellads.net/uu/1/127419/1670532177-Stock.jpg';
+
+
+document.getElementById('hue').onclick= function() {
+  image.filters[0].rotation = 2 * Math.random() - 1;
+  console.log(image.filters[0].rotation);
+  image.applyFilters();
+  canvas.requestRenderAll();
+};
+document.getElementById('reset').onclick= function() {
+    canvas.getObjects()[0].filters = [];
+    canvas.getObjects()[0].applyFilters();
+    canvas.renderAll();
+};
+
+    </script>
+</body>
+</html>
+
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <style>
+        canvas{
+ border:2px solid #000;
+}
+    </style>
+</head>
+<body>
+    <script src="assets/js/fabric.min.js"></script>
+<canvas id='c' width=400 height=400></canvas>
+    <script type="text/javascript">
+        var canvas = new fabric.Canvas('c');
+fabric.Image.fromURL('https://cdn4.buysellads.net/uu/1/127419/1670532177-Stock.jpg',function(img){
+  img.set({
+   scaleX:0.6,
+   scaleY:0.7
+  })
+  canvas.add(img);
+  var filter = new fabric.Image.filters.BlendColor({
+   color:'purple',
+   mode: 'tint',
+   alpha: 0.8
+  });
+  img.filters.push(filter);
+  img.applyFilters();
+  canvas.renderAll();
+},{
+ crossOrigin:'null'
+})
+    </script>
+</body>
+</html> -->
+
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <title>Fabric.js - Apply Color Tint Filter</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+</head>
+<body>
+    <canvas id="c" width="600" height="400"></canvas>
+    <script>
+        var canvas = new fabric.Canvas('c');
+
+        // Create an image object
+        var imgObj = new Image();
+        imgObj.crossOrigin = 'anonymous';
+        imgObj.onload = function() {
+            // Create a Fabric image object
+            var fabricImg = new fabric.Image(imgObj);
+
+            // Create a Hue filter with color code
+            function generateHueMatrix(color) {
+  var r = parseInt(color.substr(1, 2), 16);
+  var g = parseInt(color.substr(3, 2), 16);
+  var b = parseInt(color.substr(5, 2), 16);
+  var red = r / 255;
+  var green = g / 255;
+  var blue = b / 255;
+  var max = Math.max(red, green, blue);
+  var min = Math.min(red, green, blue);
+  var delta = max - min;
+  var hue = 0;
+  var saturation = 0;
+  var lightness = (max + min) / 2;
+  if (delta !== 0) {
+    saturation = delta / (1 - Math.abs(2 * lightness - 1));
+    switch (max) {
+      case red:
+        hue = (green - blue) / delta + (green < blue ? 6 : 0);
+        break;
+      case green:
+        hue = (blue - red) / delta + 2;
+        break;
+      case blue:
+        hue = (red - green) / delta + 4;
+        break;
+    }
+    hue /= 6;
+  }
+  var matrix = [    0.213 + 0.787 * saturation - 0.213 * hue,    0.715 - 0.715 * saturation + 0.715 * hue,    0.072 - 0.072 * saturation + 0.928 * hue,    0,    0,    0.213 - 0.213 * saturation - 0.213 * hue,    0.715 + 0.285 * saturation + 0.143 * hue,    0.072 - 0.072 * saturation - 0.787 * hue,    0,    0,    0.213 - 0.213 * saturation + 0.928 * hue,    0.715 - 0.715 * saturation - 0.715 * hue,    0.072 + 0.928 * saturation + 0.072 * hue,    0,    0,    0,    0,    0,    1,    0  ];
+  return matrix;
+}
+
+// Example usage
+var color = "#8a0c0c";
+var hueMatrix = generateHueMatrix(color);
+
+            var hueFilter = new fabric.Image.filters.ColorMatrix({
+                matrix: hueMatrix,
+            });
+console.log(hueFilter);
+
+            // Apply the Hue filter to the Fabric image object
+            fabricImg.filters.push(hueFilter);
+            fabricImg.applyFilters();
+
+            // Add the Fabric image object to the canvas
+            canvas.add(fabricImg);
+        };
+        imgObj.src = 'https://cdn4.buysellads.net/uu/1/127419/1670532177-Stock.jpg';
+    </script>
+</body>
+</html>
+ -->
+
+ <!-- <!DOCTYPE html>
+<html>
+<head>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+</head>
+<body>
+    <canvas id="canvas" width="600" height="400"></canvas>
+    <script type="text/javascript">
+        var canvas = new fabric.Canvas('canvas');
+        var imgSrc = 'https://i.imgur.com/z8tNcTt.jpg';
+
+        fabric.Image.fromURL(imgSrc, function(img) {
+            var hueColor = '#FF00FF'; // Set the hue color
+
+            // Create a hue matrix and rotate it by 90 degrees
+            var matrix = fabric.Color.fromHex(hueColor).matrix;
+            matrix = fabric.util.calcRotateMatrix(matrix, 90);
+
+            // Apply the hue matrix and rotation on the image
+            var hueFilter = new fabric.Image.filters.ColorMatrix({
+                matrix: matrix
+            });
+            img.filters.push(hueFilter);
+            img.applyFilters();
+
+            canvas.add(img);
+        });
+    </script>
+</body>
+</html> -->

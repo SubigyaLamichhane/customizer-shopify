@@ -284,11 +284,19 @@ app.get("/api/get-setting", (req: Request, res: Response) => {
         let query: string = `SELECT * FROM settings WHERE session_id='${res.locals.shopify.session.id}' LIMIT 1`;
         mysqlConnection.query(query, function (error: any, results: any, fields: any) {
             if (error) throw error;
-            res.status(200).send({
-                "status": true,
-                "message": "Data fetched!",
-                "data": results
-            });
+            if (results.length > 0) {
+                res.status(200).send({
+                    "status": true,
+                    "message": "Data fetched!",
+                    "data": results
+                });
+            } else {
+                res.status(404).send({
+                    "status": false,
+                    "message": "Data not found!",
+                    "data": []
+                });
+            }
         });
     } catch (e: any) {
         res.status(404).send({
@@ -307,19 +315,37 @@ app.post("/api/save-setting", (req: Request, res: Response) => {
         let visible_upload: number = req.body.visible_upload;
         let visible_add_name: number = req.body.visible_add_name;
         let visible_add_notes: number = req.body.visible_add_notes;
-        mysqlConnection.query('INSERT INTO settings SET ?', {
-            session_id: session_id,
-            visible_add_art: visible_add_art,
-            visible_upload: visible_upload,
-            visible_add_name: visible_add_name,
-            visible_add_notes: visible_add_notes,
-        }, function (error: any, results: any, fields: any) {
+
+        let query_1: string = `SELECT * FROM settings WHERE session_id='${res.locals.shopify.session.id}' LIMIT 1`;
+        mysqlConnection.query(query_1, function (error: any, result_1: any, fields: any) {
             if (error) throw error;
-            res.status(201).send({
-                "status": true,
-                "message": "Setting saved!",
-                "data": results
-            });
+            if (result_1.length > 0) {
+                let query_2: string = `UPDATE settings SET visible_add_art = ?, visible_upload = ?, visible_add_name = ?, visible_add_notes = ? WHERE session_id='${res.locals.shopify.session.id}'`;
+                let updatedData = [visible_add_art, visible_upload, visible_add_name, visible_add_notes];
+                mysqlConnection.query(query_2, updatedData, function (error, result_2, fields) {
+                    if (error) throw error;
+                    res.status(201).send({
+                        "status": true,
+                        "message": "Setting updated!",
+                        "data": result_2
+                    });
+                });
+            } else {
+                mysqlConnection.query('INSERT INTO settings SET ?', {
+                    session_id: session_id,
+                    visible_add_art: visible_add_art,
+                    visible_upload: visible_upload,
+                    visible_add_name: visible_add_name,
+                    visible_add_notes: visible_add_notes,
+                }, function (error: any, results: any, fields: any) {
+                    if (error) throw error;
+                    res.status(201).send({
+                        "status": true,
+                        "message": "Setting saved!",
+                        "data": results
+                    });
+                });
+            }
         });
     } catch (e: any) {
         res.status(404).send({
@@ -353,6 +379,13 @@ app.delete("/api/delete-setting/:id", (req: Request, res: Response) => {
 
 // Add product
 app.post("/api/add-product", (req: Request, res: Response) => {
+    // console.log('req.body',JSON.parse(req.body))
+    // res.status(201).send({
+    //     "status": true,
+    //     "message": "Test!",
+    //     "data": JSON.parse(req.body)
+    // });
+
     let session_id: string = res.locals.shopify.session.id;
     let product_id: number = req.body.product_id;
     let product_title: string = req.body.product_title;
@@ -583,7 +616,7 @@ app.post("/api/create-text-setting", (req: Request, res: Response) => {
 app.get("/api/get-text-setting", (req: Request, res: Response) => {
     try {
         let query: string = `SELECT * FROM text_settings WHERE session_id='${res.locals.shopify.session.id}'`;
-        mysqlConnection.query( query, function (error: any, results: any, fields: any) {
+        mysqlConnection.query(query, function (error: any, results: any, fields: any) {
             if (error) throw error;
             res.status(200).send({
                 "status": true,
@@ -603,7 +636,7 @@ app.get("/api/get-text-setting", (req: Request, res: Response) => {
 // Delete Text Setting by id
 app.delete("/api/delete-text-setting/:id", (req: Request, res: Response) => {
     let query: string = `DELETE FROM text_settings WHERE id=${req.params.id}`;
-    mysqlConnection.query( query, function (error: any, results: any, fields: any) {
+    mysqlConnection.query(query, function (error: any, results: any, fields: any) {
         if (error) throw error;
         if (results.affectedRows > 0) {
             res.status(200).send({
