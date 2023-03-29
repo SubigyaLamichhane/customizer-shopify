@@ -1,7 +1,7 @@
 var front_canvas = new fabric.Canvas('front-canvas', {
     fireRightClick: true,
     stopContextMenu: true,
-    controlsAboveOverlay: true
+    controlsAboveOverlay: true,
 });
 
 var back_canvas = new fabric.Canvas('back-canvas', {
@@ -68,77 +68,75 @@ function changeCanvasType(type) {
     }
 }
 
-
+ 
 //Disable context menu
 fabric.util.addListener(document.getElementsByClassName('upper-canvas')[0], 'contextmenu', function(e) {
     e.preventDefault();
 });
 
 // delete object code START
-var resizeIcon = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJfMDAtYm91bmRpbmctc2NhbGUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeD0iMCIgeT0iMCIgdmlld0JveD0iMCAwIDM5IDM5IiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBmaWxsPSIjMDM5Q0I1IiBkPSJNMjUuNiAxOS43djMuOEwxNS41IDEzLjRoMy43di0zaC04Ljh2OC44aDN2LTMuN2wxMC4xIDEwLjFoLTMuOHYzaDguOXYtOC45eiI+PC9wYXRoPjwvc3ZnPg==';
+var deleteIcon = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjAiIHk9IjAiIHZpZXdCb3g9IjAgMCAxNyAxNyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PGNpcmNsZSBmaWxsPSIjRkZGIiBjeD0iOC41IiBjeT0iOC41IiByPSI4LjUiPjwvY2lyY2xlPjxnIGZpbGw9IiNlZTM1MjQiPjxwYXRoIGQ9Im0xMS4xMyA0Ljk3LTYuMTYgNi4xNmMtLjI1LjI1LS4yNS42NSAwIC45cy42NS4yNS45IDBsNi4xNi02LjE2Yy4yNS0uMjUuMjUtLjY1IDAtLjlhLjYzNC42MzQgMCAwIDAtLjkgMCI+PC9wYXRoPjxwYXRoIGQ9Ik0xMi4wMyAxMS4xNCA1Ljg2IDQuOTdhLjYzNC42MzQgMCAwIDAtLjkgMGMtLjI1LjI1LS4yNS42NSAwIC45bDYuMTYgNi4xNmMuMjUuMjUuNjUuMjUuOSAwIC4yNi0uMjQuMjYtLjY1LjAxLS44OSI+PC9wYXRoPjwvZz48L3N2Zz4=';
 
-var img = document.createElement('img');
-img.src = resizeIcon;
+var deleteImg = document.createElement('img');
+deleteImg.src = deleteIcon;
 
  // Initialise delete icon for text
-// fabric.Textbox.prototype.controls.deleteControl = new fabric.Control({
-//     x: -0.5,
-//     y: -0.5,
-//     offsetY: -16,
-//     offsetX: -16,
-//     cursorStyle: 'pointer',
-//     mouseUpHandler: deleteObject,
-//     render: renderIcon,
-//     cornerSize: 24,
-//     position: { x: -0.5, y: -0.5 }, // position the delete icon outside the canvas
-//   renderOnAddition: true
-// });
+fabric.Textbox.prototype.controls.deleteControl = new fabric.Control({
+    x: -0.5,
+    y: -0.5,
+    offsetY: -16,
+    offsetX: -16,
+    cursorStyle: 'pointer',
+    mouseUpHandler: deleteObject,
+    render: renderIcon(deleteImg),
+    cornerSize: 24,
+    position: { x: -0.5, y: -0.5 }, // position the delete icon outside the canvas
+  renderOnAddition: true
+});
 
  // Initialise delete icon for image
-// fabric.Image.prototype.controls.deleteControl = new fabric.Control({
-//     x: -0.5,
-//     y: -0.5,
-//     offsetY: -16,
-//     offsetX: -16,
-//     cursorStyle: 'pointer',
-//     mouseUpHandler: deleteObject,
-//     render: renderIcon,
-//     cornerSize: 24,
-//     position: { x: -0.5, y: -0.5 }, // position the delete icon outside the canvas
-//     renderOnAddition: true
-// });
+fabric.Image.prototype.controls.deleteControl = new fabric.Control({
+    x: -0.5,
+    y: -0.5,
+    offsetY: -16,
+    offsetX: -16,
+    cursorStyle: 'pointer',
+    mouseUpHandler: deleteObject,
+    render: renderIcon(deleteImg),
+    cornerSize: 24,
+    position: { x: -0.5, y: -0.5 }, // position the delete icon outside the canvas
+    renderOnAddition: true
+});
+ 
+// Change bottom right scalling (resize) option icon
+var resizeIcon = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJfMDAtYm91bmRpbmctc2NhbGUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeD0iMCIgeT0iMCIgdmlld0JveD0iMCAwIDM5IDM5IiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBmaWxsPSIjMDM5Q0I1IiBkPSJNMjUuNiAxOS43djMuOEwxNS41IDEzLjRoMy43di0zaC04Ljh2OC44aDN2LTMuN2wxMC4xIDEwLjFoLTMuOHYzaDguOXYtOC45eiI+PC9wYXRoPjwvc3ZnPg==';
 
-// Change bottom right scalling option 
-// var scalingIcon = '';
-// var scalingIconImg = document.createElement('img');
-// scalingIconImg.src = scalingIcon;
+var resizeImg = document.createElement('img');
+resizeImg.src = resizeIcon;
 
+ // Initialise resize icon for object
 fabric.Object.prototype.controls.br = new fabric.Control({
   x: 0.5,
   y: 0.5,
   cursorStyle: 'nw-resize',
   actionHandler: fabric.controlsUtils.scalingEqually,
   actionName: 'resize',
-  render: renderIcon,
+  render: renderIcon(resizeImg),
   cornerSize: 20,
   renderOnAddRemove: true
 });
 
-// rect.addControl('br');
-
-// Render the control outside the canvas region
-canvas.renderOnAddRemove = true;
-// canvas.addControl(rect.controls.br);
-
-
-// objectControls.mr = new fabric.Control({
-//   x: 0.5,
-//   y: 0,
-//   cursorStyleHandler: scaleSkewStyleHandler,
-//   actionHandler: scalingXOrSkewingY,
-//   getActionName: scaleOrSkewActionName,
-// });
-
+ // Initialise resize icon for text
+fabric.Textbox.prototype.controls.br = new fabric.Control({
+  x: 0.5,
+  y: 0.5,
+  cursorStyle: 'nw-resize',
+  actionHandler: fabric.controlsUtils.scalingEqually,
+  actionName: 'resize',
+  render: renderIcon(resizeImg),
+  cornerSize: 20,
+  renderOnAddRemove: true
+});
 
 
 function deleteObject(eventData, transform){
@@ -150,14 +148,16 @@ function deleteObject(eventData, transform){
   $('.child_layer').css("display","none");
 }
 
-function renderIcon(ctx, left, top, styleOverride, fabricObject) {
-  var size = this.cornerSize;
-  ctx.save();
-  ctx.translate(left, top);
-  ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle));
-  ctx.drawImage(img, -size / 2, -size / 2, size, size);
-  ctx.restore();
-}
+function renderIcon(icon) {
+    return function renderIcon(ctx, left, top, styleOverride, fabricObject) {
+      var size = this.cornerSize;
+      ctx.save();
+      ctx.translate(left, top);
+      ctx.rotate(fabric.util.degreesToRadians(fabricObject.angle));
+      ctx.drawImage(icon, -size/2, -size/2, size, size);
+      ctx.restore();
+    }
+  }
 
 // delete object code END
 
@@ -171,21 +171,32 @@ function fitToObject(event) {
     var tempData = $.measureText(text_val, {fontFamily:font_family, fontSize:font_size});
     console.log(tempData)
     if(tempData.width > canvas.width){
-        console.log("condition 1")
-        var text_width = tempData.width;
-        while (text_width > canvas.width) {
-            console.log('text width : ', text_width , " | canvas width : ", canvas.width, " | font size : ", font_size);
-          font_size = font_size-1;
-          var tempData = $.measureText(text_val, {fontFamily: font_family, fontSize:font_size});
-          text_width = tempData.width;
+            console.log("condition 1");
+            var text_width = tempData.width;
+            while (text_width > canvas.width){
+               console.log('text width : ', text_width , " | canvas width : ", canvas.width, " | font size : ", font_size);
+            font_size = font_size-1;
+            var tempData = $.measureText(text_val, {fontFamily: font_family, fontSize:font_size});
+            text_width = tempData.width;
         }
     }
-    obj.set({
-        text: text_val,
-        width: tempData.width,
-        height: tempData.height,
-        fontSize: font_size
-    });
+    if(obj.type == 'shape'){
+        var new_height = tempData.height+obj.path.height;
+        console.log("shape edit height => ", new_height);
+        obj.set({
+            text: text_val,
+            width: tempData.width,
+            fontSize: font_size
+        });
+        obj.set({height: new_height})
+    }else{
+        obj.set({
+            text: text_val,
+            width: tempData.width,
+            height: tempData.height,
+            fontSize: font_size
+        });
+    }
     $('#textFontSize').val(font_size);
 }
 
@@ -257,13 +268,9 @@ function actionIconPosition(obj){
         $('.scale_icon_wrap').css({"top":res_top_pos, "left":res_left_pos});
 }
 
-function reSizeObject(){
-    console.log("It worked!");
-    resize();
-}
 
 
-//function fireevent start
+//function fire event start this function will call whenever we change canvas type(front, back)
 function fireEvents(){
 
 canvas.clipTo = function(ctx) {
@@ -283,7 +290,7 @@ canvas.on('mouse:down', function(options) {
   // checking when you click on canvas then object was selected on not.
   if(obj_target) {
     actionIconPosition(obj_target);
-    if (obj_target.type == 'text') {
+    if (obj_target.type == 'text' || obj_target.type == 'shape') {
         console.log('Text object was clicked! ', obj_target);
         // editTextFunction(options.target);
         $('.ct_content_tab').removeClass("active_tab");
@@ -355,7 +362,7 @@ canvas.on('mouse:down', function(options) {
     }
 });
 
-
+// function work when object move
 canvas.on('object:moving', function(e) {
     var obj = e.target;
 
@@ -382,33 +389,37 @@ var scale1x = 0 ;
 var scale1y = 0 ;    
 var width1 = 0 ;    
 var height1 = 0 ;
+
+// function work on object scaling
 canvas.on('object:scaling', function (e){
 
     console.log("scaling");
     // setObjectInside(e.target);
     // fitToObject(e.target);
     var obj = e.target;
-    
-    obj.setCoords();
-    var brNew = obj.getBoundingRect();
 
-    if (((brNew.width+brNew.left)>=obj.canvas.width) || ((brNew.height+brNew.top)>=obj.canvas.height) || ((brNew.left<0) || (brNew.top<0))) {
-        obj.left = left1;
-        obj.top=top1;
-        obj.scaleX=scale1x;
-        obj.scaleY=scale1y;
-        obj.width=width1;
-        obj.height=height1;
-    }
-    else{    
-        left1 =obj.left;
-        top1 =obj.top;
-        scale1x = obj.scaleX;
-        scale1y=obj.scaleY;
-        width1=obj.width;
-        height1=obj.height;
-        actionIconPosition(obj);
-    }
+    
+        obj.setCoords();
+        var brNew = obj.getBoundingRect();
+
+        if (((brNew.width+brNew.left)>=obj.canvas.width) || ((brNew.height+brNew.top)>=obj.canvas.height) || ((brNew.left<0) || (brNew.top<0))) {
+            obj.left = left1;
+            obj.top=top1;
+            obj.scaleX=scale1x;
+            obj.scaleY=scale1y;
+            obj.width=width1;
+            obj.height=height1;
+        }
+        else{    
+            left1 =obj.left;
+            top1 =obj.top;
+            scale1x = obj.scaleX;
+            scale1y=obj.scaleY;
+            width1=obj.width;
+            height1=obj.height;
+            actionIconPosition(obj);
+        }
+    
 });
 
 
@@ -433,6 +444,38 @@ canvas.on('object:modified', function(event) {
         
         $('#textFontSize').val(parseInt(newfontsize, 10));
        // fitToObject(event.target)
+    }
+    if(event.target.type == 'shape'){
+        var newfontsize = (event.target.fontSize * event.target.scaleX);
+
+       var tempData = $.measureText(event.target.text, {fontFamily: event.target.fontFamily, fontSize:newfontsize});
+
+       console.log('text width : ', tempData.width , " | canvas width : ", canvas.width, " | font size : ", newfontsize);
+
+       var get_path = event.target.path;
+        console.log("active path  before: ", get_path)
+       get_path.set({
+            scaleToWidth:tempData.width
+       })  
+      
+       // get_path.scaleToWidth(tempData.width);
+       
+       // console.log("active path  width : ", get_path.width * get_path.scaleX)
+
+       
+       event.target.set({
+            fontSize: parseInt(newfontsize, 10),
+            scaleX: 1,
+            scaleY:1,
+            width: tempData.width,
+        })
+       var new_height = event.target.path.height + tempData.height;
+       console.log("New height : ", new_height);
+       console.log("active path after: ", get_path)
+        event.target.set({ height: new_height });
+        $('#textFontSize').val(parseInt(newfontsize, 10));
+        var shape_val = $('.selected_shape_name').text();
+        changeTextEffect(shape_val);
     }
     if (event.target.type == 'art' || event.target.type == 'image') {
         var newWidth = (event.target.width * event.target.scaleX);
@@ -497,7 +540,8 @@ $("#addTextContent").click(function(){
             editable: false,
             lockUniScaling: true,
             fixedWidth:200,
-            type: 'text'
+            type: 'text',
+            strokeWidth:0
 	    });
         textBox.setControlsVisibility({
             tl: false,
@@ -529,46 +573,52 @@ $("#editTextContent").keyup(function(){
     text_val = text_val.replace(/\s+/g, " ");
     console.log("value is => ", text_val);
 
-    var selectedObject = canvas.getActiveObject();      
+    var selectedObject = canvas.getActiveObject(); 
 
-    if(text_val == ''){
-        var text_static_val = 'No Text';
-            var noTextData = $.measureText(text_static_val, {fontFamily: selectedObject.fontFamily, fontSize:selectedObject.fontSize});
-            console.log('text width : ', noTextData.width , " | canvas width : ", canvas.width, " | font size : ", selectedObject.fontSize);
-            selectedObject.set({
-                text: text_static_val,
-                width: noTextData.width,
-                height: noTextData.height,
-                fontSize: selectedObject.fontSize
-            });
-    }else{
-        var tempData = $.measureText(text_val, {fontFamily: selectedObject.fontFamily, fontSize:selectedObject.fontSize});
-
-        // selectedObject.set('text', text_val);  
-        var font_size = selectedObject.fontSize;
-        console.log('text width : ', tempData.width , " | canvas width : ", canvas.width, " | font size : ", font_size);
-
-        if(tempData.width > canvas.width){
-            console.log("condition 1")
-            var text_width = tempData.width;
-            while (text_width > canvas.width) {
-                
-              font_size = font_size-1;
-              var tempData = $.measureText(text_val, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
-              text_width = tempData.width;
-            }
+        if(text_val == ''){
+            var text_static_val = 'No Text';
+                var noTextData = $.measureText(text_static_val, {fontFamily: selectedObject.fontFamily, fontSize:selectedObject.fontSize});
+                console.log('text width : ', noTextData.width , " | canvas width : ", canvas.width, " | font size : ", selectedObject.fontSize);
+                selectedObject.set({
+                    text: text_static_val,
+                    width: noTextData.width,
+                    height: noTextData.height,
+                    fontSize: selectedObject.fontSize
+                });
         }else{
-            console.log("condition 2")
-        }
+            var tempData = $.measureText(text_val, {fontFamily: selectedObject.fontFamily, fontSize:selectedObject.fontSize});
 
-        selectedObject.set({
-            text: text_val,
-            width: tempData.width,
-            height: tempData.height,
-            fontSize: font_size
-        }); 
-        $('#textFontSize').val(font_size);
-    }     
+            // selectedObject.set('text', text_val);  
+            var font_size = selectedObject.fontSize;
+            console.log('text width : ', tempData.width , " | canvas width : ", canvas.width, " | font size : ", font_size);
+
+            if(tempData.width > canvas.width){
+                console.log("condition 1")
+                var text_width = tempData.width;
+                while (text_width > canvas.width) {
+                    
+                  font_size = font_size-1;
+                  var tempData = $.measureText(text_val, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
+                  text_width = tempData.width;
+                }
+            }else{
+                console.log("condition 2")
+            }
+
+            selectedObject.set({
+                text: text_val,
+                width: tempData.width,
+                height: tempData.height,
+                fontSize: font_size
+            }); 
+            $('#textFontSize').val(font_size);
+        } 
+
+    if(selectedObject.type == "shape"){
+        var shape_val = $('.selected_shape_name').text();
+        changeTextEffect(shape_val);
+    }
+      
     setObjectInside(selectedObject);
     canvas.renderAll(); 
     var font_text = truncateString(text_val, 10);
@@ -581,12 +631,83 @@ function changeTextFont(font){
     selectedObject.set('fontFamily', font);
     $('.selected_font_name').text(font);
     fitToObject(selectedObject);
+    if(selectedObject.type == "shape"){
+        var shape_val = $('.selected_shape_name').text();
+        changeTextEffect(shape_val);
+    }
+
+    
     setObjectInside(selectedObject);
     canvas.renderAll(); 
     
 }
+
+// text curve section
+
 function changeTextEffect(effect){
-    alert(effect)
+    $('.txt_shape_container').removeClass('active_shape');
+    console.log('type => ', effect)
+    var selectedObject = canvas.getActiveObject();
+    var selected_shap = $('.selected_shape_name').text();
+    console.log('selected_shap => ', selected_shap)
+    if(effect == 'curve'){
+
+       var textLength = selectedObject.measureLine(0);
+       console.log("Text length width : ", textLength);
+       var angle = 100;
+       var shapeString = `m 0 0 a ${angle} ${angle} 0 0 1 ${textLength.width} 0`;
+       var textPath = new fabric.Path(shapeString);
+       textPath.set('fill','transparent')
+       var tempData = $.measureText(selectedObject.text, {fontFamily: selectedObject.fontFamily, fontSize:selectedObject.fontSize});
+        // console.log("Path width : ", textPath.width , " | heihght : ", textPath.height);
+       var new_height = tempData.height + textPath.height;
+       var new_width = tempData.width;
+       var font_size = selectedObject.fontSize;
+
+        if(tempData.width > canvas.width){
+            console.log("condition 1")
+            var text_width = tempData.width;
+            while (text_width > canvas.width) {
+                
+              font_size = font_size-1;
+              var checkData = $.measureText(selectedObject.text, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
+              text_width = checkData.width;
+            }
+            new_width = text_width
+        }
+
+       console.log(" => height : ", new_height, " |   : ", tempData.width);
+       selectedObject.set({
+        path: textPath,
+        width: new_width,
+        height: new_height,
+        font_size: font_size,
+        'type': 'shape'
+       });
+       // canvas.add(obj);
+       selectedObject.set('height', new_height);
+       $('#textFontSize').val(font_size);
+    }else{
+        var tempData = $.measureText(selectedObject.text, {fontFamily: selectedObject.fontFamily, fontSize:selectedObject.fontSize});
+        selectedObject.set({
+            path: '',
+            width: tempData.width,
+            height: tempData.height,
+            'type': 'text'
+       });
+    }
+
+
+
+    setObjectInside(selectedObject);
+    canvas.renderAll();
+    if(effect == 'normal'){
+        $('.selected_shape_name').text('none');
+    }else{
+        $('.selected_shape_name').text(effect);
+    }
+    $('.txt_shape_container.'+effect+'_text').addClass('active_shape');
+    
 }
 // text color js
 function changeTextColor(color, name){
@@ -683,6 +804,10 @@ function changeTxtFontSize(value){
             fontSize: font_size,
         }); 
         $('#textFontSize').val(font_size);
+    }
+    if(selectedObject.type == "shape"){
+        var shape_val = $('.selected_shape_name').text();
+        changeTextEffect(shape_val);
     }
     setObjectInside(selectedObject);
     canvas.renderAll();
@@ -945,4 +1070,5 @@ document.addEventListener("keydown", function(e) {
         canvas.remove(canvas.getActiveObject());
     }
 }, false);
+
 

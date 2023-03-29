@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>bridge curve</title>
+	<style type="text/css">
+		span {
+		    display:inline-block;
+		    width:70px;
+		    text-align:right;
+		    font:12px sans-serif;
+		}
+
+	</style>
+</head>
+<body>
+	<canvas id=demo width=400 height=300></canvas>
+	<br>
+	    <span>Curve:</span>
+	<input id="iCurve" type="range" min=0 max=200 value=110>
+	<span id="vCurve">110</span>
+	    <br><span>OffsetY:</span>
+	<input id="iOffset" type="range" min=0 max=100 value=4>
+	<span id="vOffset">0</span>
+	    <br><span>Text height:</span>
+	<input id="iHeight" type="range" min=0 max=200 value=64>
+	<span id="vHeight">64</span>
+	    <br><span>Bottom:</span>
+	<input id="iBottom" type="range" min=0 max=200 value=200>
+	<span id="vBottom">200</span>
+	    <br><span>Triangle:</span>
+	    <input id="iTriangle" type="checkbox">
+	<br><span>Text:</span>
+	<input id="iText" type="text" value="BRIDGE TEXT">
+
+	<script type="text/javascript">
+		var ctx = demo.getContext('2d'),
+	    font = '64px impact',
+	    w = demo.width,
+	    h = demo.height,
+	    curve,
+	    offsetY,
+	    bottom,
+	    textHeight,
+	    isTri = false,
+	    dltY,
+	    angleSteps = 180 / w,
+	    i = w,
+	    y,
+	    os = document.createElement('canvas'),
+	    octx = os.getContext('2d');
+
+		os.width = w;
+		os.height = h;
+
+		octx.font = font;
+		octx.textBaseline = 'top';
+		octx.textAlign = 'center';
+
+		function renderBridgeText() {
+
+		    curve = parseInt(iCurve.value, 10);
+		    offsetY = parseInt(iOffset.value, 10);
+		    textHeight = parseInt(iHeight.value, 10);
+		    bottom = parseInt(iBottom.value, 10);
+		    isTri = iTriangle.checked;
+
+		    vCurve.innerHTML = curve;
+		    vOffset.innerHTML = offsetY;
+		    vHeight.innerHTML = textHeight;
+		    vBottom.innerHTML = bottom;
+
+		    octx.clearRect(0, 0, w, h);
+		    ctx.clearRect(0, 0, w, h);
+
+		    octx.fillText(iText.value.toUpperCase(), w * 0.5, 0);
+
+		    /// slide and dice
+		    i = w;
+		    dltY = curve / textHeight;
+		    y = 0;
+		    while (i--) {
+		        if (isTri) {
+		            y += dltY;
+		            if (i === (w * 0.5)|0) dltY = -dltY;
+		        } else {
+		            y = bottom - curve * Math.sin(i * angleSteps * Math.PI / 180);
+		        }
+		        ctx.drawImage(os, i, 0, 1, textHeight,
+		        i, h * 0.5 - offsetY / textHeight * y, 1, y);
+		    }
+		}
+
+		iCurve.onchange = iOffset.onchange = iHeight.onchange = iBottom.onchange = iText.onkeyup = iTriangle.onchange = renderBridgeText;
+
+		renderBridgeText()
+	</script>
+
+</body>
+</html>

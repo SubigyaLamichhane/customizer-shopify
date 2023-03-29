@@ -188,6 +188,80 @@ $('.back_font_btn').click(function(){
 	$('.all_font_list_wrapper').css("display","none");
 })
 
+// Rendering color box
+
+	let colorsdata = [
+		{color_name: 'White' , color_code: "#ffffff"},
+		{color_name: 'Natural', color_code: "#ae4a60"},
+		{color_name: 'Black' , color_code:'#000000' },
+		{color_name: 'Ash' , color_code:"#B2BEB5" },
+		{color_name: 'Light Steel'  , color_code: '#b0c4de' },
+		{color_name: 'Pebble', color_code:'#e2bea3' },
+		{color_name: 'Oxford Gray', color_code: '#8292A0' },
+		{color_name: 'Smoke Gray' , color_code: '#848884' },
+		{color_name: 'Charcoal Heather', color_code: '#36454f' },
+		{color_name: 'Navy' , color_code:  '#000080'},
+		{color_name: 'Deep Royal' , color_code: '#4169e1' },
+		{color_name: 'Carolina Blue', color_code:'#7BAFD4' },
+		{color_name: 'Light Blue', color_code: '#ADD8E6'},
+		{color_name: 'Aquatic Blue', color_code:'#00FFFF' },
+		{color_name: 'Blue Horizon', color_code: '#8eb3d1' },
+		{color_name: 'Stonewashed Blue', color_code:'#6b8da9' },
+		{color_name: 'Denim Blue' , color_code: '#6F8FAF'},
+		{color_name: 'Sapphire' , color_code:'#0F52BA'  },
+		{color_name: 'Teal' , color_code: '#008080' },
+		{color_name: 'Lavender' , color_code: '#E6E6FA'},
+		{color_name: 'Purple' , color_code:'#A020F0' },
+		{color_name: 'Deep Red', color_code:  '#850101' },
+		{color_name: 'Cardinal', color_code: '#C41E3A' },
+		{color_name: 'Maroon' , color_code: '#800000'},
+		{color_name: 'Wow Pink' , color_code: '#C24D78' },
+		{color_name: 'Pink' , color_code: '#FFC0CB' },
+		{color_name: 'Pale pink' , color_code: '#FFB6C1' },
+		{color_name: 'Charisma Coral', color_code: '#ee9489' },
+		{color_name: 'Gold', color_code:'#FFD700' },
+		{color_name: 'Yellow', color_code:'#FFFF00' },
+		{color_name: 'Daffodil Yellow' , color_code:'#FFDC82' },
+		{color_name: 'Candy Orange' , color_code:'#FFD09A' },
+		{color_name: 'Orange' , color_code:'#FFA500' },
+		{color_name: 'Safety Orange', color_code: '#FF7900' },
+		{color_name: 'Deep Forest' , color_code:'#228B22'  },
+		{color_name: 'Fatigue Green' , color_code: '#758062' },
+		{color_name: 'Kelly Green', color_code:'#4CBB17' },
+		{color_name: 'Clean Mint', color_code:'#3EB489'  },
+		{color_name: 'Stonewashed Green', color_code:'#74809a' },
+		{color_name: 'Lime', color_code:'#32CD32' },
+		{color_name: 'Safety Green', color_code: '#F2FB3E' },
+		{color_name: 'Sand', color_code: '#c2b280'  },
+		{color_name: 'Dark Chocolate', color_code: '#7B3F00' }
+	  ]
+
+// Append all color for text color
+colorsdata.forEach((item)=>{
+	if(item.color_name == 'Black'){
+		$('.text_body_color  .all_colors_list').append(` <div class="color_box" style="background-color: ${item.color_code};">
+			<input type="radio" name="text_color_input" class="text_color_input" data-color-code='${item.color_code}' data-color-name='${item.color_name}' onclick="changeTextColor('${item.color_code}','${item.color_name}')" checked />
+			<span class="check_icon"><i class="fa fa-check"></i></span>
+			<span class="box_outline"></span>
+		</div>`);	
+	}else{
+		$('.text_body_color  .all_colors_list').append(` <div class="color_box" style="background-color: ${item.color_code};">
+			<input type="radio" name="text_color_input" class="text_color_input" data-color-code='${item.color_code}' data-color-name='${item.color_name}' onclick="changeTextColor('${item.color_code}','${item.color_name}')" />
+			<span class="check_icon"><i class="fa fa-check"></i></span>
+			<span class="box_outline"></span>
+		</div>`);	
+	}
+	
+})
+
+// Append all color for text outline
+colorsdata.forEach((item)=>{
+	$('.outline_color_container  .all_outline_colors_list').append(`  <div class="color_box" style="background-color: ${item.color_code};">
+	<input type="radio" name="text_outline_input" class="text_color_input" data-color-code="${item.color_code}" data-color-name="${item.color_name}" onclick="changeTxtOutlineColor('${item.color_code}','${item.color_name}')" />
+	<span class="check_icon"><i class="fa fa-check"></i></span>
+	<span class="box_outline"></span>
+</div>`);	
+})
 
 
 // Text color js

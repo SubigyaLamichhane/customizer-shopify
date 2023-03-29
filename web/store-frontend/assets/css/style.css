@@ -31,6 +31,8 @@ body,h1,h2,h3,h4,h5,h6,p,span,ul,li,div,button,a,input{
     position: relative; 
     user-select: none;
         border: 1px solid #cacaca;
+    /*outline: 1px solid #cacaca;*/
+    /*outline-offset: -15px;  */
 }
 
 #customiserContainer{
@@ -979,7 +981,7 @@ img#customiserImage {
     width: 100px;
     height: 100px;
 }
-.all_shapes_wrapper, .edit_art_color_wrapper, .edit_image_color_wrapper {
+.edit_art_color_wrapper, .edit_image_color_wrapper {
     display: none;
 }
 .canvas_view_options {
@@ -1043,11 +1045,27 @@ img#customiserImage {
     /*z-index: -1;*/
     background: #fff;
     border-radius: 50%;
+    display: none;
 }
 .scale_icon_wrap img, .delete_icon_wrap img{
     width: 100%;
     height: 100%;
 }
+.ndx-TextEffectCard-button {
+   margin: 0 1.5rem;
+   padding: 1rem 0;
+   cursor: pointer;
+   display: flex;
+   justify-content: center;
+}
+.ndx-TextEffectCard-button svg{
+   width: 100px;
+}
+.txt_shape_container.active_shape {
+    border: 2px solid #5b00ff;
+}
+
+
 
 
 
