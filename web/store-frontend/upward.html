@@ -32,15 +32,13 @@
         fontFamily: 'Monaco',
         padding: 0,
         lineHeight: 1,
-         })
-        .scale(1.5);
+         });
       canvas.add(upward);
 
       function upword(){
         console.log("clicked function");
         var selectedObj = canvas.getActiveObject();
         var text_val = selectedObj.text.toUpperCase();
-        console.log(selectedObj);
         var i = 0;
         var font_size = selectedObj.fontSize-15;
         var add_size = (1500 / selectedObj._text.length) * .01;
@@ -48,24 +46,28 @@
         console.log("font size : ", font_size , " | add size in point : ", add_size);
         var style_json = {};
         // font_size = 15;
+        var top_pos_val = 50;
         while(selectedObj._text.length > i){
           if(selectedObj._text[i] !== ''){
             var updated_font_size = font_size+add_size;
-            style_json[parseInt(i)] = { fontSize: updated_font_size}
-            font_size = updated_font_size
+            var updated_top = top_pos_val + 10;
+            style_json[parseInt(i)] = { fontSize: updated_font_size, fontWeight: 600, top:updated_top}
+            font_size = updated_font_size;
+            top_pos_val = updated_top;
           }else{
             style_json[i] = { fontSize : font_size }
           }
           i++;
         }
 
-        console.log("style json : ", style_json)
         selectedObj.set({
           text: text_val,
           styles: {
             0 : style_json
-          }
+          },
+          charSpacing:.5
         })
+        console.log(selectedObj);
         canvas.renderAll();
       }
 

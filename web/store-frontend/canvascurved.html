@@ -317,7 +317,22 @@ obj = new fabric.TextCurved("Hi Working fine!", {
       left: 50,
       top: 50
    });
-   canvas.add(obj);
+   // canvas.add(obj);
+
+
+
+var arc1 = new fabric.Path("M 255 135 A 50 50 0 0 1 200 110", {
+                stroke: 'black',
+                fill: "white"
+            });
+
+   const path = new fabric.Path("M80 0 C160 0, 160 100, 80 100 C0 100, 0 0, 80 0Z");
+const text = new fabric.Text("Text",{fontSize: 20, path});
+
+
+// canvas.add(arc1)
+
+canvas.add(text)
    canvas.renderAll();
 
 

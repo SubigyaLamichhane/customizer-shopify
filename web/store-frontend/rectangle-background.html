@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Fabric.js Example: Background Rectangle with TextBox and Image Object</title>
+	<script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.0/fabric.min.js"></script>
+</head>
+<body>
+	<canvas id="canvas" width="400" height="400"></canvas>
+	<script>
+		// Create a Fabric.js canvas
+		var canvas = new fabric.Canvas('canvas');
+
+		// Define the background rectangle dimensions
+		var bgWidth = 300;
+		var bgHeight = 300;
+
+		// Create the background rectangle
+		var bgRect = new fabric.Rect({
+			left: 50,
+			top: 50,
+			width: bgWidth,
+			height: bgHeight,
+			fill: 'lightgray',
+			stroke: 'black',
+			strokeWidth: 1
+		});
+
+		// Add the background rectangle to the canvas
+		canvas.setBackgroundImage(bgRect);
+
+		// Create a TextBox object
+		var textBox = new fabric.Textbox('Good morning', {
+			left: 100,
+			top: 100,
+			width: 100,
+			height: 50,
+			fill: 'white',
+			stroke: 'black',
+			strokeWidth: 1
+		});
+
+		// Add the TextBox object to the canvas
+		canvas.add(textBox);
+
+		// Create an Image object
+		fabric.Image.fromURL('https://source.unsplash.com/random/200x200', function(img) {
+			// Set the Image object's size and position
+			img.set({
+				left: 200,
+				top: 200,
+				width: 100,
+				height: 100
+			});
+			// Add the Image object to the canvas
+			canvas.add(img);
+		});
+
+		// Restrict object movement and edges within the background rectangle
+		// canvas.on('object:moving', function(options) {
+		// 	var obj = options.target;
+		// 	// If the object is going outside of the background rectangle, prevent it
+		// 	if (obj.left < bgRect.left || obj.top < bgRect.top ||
+		// 	    (obj.left + obj.width) > (bgRect.left + bgRect.width) ||
+		// 	    (obj.top + obj.height) > (bgRect.top + bgRect.height)) {
+		// 		obj.set({
+		// 			left: obj.lastLeft,
+		// 			top: obj.lastTop
+		// 		});
+		// 	}
+		// 	// Save the object's current position as the last position
+		// 	obj.lastLeft = obj.left;
+		// 	obj.lastTop = obj.top;
+		// });
+
+
+		// Event listener for object:moving event
+		canvas.on('object:moving', function(e) {
+			var obj = e.target;
+			// var bounds = obj.getBoundingRect();
+
+			// Check if the object is going outside of the background rectangle
+			// if (bounds.left < bgRect.left) {
+			// 	obj.left = (bgRect.left + bounds.width / 2);
+			// } else if (bounds.left + bounds.width > bgRect.left + bgRect.width) {
+			// 	obj.left = (bgRect.left + bgRect.width - bounds.width / 2);
+			// }
+			// if (bounds.top < bgRect.top) {
+			// 	obj.top = (bgRect.top + bounds.height / 2);
+			// } else if (bounds.top + bounds.height > bgRect.top + bgRect.height) {
+			// 	obj.top = (bgRect.top + bgRect.height - bounds.height / 2);
+			// }
+
+
+			// var obj = options.target;
+			// If the object is going outside of the background rectangle, prevent it
+			if (obj.left < bgRect.left || obj.top < bgRect.top ||
+			    (obj.left + obj.width) > (bgRect.left + bgRect.width) ||
+			    (obj.top + obj.height) > (bgRect.top + bgRect.height)) {
+				obj.set({
+					left: obj.lastLeft,
+					top: obj.lastTop
+				});
+			}
+			// Save the object's current position as the last position
+			obj.lastLeft = obj.left;
+			obj.lastTop = obj.top;
+
+			// If the object is rotated
+			if (obj.angle !== 0){
+				// Get the rotated object's bounding box after applying the object's transformation
+				var rotatedBounds = obj.getBoundingRect(true);
+				console.log("Rotate bound => ", rotatedBounds)
+
+				// Check if the rotated object's bounding box is going outside of the background rectangle
+				if (rotatedBounds.left < bgRect.left) {
+					obj.left = (bgRect.left + rotatedBounds.width / 2);
+				} else if (rotatedBounds.left + rotatedBounds.width > bgRect.left + bgRect.width) {
+					obj.left = (bgRect.left + bgRect.width - rotatedBounds.width / 2);
+				}
+				if (rotatedBounds.top < bgRect.top) {
+					obj.top = (bgRect.top + rotatedBounds.height / 2);
+				} else if (rotatedBounds.top + rotatedBounds.height > bgRect.top + bgRect.height) {
+					obj.top = (bgRect.top + bgRect.height - rotatedBounds.height / 2);
+				}
+				// Save the object's current position as the last position
+				obj.lastLeft = obj.left;
+				obj.lastTop = obj.top;
+			}
+
+
+		});
+
+
+
+
+
+	</script>
+</body>
+</html>

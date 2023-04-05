@@ -22,17 +22,41 @@ var right_canvas = new fabric.Canvas('right-canvas', {
     controlsAboveOverlay: true
 });
 
+
 var canvas_view_type = $('.canvas_view_input[name="canvas_view_type"]:checked').attr('view_type');
 var canvas = front_canvas;
-// if(canvas_view_type == 'back'){
-//     canvas = back_canvas;
-// }else if(canvas_view_type == 'right'){
-//     canvas = right_canvas;
-// }else if(canvas_view_type == 'left'){
-//     canvas = left_canvas;
-// }else{
-//     canvas = front_canvas;
-// }
+
+
+
+var minX, minY, maxX, maxY;
+// Define the background rectangle dimensions
+    var bgWidth = 200;
+    var bgHeight = 300;
+    var bgLeft = (canvas.width - bgWidth) / 2;
+    var bgTop = (canvas.height - bgHeight) / 2;
+
+// Create the background rectangle
+    var bgRect = new fabric.Rect({
+        left: bgLeft,
+        top: bgTop,
+        width: bgWidth,
+        height: bgHeight,
+        fill: 'transparent',
+        stroke: '#cacaca',
+        strokeWidth: 1
+    });
+    
+// Add the background rectangle to the canvas
+    canvas.setBackgroundImage(bgRect);
+    canvas.renderAll();
+
+minX = bgRect.left;
+maxX = bgRect.left+bgRect.width;
+minY = bgRect.top;
+maxY = bgRect.top+bgRect.height;
+var CANVAS_WIDTH = maxX;
+var CANVAS_HEIGHT = maxY;
+
 
 // Change canvas type like :- [front, back, right, left]
 function changeCanvasType(type) {
@@ -45,29 +69,21 @@ function changeCanvasType(type) {
         $('#backCanvasWrap').css('display','block');
         canvas = back_canvas;
         fireEvents();
-        // canvas.deactivateAllWithDispatch();
         // canvas.calcOffset();
     }else if(type == 'right'){
         $('#rightCanvasWrap').css('display','block');
         canvas = right_canvas;
         fireEvents();
-        // canvas.deactivateAllWithDispatch();
-        // canvas.calcOffset();
     }else if(type =='left'){
         $('#leftCanvasWrap').css('display','block');
         canvas = left_canvas;
         fireEvents();
-        // canvas.deactivateAllWithDispatch();
-        // canvas.calcOffset();
     }else{
         $('#frontCanvasWrap').css('display','block');
         canvas = front_canvas;
         fireEvents();
-        // canvas.deactivateAllWithDispatch();
-        // canvas.calcOffset();
     }
 }
-
  
 //Disable context menu
 fabric.util.addListener(document.getElementsByClassName('upper-canvas')[0], 'contextmenu', function(e) {
@@ -89,7 +105,7 @@ fabric.Textbox.prototype.controls.deleteControl = new fabric.Control({
     cursorStyle: 'pointer',
     mouseUpHandler: deleteObject,
     render: renderIcon(deleteImg),
-    cornerSize: 24,
+    cornerSize: 20,
     position: { x: -0.5, y: -0.5 }, // position the delete icon outside the canvas
   renderOnAddition: true
 });
@@ -103,7 +119,7 @@ fabric.Image.prototype.controls.deleteControl = new fabric.Control({
     cursorStyle: 'pointer',
     mouseUpHandler: deleteObject,
     render: renderIcon(deleteImg),
-    cornerSize: 24,
+    cornerSize: 20,
     position: { x: -0.5, y: -0.5 }, // position the delete icon outside the canvas
     renderOnAddition: true
 });
@@ -113,6 +129,7 @@ var resizeIcon = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJfMDAt
 
 var resizeImg = document.createElement('img');
 resizeImg.src = resizeIcon;
+
 
  // Initialise resize icon for object
 fabric.Object.prototype.controls.br = new fabric.Control({
@@ -130,9 +147,11 @@ fabric.Object.prototype.controls.br = new fabric.Control({
 fabric.Textbox.prototype.controls.br = new fabric.Control({
   x: 0.5,
   y: 0.5,
+  offsetY: 10,
+  offsetX: 10,
   cursorStyle: 'nw-resize',
   actionHandler: fabric.controlsUtils.scalingEqually,
-  actionName: 'resize',
+  actionName: 'resizing',
   render: renderIcon(resizeImg),
   cornerSize: 20,
   renderOnAddRemove: true
@@ -169,15 +188,13 @@ function fitToObject(event) {
     var text_val = obj.text;
     var font_family = obj.fontFamily;
     var tempData = $.measureText(text_val, {fontFamily:font_family, fontSize:font_size});
-    console.log(tempData)
-    if(tempData.width > canvas.width){
-            console.log("condition 1");
+    if(tempData.width > CANVAS_WIDTH){
             var text_width = tempData.width;
-            while (text_width > canvas.width){
-               console.log('text width : ', text_width , " | canvas width : ", canvas.width, " | font size : ", font_size);
+            while (text_width > CANVAS_WIDTH){
+               console.log('text width : ', text_width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", font_size);
             font_size = font_size-1;
-            var tempData = $.measureText(text_val, {fontFamily: font_family, fontSize:font_size});
-            text_width = tempData.width;
+            var updateData = $.measureText(text_val, {fontFamily: font_family, fontSize:font_size});
+            text_width = updateData.width;
         }
     }
     if(obj.type == 'shape'){
@@ -203,71 +220,76 @@ function fitToObject(event) {
 // function for object can not go outside of canvas mark
 function setObjectInside(e) {
     var obj = e;
-    if(obj.currentHeight > obj.canvas.height || obj.currentWidth > obj.canvas.width){
+    if(obj.height > CANVAS_HEIGHT || obj.width > CANVAS_WIDTH){
         return;
     }       
     
     obj.setCoords(); 
 
-    if(obj.getBoundingRect().top < 0 || obj.getBoundingRect().left < 0){
-        obj.top = Math.max(obj.top, obj.top-obj.getBoundingRect().top);
-        obj.left = Math.max(obj.left, obj.left-obj.getBoundingRect().left);
+    if(obj.getBoundingRect().top < minY || obj.getBoundingRect().left < minX){
+        obj.top = Math.max(obj.top, obj.top-obj.getBoundingRect().top+minY);
+        obj.left = Math.max(obj.left, obj.left-obj.getBoundingRect().left+minX);
+        if(obj.top < minY){
+            obj.top = minY;
+        }
+        if(obj.left < minX){
+            obj.left = minX;
+        }
     }
 
-    if(obj.getBoundingRect().top+obj.getBoundingRect().height  > obj.canvas.height || obj.getBoundingRect().left+obj.getBoundingRect().width  > obj.canvas.width){
-
-        obj.top = Math.min(obj.top, obj.canvas.height-obj.getBoundingRect().height+obj.top-obj.getBoundingRect().top);
-        obj.left = Math.min(obj.left, obj.canvas.width-obj.getBoundingRect().width+obj.left-obj.getBoundingRect().left);
+    if(obj.getBoundingRect().top+obj.getBoundingRect().height  > CANVAS_HEIGHT || obj.getBoundingRect().left+obj.getBoundingRect().width  > CANVAS_WIDTH){
+        obj.top = Math.min(obj.top, CANVAS_HEIGHT-obj.getBoundingRect().height+obj.top-obj.getBoundingRect().top);
+        obj.left = Math.min(obj.left, CANVAS_WIDTH-obj.getBoundingRect().width+obj.left-obj.getBoundingRect().left);
     }  
 
 }
 
+
 // function for custom action(resize and delete) icon position
-function actionIconPosition(obj){
-    var icon_width = 20;
+// function actionIconPosition(obj){
+//     var icon_width = 20;
     
-        var obj_width = obj.width;
-        var obj_height = obj.height;
-        if(obj.type == "art" || obj.type == 'image'){
-            obj_width = (obj.width * obj.scaleX);
-            obj_height = (obj.height * obj.scaleY);
-        }
+//         var obj_width = obj.width;
+//         var obj_height = obj.height;
+//         if(obj.type == "art" || obj.type == 'image'){
+//             obj_width = (obj.width * obj.scaleX);
+//             obj_height = (obj.height * obj.scaleY);
+//         }
 
-        // for delete icon position
-        var del_icon_pos = obj.aCoords.tl;
-        var check_width = obj_width+del_icon_pos.x;
-        var check_height = obj_height+del_icon_pos.y;
-        var del_top_pos = del_icon_pos.y-icon_width;
-        var del_left_pos = del_icon_pos.x-icon_width;
+//         // for delete icon position
+//         var del_icon_pos = obj.aCoords.tl;
+//         var check_width = obj_width+del_icon_pos.x;
+//         var check_height = obj_height+del_icon_pos.y;
+//         var del_top_pos = del_icon_pos.y-icon_width;
+//         var del_left_pos = del_icon_pos.x-icon_width;
 
-        // for resize icon position
-        var resize_icon_pos = obj.aCoords.br;
-        var res_top_pos = resize_icon_pos.y;
-        var res_left_pos = resize_icon_pos.x;
+//         // for resize icon position
+//         var resize_icon_pos = obj.aCoords.br;
+//         var res_top_pos = resize_icon_pos.y;
+//         var res_left_pos = resize_icon_pos.x;
        
-        if(del_icon_pos.y <= 0){
-            del_top_pos = -icon_width; // we have assign icon width above
-            res_top_pos = obj_height;
-        }
-        if(del_icon_pos.x <= 0){
-            del_left_pos = -icon_width; // don't touch this icon width with minus
-            res_left_pos = obj_width
-        }
-        if(check_width > obj.canvas.width){
-            del_left_pos = obj.canvas.width - obj_width;
-            del_left_pos = del_left_pos-icon_width;
-            res_left_pos = obj.canvas.width;
-        }
-        if(check_height > obj.canvas.height){
-            del_top_pos = obj.canvas.height - obj_height;
-            del_top_pos = del_top_pos-icon_width
-            res_top_pos = obj.canvas.height;
-        }
+//         if(del_icon_pos.y <= 0){
+//             del_top_pos = -icon_width; // we have assign icon width above
+//             res_top_pos = obj_height;
+//         }
+//         if(del_icon_pos.x <= 0){
+//             del_left_pos = -icon_width; // don't touch this icon width with minus
+//             res_left_pos = obj_width
+//         }
+//         if(check_width > CANVAS_WIDTH){
+//             del_left_pos = CANVAS_WIDTH - obj_width;
+//             del_left_pos = del_left_pos-icon_width;
+//             res_left_pos = CANVAS_WIDTH;
+//         }
+//         if(check_height > CANVAS_HEIGHT){
+//             del_top_pos = CANVAS_HEIGHT - obj_height;
+//             del_top_pos = del_top_pos-icon_width
+//             res_top_pos = CANVAS_HEIGHT;
+//         }
         
-        $('.delete_icon_wrap').css({"top":del_top_pos, "left":del_left_pos});
-        $('.scale_icon_wrap').css({"top":res_top_pos, "left":res_left_pos});
-}
-
+//         $('.delete_icon_wrap').css({"top":del_top_pos, "left":del_left_pos});
+//         $('.scale_icon_wrap').css({"top":res_top_pos, "left":res_left_pos});
+// }
 
 
 //function fire event start this function will call whenever we change canvas type(front, back)
@@ -277,7 +299,7 @@ canvas.clipTo = function(ctx) {
   ctx.save();
   ctx.setTransform(1, 0, 0, 1, 0, 0);
   ctx.beginPath();
-  ctx.rect(0, 0, canvas.width, canvas.height);
+  ctx.rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
   ctx.closePath();
   ctx.restore();
 };
@@ -289,7 +311,7 @@ canvas.on('mouse:down', function(options) {
     
   // checking when you click on canvas then object was selected on not.
   if(obj_target) {
-    actionIconPosition(obj_target);
+    // actionIconPosition(obj_target);
     if (obj_target.type == 'text' || obj_target.type == 'shape') {
         console.log('Text object was clicked! ', obj_target);
         // editTextFunction(options.target);
@@ -351,7 +373,7 @@ canvas.on('mouse:down', function(options) {
 
     $('#defaultSettings').addClass("active_tab");
   }
-
+  console.log(options)
   //  Show context menu when click on right button of mouse
   if(options.e.button === 2) {
         var top_pos = options.e.layerY + 10;
@@ -366,25 +388,31 @@ canvas.on('mouse:down', function(options) {
 canvas.on('object:moving', function(e) {
     var obj = e.target;
 
-    if(obj.height > obj.canvas.height || obj.width > obj.canvas.width){
+    if(obj.height > CANVAS_HEIGHT || obj.width > CANVAS_WIDTH){
         return;
     }else{
-        actionIconPosition(obj);
+        // actionIconPosition(obj);
     }        
     obj.setCoords();   
-    if(obj.getBoundingRect().top < 0 || obj.getBoundingRect().left < 0){
-        obj.top = Math.max(obj.top, obj.top-obj.getBoundingRect().top);
-        obj.left = Math.max(obj.left, obj.left-obj.getBoundingRect().left);
+    if(obj.getBoundingRect().top < minY || obj.getBoundingRect().left < minX){
+        obj.top = Math.max(obj.top, obj.top-obj.getBoundingRect().top+minY);
+        obj.left = Math.max(obj.left, obj.left-obj.getBoundingRect().left+minX);
+        if(obj.top < minY){
+            obj.top = minY;
+        }
+        if(obj.left < minX){
+            obj.left = minX;
+        }
     }
-    if(obj.getBoundingRect().top+obj.getBoundingRect().height  > obj.canvas.height || obj.getBoundingRect().left+obj.getBoundingRect().width  > obj.canvas.width){
-        obj.top = Math.min(obj.top, obj.canvas.height-obj.getBoundingRect().height+obj.top-obj.getBoundingRect().top);
-        obj.left = Math.min(obj.left, obj.canvas.width-obj.getBoundingRect().width+obj.left-obj.getBoundingRect().left);
+    if(obj.getBoundingRect().top+obj.getBoundingRect().height  > CANVAS_HEIGHT || obj.getBoundingRect().left+obj.getBoundingRect().width  > CANVAS_WIDTH){
+        obj.top = Math.min(obj.top, CANVAS_HEIGHT-obj.getBoundingRect().height+obj.top-obj.getBoundingRect().top);
+        obj.left = Math.min(obj.left, CANVAS_WIDTH-obj.getBoundingRect().width+obj.left-obj.getBoundingRect().left);
     }
 
 });
 
-var left1 = 0;
-var top1 = 0 ;
+var left1 = minX;
+var top1 = minY;
 var scale1x = 0 ;    
 var scale1y = 0 ;    
 var width1 = 0 ;    
@@ -393,16 +421,20 @@ var height1 = 0 ;
 // function work on object scaling
 canvas.on('object:scaling', function (e){
 
-    console.log("scaling");
+    console.log("scaling => ", e.target.type);
     // setObjectInside(e.target);
     // fitToObject(e.target);
     var obj = e.target;
 
-    
+        if(obj.type == 'shape')
+        {
+            console.log("Inside function1");
+            // updatePathBoundingBox(obj);
+        } 
         obj.setCoords();
         var brNew = obj.getBoundingRect();
 
-        if (((brNew.width+brNew.left)>=obj.canvas.width) || ((brNew.height+brNew.top)>=obj.canvas.height) || ((brNew.left<0) || (brNew.top<0))) {
+        if (((brNew.width+brNew.left)>=CANVAS_WIDTH) || ((brNew.height+brNew.top)>=CANVAS_HEIGHT) || ((brNew.left<minX) || (brNew.top<minY))) {
             obj.left = left1;
             obj.top=top1;
             obj.scaleX=scale1x;
@@ -417,22 +449,23 @@ canvas.on('object:scaling', function (e){
             scale1y=obj.scaleY;
             width1=obj.width;
             height1=obj.height;
-            actionIconPosition(obj);
+            // actionIconPosition(obj);
         }
-    
+
 });
 
 
 canvas.on('object:modified', function(event) {
 
-    actionIconPosition(event.target)
+    // actionIconPosition(event.target);
+    // positionDelete(event.target);
     console.log("modified");
     if (event.target.type == 'text') {
        var newfontsize = (event.target.fontSize * event.target.scaleX);
 
        var tempData = $.measureText(event.target.text, {fontFamily: event.target.fontFamily, fontSize:newfontsize});
 
-       console.log('text width : ', tempData.width , " | canvas width : ", canvas.width, " | font size : ", newfontsize);
+       console.log('text width : ', tempData.width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", newfontsize);
 
        event.target.set({
             fontSize: parseInt(newfontsize, 10),
@@ -446,11 +479,12 @@ canvas.on('object:modified', function(event) {
        // fitToObject(event.target)
     }
     if(event.target.type == 'shape'){
+
         var newfontsize = (event.target.fontSize * event.target.scaleX);
 
        var tempData = $.measureText(event.target.text, {fontFamily: event.target.fontFamily, fontSize:newfontsize});
 
-       console.log('text width : ', tempData.width , " | canvas width : ", canvas.width, " | font size : ", newfontsize);
+       console.log('text width : ', tempData.width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", newfontsize);
 
        var get_path = event.target.path;
         console.log("active path  before: ", get_path)
@@ -496,7 +530,7 @@ canvas.on('object:modified', function(event) {
 
 fireEvents();
 
-// truncate fucntion for font text
+// truncate fucntion for font family section text
 const truncateString = (string = '', maxLength = 50) => 
   string.length > maxLength 
     ? `${string.substring(0, maxLength)}…`
@@ -506,7 +540,7 @@ const truncateString = (string = '', maxLength = 50) =>
 
 
 $("#textContent").keypress(function(e) {
-    if(e.which == 13) {
+    if(e.which == 13){
         // alert('You pressed enter!');
         $("#addTextContent").trigger("click");
     }
@@ -520,11 +554,11 @@ $("#addTextContent").click(function(){
         var font_size = 26;
         var tempData = $.measureText(text_val, {fontFamily:"Arial", fontSize:font_size});
         console.log(tempData)
-        if(tempData.width > canvas.width-5){
+        if(tempData.width > CANVAS_WIDTH-5){
             console.log("condition 1")
             var text_width = tempData.width;
-            while (text_width > canvas.width-5) {
-                console.log('text width : ', text_width , " | canvas width : ", canvas.width, " | font size : ", font_size);
+            while (text_width > CANVAS_WIDTH-5) {
+                console.log('text width : ', text_width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", font_size);
               font_size = font_size-1;
               var tempData = $.measureText(text_val, {fontFamily: "Arial", fontSize:font_size});
               text_width = tempData.width;
@@ -541,7 +575,10 @@ $("#addTextContent").click(function(){
             lockUniScaling: true,
             fixedWidth:200,
             type: 'text',
-            strokeWidth:0
+            strokeWidth:0,
+            'strokeUniform': true,
+            top:minY,
+            left:minX
 	    });
         textBox.setControlsVisibility({
             tl: false,
@@ -565,6 +602,7 @@ $("#addTextContent").click(function(){
         var font_text = truncateString(text_val, 10);
         $('ul#allFonts>li>span.active_text').text(font_text);
 	}
+
 })
 
 
@@ -578,7 +616,7 @@ $("#editTextContent").keyup(function(){
         if(text_val == ''){
             var text_static_val = 'No Text';
                 var noTextData = $.measureText(text_static_val, {fontFamily: selectedObject.fontFamily, fontSize:selectedObject.fontSize});
-                console.log('text width : ', noTextData.width , " | canvas width : ", canvas.width, " | font size : ", selectedObject.fontSize);
+                console.log('text width : ', noTextData.width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", selectedObject.fontSize);
                 selectedObject.set({
                     text: text_static_val,
                     width: noTextData.width,
@@ -590,12 +628,12 @@ $("#editTextContent").keyup(function(){
 
             // selectedObject.set('text', text_val);  
             var font_size = selectedObject.fontSize;
-            console.log('text width : ', tempData.width , " | canvas width : ", canvas.width, " | font size : ", font_size);
+            console.log('text width : ', tempData.width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", font_size);
 
-            if(tempData.width > canvas.width){
+            if(tempData.width > CANVAS_WIDTH){
                 console.log("condition 1")
                 var text_width = tempData.width;
-                while (text_width > canvas.width) {
+                while (text_width > CANVAS_WIDTH) {
                     
                   font_size = font_size-1;
                   var tempData = $.measureText(text_val, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
@@ -651,7 +689,7 @@ function changeTextEffect(effect){
     var selected_shap = $('.selected_shape_name').text();
     console.log('selected_shap => ', selected_shap)
     if(effect == 'curve'){
-
+        changeTextEffect('none'); // called this function for reset option
        var textLength = selectedObject.measureLine(0);
        console.log("Text length width : ", textLength);
        var angle = 100;
@@ -664,10 +702,10 @@ function changeTextEffect(effect){
        var new_width = tempData.width;
        var font_size = selectedObject.fontSize;
 
-        if(tempData.width > canvas.width){
+        if(tempData.width > CANVAS_WIDTH){
             console.log("condition 1")
             var text_width = tempData.width;
-            while (text_width > canvas.width) {
+            while (text_width > CANVAS_WIDTH) {
                 
               font_size = font_size-1;
               var checkData = $.measureText(selectedObject.text, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
@@ -687,13 +725,98 @@ function changeTextEffect(effect){
        // canvas.add(obj);
        selectedObject.set('height', new_height);
        $('#textFontSize').val(font_size);
-    }else{
+    }else if(effect == 'downward'){
+        changeTextEffect('none'); // called this function for reset option
+        var text_val = selectedObject.text.toUpperCase();
+        var i = 0;
+        var font_size = selectedObject.fontSize-15;
+        var add_size = (1500 / selectedObject._text.length) * .01;
+        console.log("font size : ", font_size , " | add size in point : ", add_size);
+        var style_json = {};
+        while(selectedObject._text.length > i){
+          if(selectedObject._text[i] !== ''){
+            var updated_font_size = font_size+add_size;
+            style_json[parseInt(i)] = { fontSize: updated_font_size, fontWeight:600}
+            font_size = updated_font_size;
+          }else{
+            style_json[i] = { fontSize : font_size }
+          }
+          i++;
+        }
+
+        selectedObject.set({
+          text: text_val,
+          skewY: 10,
+          styles: {
+            0 : style_json
+          }
+        })
+    }else if(effect == 'upward'){
+        changeTextEffect('none'); // called this function for reset option
+        var text_val = selectedObject.text.toUpperCase();
+        var i = 0;
+        var font_size = selectedObject.fontSize-15;
+        var add_size = (1500 / selectedObject._text.length) * .01;
+        console.log("font size : ", font_size , " | add size in point : ", add_size);
+        var style_json = {};
+        while(selectedObject._text.length > i){
+          if(selectedObject._text[i] !== ''){
+            var updated_font_size = font_size+add_size;
+            style_json[parseInt(i)] = { fontSize: updated_font_size, fontWeight:600}
+            font_size = updated_font_size;
+          }else{
+            style_json[i] = { fontSize : font_size }
+          }
+          i++;
+        }
+
+        selectedObject.set({
+          text: text_val,
+          styles: {
+            0 : style_json
+          }
+        })
+    }else if(effect == 'cone'){
+        changeTextEffect('none'); // called this function for reset option
+        var text_val = selectedObject.text.toUpperCase();
+        var i = 0;
+        var font_size = selectedObject.fontSize-15;
+        var add_size = (1500 / selectedObject._text.length) * .01;
+        console.log("font size : ", font_size , " | add size in point : ", add_size);
+        var style_json = {};
+        while(selectedObject._text.length > i){
+          if(selectedObject._text[i] !== ''){
+            var updated_font_size = font_size+add_size;
+            style_json[parseInt(i)] = { fontSize: updated_font_size, fontWeight:600}
+            font_size = updated_font_size;
+          }else{
+            style_json[i] = { fontSize : font_size }
+          }
+          i++;
+        }
+
+        selectedObject.set({
+          text: text_val,
+          skewY: 5,
+          angle: -1,
+          styles: {
+            0 : style_json
+          }
+        })
+    }
+    else{
         var tempData = $.measureText(selectedObject.text, {fontFamily: selectedObject.fontFamily, fontSize:selectedObject.fontSize});
         selectedObject.set({
             path: '',
             width: tempData.width,
             height: tempData.height,
-            'type': 'text'
+            'type': 'text',
+            skewY: 0,
+            angle: 0,
+            fontWeight:500,
+            styles: {
+                0 : {}
+            }
        });
     }
 
@@ -784,12 +907,12 @@ function changeTxtFontSize(value){
         var newData = $.measureText(selectedObject.text, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
 
  
-        console.log('text width : ', newData.width , " | canvas width : ", canvas.width," | font size : ", font_size);
+        console.log('text width : ', newData.width , " | canvas width : ", CANVAS_WIDTH," | font size : ", font_size);
 
-        if(newData.width > canvas.width){
+        if(newData.width > CANVAS_WIDTH){
             console.log("condition 1");
             var text_width = newData.width;
-            while (text_width > canvas.width) {
+            while (text_width > CANVAS_WIDTH) {
               font_size = font_size-1;
               var newData = $.measureText(selectedObject.text, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
               text_width = newData.width;
@@ -896,8 +1019,8 @@ function updateTshirtImage(imageURL){
         img.scaleToWidth(80); 
         img.set({
             "type":'art',
-            left:0,
-            top:0
+            left:minX,
+            top:minY
         })
         // canvas.centerObject(img);
         img.setControlsVisibility({
@@ -1021,8 +1144,8 @@ document.getElementById('uploadFile').addEventListener("change", function(e){
             img.scaleToWidth(80); 
             img.set({
                 "type":'image',
-                left:0,
-                top:0,
+                left:minX,
+                top:minY,
                 width:80,
                 height:80
             })
@@ -1063,7 +1186,7 @@ document.getElementById('uploadFile').addEventListener("change", function(e){
 // The object will be removed !
 document.addEventListener("keydown", function(e) {
     var keyCode = e.keyCode;
-    console.log("key code => ", keyCode);
+    // console.log("key code => ", keyCode);
 
     if(keyCode == 46){
         console.log("Removing selected element on Fabric.js on DELETE key !");

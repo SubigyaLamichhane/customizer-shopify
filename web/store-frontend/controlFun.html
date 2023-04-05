@@ -8,10 +8,8 @@
         border:1px solid #000000;
 /*        z-index: 1;*/
 
-/*        width: 450px !important;*/
-/*        height: 450px !important;*/
-/*        left:25px !important;*/
-/*        top:25px !important;*/
+/*        width: 550px !important;*
+/*        height: 550px !important;*/
         
     }
     #pdfcanvas {
@@ -31,7 +29,7 @@
   <canvas id="pdfcanvas" width="500" height="500"></canvas>
 </div>
 
-
+<button id="inline-btn">Go</button>
 
 <script src="https://code.jquery.com/jquery-3.6.3.js"></script>
  <!-- Include Fabric.js in the page -->
@@ -47,25 +45,43 @@ var canvas = new fabric.Canvas('pdfcanvas', {
     stopContextMenu: true,
     controlsAboveOverlay: true,
 });
-var minX, minY, maxX, maxY;
-var canvasLayer = new fabric.Rect({
-            width: 400,
-            height: 400,
-            left:50,
-            top:50,
-            fill: '',
-            stroke: '#000',
-            strokeWidth: 0.5
-        });
-console.log(" => ", canvasLayer)
-minX = canvasLayer.left;
-maxX = canvasLayer.left+canvasLayer.width;
-minY = canvasLayer.top;
-maxY = canvasLayer.top+canvasLayer.height;
-canvas.setBackgroundImage(canvasLayer);
-console.log("min x => ", minX, " | max x => ", maxX, " | min y => ", minY, " | max y => ", maxY);
-
 canvas.controlsAboveOverlay = true;
+
+fabric.Canvas.prototype.getAbsoluteCoords = function(object) {
+    console.log("req => ", object);
+    return {
+      left: object.left + this._offset.left,
+      top: object.top + this._offset.top
+    };
+}
+
+var btn = document.getElementById('inline-btn'),
+      btnWidth = 85,
+      btnHeight = 18;
+
+  function positionBtn(obj){
+    var absCoords = canvas.getAbsoluteCoords(obj);
+    console.log(" absolute coards => ", absCoords);
+
+    btn.style.left = (absCoords.left - btnWidth / 2) + 'px';
+    btn.style.top = (absCoords.top - btnHeight / 2) + 'px';
+  }
+
+  fabric.Image.fromURL('assets/images/animal1.png', function(img) {
+
+    canvas.add(img.set({ left: 250, top: 250, angle: 30 }).scale(0.25));
+    img.on('moving', function() { positionBtn(img) });
+    img.on('scaling', function() { positionBtn(img) });
+    positionBtn(img);
+
+    });
+
+    // canvas.on('moving', function() { positionBtn(canvas.getActiveObject()) });
+    // canvas.on('scaling', function() { positionBtn(canvas.getActiveObject()) });
+    // positionBtn(canvas.getActiveObject());
+
+
+
 var text_val = "We are best";
 var textBox = new fabric.Textbox(text_val,{
             fontSize: 25,
@@ -76,9 +92,7 @@ var textBox = new fabric.Textbox(text_val,{
             editable: false,
             lockUniScaling: true,
             fixedWidth:200,
-            type: 'text',
-            left:minX,
-            top:minY
+            type: 'text'
         });
 textBox.setControlsVisibility({
             tl: true,
@@ -99,12 +113,11 @@ textBox.setControlsVisibility({
 
 </script>
 
-
 <!-- First option -->
 <script type="text/javascript">
 
-    var CANVAS_WIDTH = maxX;
-    var CANVAS_HEIGHT = maxY;
+    var CANVAS_WIDTH = canvas.wrapperEl.lastChild.clientWidth;
+    var CANVAS_HEIGHT = canvas.wrapperEl.lastChild.clientHeight;
     console.log("upper width : ", CANVAS_WIDTH, " | height : ", CANVAS_HEIGHT);
 
 	canvas.on('object:scaling', function (e) {
@@ -132,12 +145,12 @@ textBox.setControlsVisibility({
       }
 
       // restrict scaling above top of canvas
-      if (top < minY) {
+      if (top < 0) {
         obj.scaleY = 1;
         obj.setCoords();
         let h = obj.getScaledHeight();
         obj.scaleY = (height + top) / h;
-        obj.top = minY;
+        obj.top = 0;
         obj.setCoords();
         canvas.renderAll();
 
@@ -164,12 +177,12 @@ textBox.setControlsVisibility({
       }
 
       // restrict scaling over left of canvas
-      if(left < minX) {
+      if(left < 0) {
         obj.scaleX = 1;
         obj.setCoords();
         let w = obj.getScaledWidth();
         obj.scaleX = (width + left) / w;
-        obj.left = minX;
+        obj.left = 0;
         obj.setCoords();
         canvas.renderAll();
         obj.lockScalingX = true;
@@ -180,82 +193,23 @@ textBox.setControlsVisibility({
     });
 
 // function work when object move
-// canvas.on('object:moving', function(e) {
-//     var obj = e.target;
-
-//     if(obj.height > CANVAS_HEIGHT || obj.width > CANVAS_WIDTH){
-//         return;
-//     }       
-//     obj.setCoords();   
-//     console.log("Object => ", obj)
-//     // console.log("bounding rect => ", obj.getBoundingRect());
-//     if(obj.getBoundingRect().top < minY || obj.getBoundingRect().left < minX){
-//         obj.top = Math.max(obj.top, obj.top-obj.getBoundingRect().top);
-//         obj.left = Math.max(obj.left, obj.left-obj.getBoundingRect().left);
-//         if(obj.top < minY){
-//             obj.top = minY;
-//         }
-//         if(obj.left < minX){
-//             obj.left = minX;
-//         }
-//         console.log("first => top : ", obj.top, " | left : ", obj.left);
-//     }
-//     if(obj.getBoundingRect().top+obj.getBoundingRect().height  > CANVAS_HEIGHT || obj.getBoundingRect().left+obj.getBoundingRect().width  > CANVAS_WIDTH){
-//         obj.top = Math.min(obj.top, CANVAS_HEIGHT-obj.getBoundingRect().height+obj.top-obj.getBoundingRect().top);
-//         obj.left = Math.min(obj.left, CANVAS_WIDTH-obj.getBoundingRect().width+obj.left-obj.getBoundingRect().left);
-//         console.log("second => top : ", obj.top, " | left : ", obj.left);
-//     }
-//     // check condition for bottom left
-//     if(obj.aCoords.bl.x < minX){
-//         // obj.aCoords.bl.set({x:minX}) 
-//         obj.set({
-//             aCoords: {
-//                 bl:{x:minX}
-//             }
-//         })
-//     }
-//     if(obj.aCoords.bl.y < minY){
-//         obj.set({
-//             aCoords: {
-//                 bl:{y:minY}
-//             }
-//         }) 
-//     }
-//     obj.setCoords();  
-
-// });
-
-    canvas.on('object:moving', function(e) {
+canvas.on('object:moving', function(e) {
     var obj = e.target;
 
     if(obj.height > CANVAS_HEIGHT || obj.width > CANVAS_WIDTH){
         return;
     }       
     obj.setCoords();   
-    console.log("Object => ", obj)
-    // console.log("bounding rect => ", obj.getBoundingRect());
-    if(obj.getBoundingRect().top < minY || obj.getBoundingRect().left < minX){
-        obj.top = Math.max(obj.top, obj.top-obj.getBoundingRect().top+minY);
-        obj.left = Math.max(obj.left, obj.left-obj.getBoundingRect().left+minX);
-        if(obj.top < minY){
-            obj.top = minY;
-        }
-        if(obj.left < minX){
-            obj.left = minX;
-        }
-        console.log("first => top : ", obj.top, " | left : ", obj.left);
+    if(obj.getBoundingRect().top < 0 || obj.getBoundingRect().left < 0){
+        obj.top = Math.max(obj.top, obj.top-obj.getBoundingRect().top);
+        obj.left = Math.max(obj.left, obj.left-obj.getBoundingRect().left);
     }
-    if(obj.getBoundingRect().top + obj.getBoundingRect().height > CANVAS_HEIGHT || obj.getBoundingRect().left + obj.getBoundingRect().width > CANVAS_WIDTH){
-        obj.top = Math.min(obj.top, CANVAS_HEIGHT - obj.getBoundingRect().height + obj.top - obj.getBoundingRect().top);
-        obj.left = Math.min(obj.left, CANVAS_WIDTH - obj.getBoundingRect().width + obj.left - obj.getBoundingRect().left);
-        console.log("second => top : ", obj.top, " | left : ", obj.left);
+    if(obj.getBoundingRect().top+obj.getBoundingRect().height  > CANVAS_HEIGHT || obj.getBoundingRect().left+obj.getBoundingRect().width  > CANVAS_WIDTH){
+        obj.top = Math.min(obj.top, CANVAS_HEIGHT-obj.getBoundingRect().height+obj.top-obj.getBoundingRect().top);
+        obj.left = Math.min(obj.left, CANVAS_WIDTH-obj.getBoundingRect().width+obj.left-obj.getBoundingRect().left);
     }
-    
-
-
 
 });
-
 
  canvas.on('object:modified', function (event) {
       // after text object is done with modifing e.g. resizing or moving
