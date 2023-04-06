@@ -19,6 +19,21 @@ import { shopifyApp } from "@shopify/shopify-app-express";
 
 import { Session } from '@shopify/shopify-api';
 
+// upload image
+import multer from "multer";
+import path from "path";
+const __dirname = path.resolve();
+var storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+    //    cb(null, 'uploads');
+       cb(null, path.join(__dirname, '/uploads/'));
+    },
+    filename: function (req, file, cb) {
+       cb(null, Date.now() + '-' + file.originalname);
+    }
+ });
+ var upload = multer({ storage: storage });
+
 console.log(process.env.BACKEND_PORT, 'hello', process.env.PORT);
 
 const PORT = process.env.BACKEND_PORT || process.env.PORT;
@@ -654,6 +669,15 @@ app.delete("/api/delete-text-setting/:id", (req: Request, res: Response) => {
     });
 });
 
+// Upload image api
+app.post("/api/upload-image", upload.single('image'), async (req: Request, res: Response) => {
+    const image: any = await req.file;
+    res.status(200).send({
+        "status": true,
+        "message": "File uploaded successfully!",
+        "data": image.path
+    });
+});
 // ...................................
 
 app.use(serveStatic(STATIC_PATH, { index: false }));
