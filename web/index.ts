@@ -25,14 +25,14 @@ import path from "path";
 const __dirname = path.resolve();
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-    //    cb(null, 'uploads');
-       cb(null, path.join(__dirname, '/uploads/'));
+        //    cb(null, 'uploads');
+        cb(null, path.join(__dirname, '/uploads/'));
     },
     filename: function (req, file, cb) {
-       cb(null, Date.now() + '-' + file.originalname);
+        cb(null, Date.now() + '-' + file.originalname);
     }
- });
- var upload = multer({ storage: storage });
+});
+var upload = multer({ storage: storage });
 
 console.log(process.env.BACKEND_PORT, 'hello', process.env.PORT);
 
@@ -57,6 +57,21 @@ app.post(
     // @ts-ignore
     shopify.processWebhooks({ webhookHandlers: GDPRWebhookHandlers })
 );
+
+// ...................................
+// Front end api's.
+
+// Upload file api
+app.post("/api/upload-file", upload.single('image'), async (req: Request, res: Response) => {
+    const image: any = await req.file;
+    res.status(200).send({
+        "status": true,
+        "message": "File uploaded successfully!",
+        "data": image.path
+    });
+});
+
+// ...................................
 
 // All endpoints after this point will require an active session
 app.use("/api/*", shopify.validateAuthenticatedSession());
@@ -669,15 +684,6 @@ app.delete("/api/delete-text-setting/:id", (req: Request, res: Response) => {
     });
 });
 
-// Upload image api
-app.post("/api/upload-image", upload.single('image'), async (req: Request, res: Response) => {
-    const image: any = await req.file;
-    res.status(200).send({
-        "status": true,
-        "message": "File uploaded successfully!",
-        "data": image.path
-    });
-});
 // ...................................
 
 app.use(serveStatic(STATIC_PATH, { index: false }));
