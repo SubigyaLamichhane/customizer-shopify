@@ -58,6 +58,9 @@ app.post(
     shopify.processWebhooks({ webhookHandlers: GDPRWebhookHandlers })
 );
 
+app.use(express.json());
+app.use(bodyParser.json());
+
 // ...................................
 // Front end api's.
 
@@ -71,13 +74,21 @@ app.post("/api/upload-file", upload.single('image'), async (req: Request, res: R
     });
 });
 
+app.get("/api/test", (req: Request, res: Response) => {
+    res.status(200).send({
+        "status": true,
+        "message": 'This is test api!',
+        "data": [],
+    });
+});
+
 // ...................................
 
 // All endpoints after this point will require an active session
 app.use("/api/*", shopify.validateAuthenticatedSession());
 
-app.use(express.json());
-app.use(bodyParser.json());
+// app.use(express.json());
+// app.use(bodyParser.json());
 
 app.get("/api/products/count", async (_req: Request, res: Response) => {
     const countData = await shopify.api.rest.Product.count({
@@ -409,25 +420,20 @@ app.delete("/api/delete-setting/:id", (req: Request, res: Response) => {
 
 // Add product
 app.post("/api/add-product", (req: Request, res: Response) => {
-    // console.log('req.body',JSON.parse(req.body))
-    // res.status(201).send({
-    //     "status": true,
-    //     "message": "Test!",
-    //     "data": JSON.parse(req.body)
-    // });
-
     let session_id: string = res.locals.shopify.session.id;
-    let product_id: number = req.body.product_id;
-    let product_title: string = req.body.product_title;
-    let product_image: string = req.body.product_image;
-    let product_color: string = req.body.product_color;
-    mysqlConnection.query('INSERT INTO product_settings SET ?', {
-        session_id: session_id,
-        product_id: product_id,
-        product_title: product_title,
-        product_image: product_image,
-        product_color: product_color,
-    }, function (error: any, result: any, fields: any) {
+    let productData: any = [];
+    let products: any = req.body.products;
+    let query: string = "INSERT INTO product_settings (session_id, product_id, product_title, product_image,product_color) VALUES ?";
+    products.forEach((item: any, itemKey: any) => {
+        productData[itemKey] = [
+            session_id,
+            item.product_id,
+            item.product_title,
+            item.product_image,
+            item.product_color
+        ];
+    });
+    mysqlConnection.query(query, [productData], function (error: any, result: any, fields: any) {
         if (error) throw error;
         if (result.affectedRows > 0) {
             res.status(201).send({

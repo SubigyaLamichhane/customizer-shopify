@@ -15,7 +15,10 @@ export default function Products(props) {
 
   const selectedProduct = (selectPayload) => {
     const prodData = selectPayload.selection;
-    var data = [];
+    // var data = [];
+    var data = {
+      'products': []
+    };
     prodData.forEach((product, key) => {
       var prd_image = "";
       if (product.images !== undefined) {
@@ -28,13 +31,17 @@ export default function Products(props) {
           prd_image = dummyImage;
         }
       }
-      data[key] = {
+      data['products'][key] = {
         "product_id": Number(product.id.replace("gid://shopify/Product/", "")),
         "product_title": product.title,
         "product_image": prd_image,
         "product_color": product.options[0].values
       };
     });
+    // var products = {
+    //   'products': data
+    // };
+    console.log('data', data)
     // const productsData["product"] = JSON.stringify(data);
     const response = fetch(`${API_URL}/add-product`, {
       method: "POST",
@@ -44,8 +51,8 @@ export default function Products(props) {
       dataType: "json",
       body: JSON.stringify(data)
     });
-    hideResourcePicker();
-    console.log('data', data)
+    console.log('response', response)
+    // hideResourcePicker();
   }
   return (
     <Page>
