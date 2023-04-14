@@ -1,6 +1,6 @@
 // @ts-check
 import { join } from "path";
-import { readFileSync } from "fs";
+import { readFileSync, writeFile } from "fs";
 import express, { Request, Response, NextFunction, Express } from "express";
 import serveStatic from "serve-static";
 
@@ -18,10 +18,13 @@ import bodyParser from "body-parser";
 import { shopifyApp } from "@shopify/shopify-app-express";
 
 import { Session } from '@shopify/shopify-api';
+import { fromPath } from "pdf2pic";
+
 
 // upload image
 import multer from "multer";
 import path from "path";
+import { encode } from "punycode";
 const __dirname = path.resolve();
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -66,12 +69,33 @@ app.use(bodyParser.json());
 
 // Upload file api
 app.post("/api/upload-file", upload.single('image'), async (req: Request, res: Response) => {
-    const image: any = await req.file;
-    res.status(200).send({
-        "status": true,
-        "message": "File uploaded successfully!",
-        "data": image.path
-    });
+    let image: any = await req.file;
+    if (image.mimetype == "application/pdf") {
+        let options = {
+            density: 100,
+            saveFilename: image.filename,
+            savePath: "./uploads",
+            format: "png",
+            width: 600,
+            height: 600
+        };
+        let storeAsImage = await fromPath(image.path, options);
+        let pageToConvertAsImage = 1;
+    
+        storeAsImage(pageToConvertAsImage).then((resolve) => {
+            res.status(200).send({
+                "status": true,
+                "message": "File converted successfully!",
+                "data": resolve
+            });
+        });
+    } else {
+        res.status(200).send({
+            "status": true,
+            "message": "Unable to convert!",
+            "data": []
+        });
+    }
 });
 
 app.get("/api/test", (req: Request, res: Response) => {

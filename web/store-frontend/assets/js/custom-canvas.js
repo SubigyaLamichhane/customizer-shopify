@@ -22,40 +22,91 @@ var right_canvas = new fabric.Canvas('right-canvas', {
     controlsAboveOverlay: true
 });
 
-
 var canvas_view_type = $('.canvas_view_input[name="canvas_view_type"]:checked').attr('view_type');
 var canvas = front_canvas;
 
 
-
-var minX, minY, maxX, maxY;
+var minX, minY, maxX, maxY, CANVAS_WIDTH, CANVAS_HEIGHT;
+var canvas_padding = 80; // canvas padding like 50 = 25 for left + 25 for right(25 for each side)
 // Define the background rectangle dimensions
-    var bgWidth = 200;
-    var bgHeight = 300;
-    var bgLeft = (canvas.width - bgWidth) / 2;
-    var bgTop = (canvas.height - bgHeight) / 2;
+    // front canvas width height
+    var frontbgWidth = front_canvas.width - canvas_padding;
+    var frontbgHeight = front_canvas.height - canvas_padding;
+
+    // back canvas width height
+    var backbgWidth = back_canvas.width - canvas_padding;
+    var backbgHeight = back_canvas.height - canvas_padding;
+
+    // sleeve left canvas width height
+    var leftSlvbgWidth = left_canvas.width - canvas_padding;
+    var leftSlvbgHeight = left_canvas.height - canvas_padding;
+
+    // sleeve right canvas width height
+    var rightSlvbgWidth = right_canvas.width - canvas_padding;
+    var rightSlvbgHeight = right_canvas.height - canvas_padding;
+
+    var bgLeft = canvas_padding / 2;
+    var bgTop = canvas_padding / 2;
 
 // Create the background rectangle
-    var bgRect = new fabric.Rect({
+
+    var frontbgRect = new fabric.Rect({
         left: bgLeft,
         top: bgTop,
-        width: bgWidth,
-        height: bgHeight,
+        width: frontbgWidth,
+        height: frontbgHeight,
+        fill: 'transparent',
+        stroke: '#cacaca',
+        strokeWidth: 1
+    });
+
+    var backbgRect = new fabric.Rect({
+        left: bgLeft,
+        top: bgTop,
+        width: backbgWidth,
+        height: backbgHeight,
+        fill: 'transparent',
+        stroke: '#cacaca',
+        strokeWidth: 1
+    });
+
+    var leftbgRect = new fabric.Rect({
+        left: bgLeft,
+        top: bgTop,
+        width: leftSlvbgWidth,
+        height: leftSlvbgHeight,
+        fill: 'transparent',
+        stroke: '#cacaca',
+        strokeWidth: 1
+    });
+
+    var rightbgRect = new fabric.Rect({
+        left: bgLeft,
+        top: bgTop,
+        width: rightSlvbgWidth,
+        height: rightSlvbgHeight,
         fill: 'transparent',
         stroke: '#cacaca',
         strokeWidth: 1
     });
     
 // Add the background rectangle to the canvas
-    canvas.setBackgroundImage(bgRect);
-    canvas.renderAll();
+    front_canvas.setBackgroundImage(frontbgRect);
+    back_canvas.setBackgroundImage(backbgRect);
+    left_canvas.setBackgroundImage(leftbgRect);
+    right_canvas.setBackgroundImage(rightbgRect);
 
-minX = bgRect.left;
-maxX = bgRect.left+bgRect.width;
-minY = bgRect.top;
-maxY = bgRect.top+bgRect.height;
-var CANVAS_WIDTH = maxX;
-var CANVAS_HEIGHT = maxY;
+    front_canvas.renderAll();
+    back_canvas.renderAll();
+    left_canvas.renderAll();
+    right_canvas.renderAll();
+
+minX = frontbgRect.left;
+maxX = frontbgRect.left+frontbgRect.width;
+minY = frontbgRect.top;
+maxY = frontbgRect.top+frontbgRect.height;
+CANVAS_WIDTH = maxX;
+CANVAS_HEIGHT = maxY;
 
 
 // Change canvas type like :- [front, back, right, left]
@@ -67,19 +118,43 @@ function changeCanvasType(type) {
     $('.custom_canvas').css('display','none');
     if(type == 'back'){
         $('#backCanvasWrap').css('display','block');
+        minX = backbgRect.left;
+        maxX = backbgRect.left+backbgRect.width;
+        minY = backbgRect.top;
+        maxY = backbgRect.top+backbgRect.height;
+        CANVAS_WIDTH = maxX;
+        CANVAS_HEIGHT = maxY;
         canvas = back_canvas;
         fireEvents();
         // canvas.calcOffset();
     }else if(type == 'right'){
         $('#rightCanvasWrap').css('display','block');
+        minX = rightbgRect.left;
+        maxX = rightbgRect.left+rightbgRect.width;
+        minY = rightbgRect.top;
+        maxY = rightbgRect.top+rightbgRect.height;
+        CANVAS_WIDTH = maxX;
+        CANVAS_HEIGHT = maxY;
         canvas = right_canvas;
         fireEvents();
     }else if(type =='left'){
         $('#leftCanvasWrap').css('display','block');
+        minX = leftbgRect.left;
+        maxX = leftbgRect.left+leftbgRect.width;
+        minY = leftbgRect.top;
+        maxY = leftbgRect.top+leftbgRect.height;
+        CANVAS_WIDTH = maxX;
+        CANVAS_HEIGHT = maxY;
         canvas = left_canvas;
         fireEvents();
     }else{
         $('#frontCanvasWrap').css('display','block');
+        minX = frontbgRect.left;
+        maxX = frontbgRect.left+frontbgRect.width;
+        minY = frontbgRect.top;
+        maxY = frontbgRect.top+frontbgRect.height;
+        CANVAS_WIDTH = maxX;
+        CANVAS_HEIGHT = maxY;
         canvas = front_canvas;
         fireEvents();
     }
@@ -100,8 +175,8 @@ deleteImg.src = deleteIcon;
 fabric.Textbox.prototype.controls.deleteControl = new fabric.Control({
     x: -0.5,
     y: -0.5,
-    offsetY: -16,
-    offsetX: -16,
+    offsetY: -10,
+    offsetX: -10,
     cursorStyle: 'pointer',
     mouseUpHandler: deleteObject,
     render: renderIcon(deleteImg),
@@ -114,8 +189,8 @@ fabric.Textbox.prototype.controls.deleteControl = new fabric.Control({
 fabric.Image.prototype.controls.deleteControl = new fabric.Control({
     x: -0.5,
     y: -0.5,
-    offsetY: -16,
-    offsetX: -16,
+    offsetY: -10,
+    offsetX: -10,
     cursorStyle: 'pointer',
     mouseUpHandler: deleteObject,
     render: renderIcon(deleteImg),
@@ -135,6 +210,8 @@ resizeImg.src = resizeIcon;
 fabric.Object.prototype.controls.br = new fabric.Control({
   x: 0.5,
   y: 0.5,
+  offsetY: 10,
+  offsetX: 10,
   cursorStyle: 'nw-resize',
   actionHandler: fabric.controlsUtils.scalingEqually,
   actionName: 'resize',
@@ -182,39 +259,111 @@ function renderIcon(icon) {
 
 // function for text resize when object width is greater than canvas
 function fitToObject(event) {
+    console.log("Call fit to object function")
    var obj = event;
 
-    var font_size = obj.fontSize;
-    var text_val = obj.text;
-    var font_family = obj.fontFamily;
-    var tempData = $.measureText(text_val, {fontFamily:font_family, fontSize:font_size});
-    if(tempData.width > CANVAS_WIDTH){
-            var text_width = tempData.width;
-            while (text_width > CANVAS_WIDTH){
-               console.log('text width : ', text_width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", font_size);
-            font_size = font_size-1;
-            var updateData = $.measureText(text_val, {fontFamily: font_family, fontSize:font_size});
-            text_width = updateData.width;
+   if if(obj.type == 'text' && obj.text_effect == 'curve'){
+
+   }else if(obj.type == 'text'){
+        var canvas_space_width = 5;
+        if(parseInt(obj.outline_width) > 5 && obj.outline_color_name !== "none"){
+            canvas_space_width = 15;
+        }else if(parseInt(obj.outline_width) > 1 && obj.outline_color_name !== "none"){
+            canvas_space_width = 10;
+        }else{
+            canvas_space_width = 0;
         }
-    }
-    if(obj.type == 'shape'){
-        var new_height = tempData.height+obj.path.height;
-        console.log("shape edit height => ", new_height);
-        obj.set({
-            text: text_val,
-            width: tempData.width,
-            fontSize: font_size
-        });
-        obj.set({height: new_height})
-    }else{
-        obj.set({
-            text: text_val,
-            width: tempData.width,
-            height: tempData.height,
-            fontSize: font_size
-        });
-    }
-    $('#textFontSize').val(font_size);
+        console.log("canvas space => ", canvas_space_width);
+        console.log("canvas => scale to width : ",  obj.scaleToWidth , " | width " , (CANVAS_WIDTH-minX) , " | height : ", obj.scaleToHeight, " | ", parseInt(obj.scaleToWidth) > parseInt(CANVAS_WIDTH-minX) )
+        if(parseInt(obj.scaleToWidth) > parseInt(CANVAS_WIDTH-minX)){
+            var font_size = obj.text_font_size;
+            var text_val = obj.text;
+            var font_family = obj.text_font_family;
+            var tempData = $.measureText(text_val, {fontFamily:font_family, fontSize:parseFloat(font_size)});
+            console.log("canvas => temp to width : ",  tempData.width , " | width " , parseInt(CANVAS_WIDTH-minX-canvas_space_width), " | font_size ", font_size );
+            if(tempData.width > parseInt(CANVAS_WIDTH-minX-canvas_space_width)){
+                    var text_width = tempData.width;
+                    while (text_width > (CANVAS_WIDTH-minX-canvas_space_width)){
+                        console.log('text width : ', text_width , " | canvas width : ", (CANVAS_WIDTH-minX-canvas_space_width), " | font size : ", font_size);
+                        font_size = font_size-0.1;
+                        var updateData = $.measureText(text_val, {fontFamily: font_family, fontSize:font_size});
+                        text_width = updateData.width;
+                    }
+            }
+
+            $.ajax({
+              url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+text_val+"&effect="+obj.text_effect+"&font_color="+obj.text_color.replace("#","")+"&font_size="+font_size+"&fontName="+obj.text_font_family+"&outline_color="+obj.outline_color.replace("#","")+"&outline_width="+obj.outline_width,
+              xhrFields: {
+                responseType: 'blob'
+              },
+              beforeSend: function() {
+                $('.customiseLoader').css("display","flex");
+              },
+              success: function (img, status, xhr) {
+                $('#textFontSize').val(parseFloat(font_size).toFixed(1));
+
+                obj.set({
+                    scaleToWidth:xhr.getResponseHeader('x-img-width'),
+                    scaleToHeight:xhr.getResponseHeader('x-img-height'),
+                    scaleX: 1,
+                    scaleY:1,
+                    "text_font_size": font_size,
+                })
+                obj.setSrc(URL.createObjectURL(img));                
+                        
+                setTimeout(function(){
+                    setObjectInside(obj);
+                    canvas.renderAll(); 
+                    $('.customiseLoader').css("display","none");
+                }, 200)
+              },
+              error: function (jqXhr, textStatus, errorMessage) {
+                console.log("Error => ",errorMessage);
+                $('.customiseLoader').css("display","none");
+              }
+            })    
+
+        }else{
+            setObjectInside(obj);
+            canvas.renderAll(); 
+            $('.customiseLoader').css("display","none"); 
+
+        }
+        
+   }
+   console.log("End fit to object Function!");
+
+    // var font_size = obj.fontSize;
+    // var text_val = obj.text;
+    // var font_family = obj.fontFamily;
+    // var tempData = $.measureText(text_val, {fontFamily:font_family, fontSize:font_size});
+    // if(tempData.width > (CANVAS_WIDTH-minX)){
+    //         var text_width = tempData.width;
+    //         while (text_width > (CANVAS_WIDTH-minX)){
+    //            console.log('text width : ', text_width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", font_size);
+    //         font_size = font_size-1;
+    //         var updateData = $.measureText(text_val, {fontFamily: font_family, fontSize:font_size});
+    //         text_width = updateData.width;
+    //     }
+    // }
+    // if(obj.type == 'shape'){
+    //     var new_height = tempData.height+obj.path.height;
+    //     console.log("shape edit height => ", new_height);
+    //     obj.set({
+    //         text: text_val,
+    //         width: tempData.width,
+    //         fontSize: font_size
+    //     });
+    //     obj.set({height: new_height})
+    // }else{
+    //     obj.set({
+    //         text: text_val,
+    //         width: tempData.width,
+    //         height: tempData.height,
+    //         fontSize: font_size
+    //     });
+    // }
+    // $('#textFontSize').val(font_size);
 }
 
 // function for object can not go outside of canvas mark
@@ -244,52 +393,72 @@ function setObjectInside(e) {
 
 }
 
+// calculate text font size when object scaling or modified
+function calculateFontSize(text, width, height){
+    let selectedObject = canvas.getActiveObject();
+    let fontSize = selectedObject.text_font_size; // Starting font size
+    let font_family = selectedObject.text_font_family;
+    let lowest_font_size = 5;
 
-// function for custom action(resize and delete) icon position
-// function actionIconPosition(obj){
-//     var icon_width = 20;
+    let tempData = $.measureText(text, {fontFamily:font_family, fontSize:fontSize});
+    let tempWidthTolerance = 4;
+
+    const content_canvas = document.createElement('canvas');
+    const context = content_canvas.getContext('2d');
     
-//         var obj_width = obj.width;
-//         var obj_height = obj.height;
-//         if(obj.type == "art" || obj.type == 'image'){
-//             obj_width = (obj.width * obj.scaleX);
-//             obj_height = (obj.height * obj.scaleY);
-//         }
+    // Set content_canvas dimensions to match text element
+    content_canvas.width = width;
+    content_canvas.height = height;
+    console.log("=== check first ====");
+    console.log(parseFloat(selectedObject.scaleToWidth) ," > ", parseFloat(width));
+    console.log("=== check last ====");
+    if(parseFloat(selectedObject.scaleToWidth) > parseFloat(width)){
+        console.log("Decrease size");
+        while (fontSize >= lowest_font_size) { // Add minimum font size condition
+          // Set the font size and measure the text
+          context.font = fontSize + 'px '+font_family;
+          const textWidth = context.measureText(text).width;
+          const textHeight = context.measureText(text).height;
+          
+          // Add a tolerance value to the text width calculation
+          const widthWithTolerance = width;
+          // If the text fits within the canvas, return the font size
+          console.log("Condition | ", textWidth ," <= ", widthWithTolerance ," | ", fontSize , " <= ", height)
+          if (textWidth <= widthWithTolerance || textHeight <= height) {
+            return fontSize;
+          }      
+          // Decrease the font size by 1 and try again
+          fontSize = fontSize-0.1;
+          // fontSize--;
+        }
+    }else if(parseFloat(selectedObject.scaleToWidth) < parseFloat(width)){
+        console.log("Increase size");
+        while (fontSize >= lowest_font_size) { // Add minimum font size condition
+          // Set the font size and measure the text
+          context.font = fontSize + 'px '+font_family;
+          const textWidth = context.measureText(text).width;
+          const textHeight = context.measureText(text).height;
+          
+          // Add a tolerance value to the text width calculation
+          const widthWithTolerance = width;
+          // If the text fits within the canvas, return the font size
+          console.log("Condition | ", textWidth ," <= ", widthWithTolerance ," | ", fontSize , " <= ", height)
+          if (textWidth >= widthWithTolerance || textHeight >= height) {
+            return fontSize;
+          }      
+          // Increase the font size by 1 and try again
+          // fontSize++;
+          fontSize = fontSize+0.1;
+        }
+    }else if(parseFloat(selectedObject.scaleToWidth) == parseFloat(width)){
+        console.log("same size");
+        return fontSize; // Return null if font size is too small
+    }
+    
+    return lowest_font_size; // Return null if font size is too small
+    
+}
 
-//         // for delete icon position
-//         var del_icon_pos = obj.aCoords.tl;
-//         var check_width = obj_width+del_icon_pos.x;
-//         var check_height = obj_height+del_icon_pos.y;
-//         var del_top_pos = del_icon_pos.y-icon_width;
-//         var del_left_pos = del_icon_pos.x-icon_width;
-
-//         // for resize icon position
-//         var resize_icon_pos = obj.aCoords.br;
-//         var res_top_pos = resize_icon_pos.y;
-//         var res_left_pos = resize_icon_pos.x;
-       
-//         if(del_icon_pos.y <= 0){
-//             del_top_pos = -icon_width; // we have assign icon width above
-//             res_top_pos = obj_height;
-//         }
-//         if(del_icon_pos.x <= 0){
-//             del_left_pos = -icon_width; // don't touch this icon width with minus
-//             res_left_pos = obj_width
-//         }
-//         if(check_width > CANVAS_WIDTH){
-//             del_left_pos = CANVAS_WIDTH - obj_width;
-//             del_left_pos = del_left_pos-icon_width;
-//             res_left_pos = CANVAS_WIDTH;
-//         }
-//         if(check_height > CANVAS_HEIGHT){
-//             del_top_pos = CANVAS_HEIGHT - obj_height;
-//             del_top_pos = del_top_pos-icon_width
-//             res_top_pos = CANVAS_HEIGHT;
-//         }
-        
-//         $('.delete_icon_wrap').css({"top":del_top_pos, "left":del_left_pos});
-//         $('.scale_icon_wrap').css({"top":res_top_pos, "left":res_left_pos});
-// }
 
 
 //function fire event start this function will call whenever we change canvas type(front, back)
@@ -305,14 +474,47 @@ canvas.clipTo = function(ctx) {
 };
 canvas.renderAllBoundaries = true;
 
+// ------------ Resize canvas function --------
+
+// window.addEventListener('resize', resizeCanvas, false);
+// function resizeCanvas() {
+//     var imgWidth = $('#customiserImage').width();
+//     var imgHeight = $('#customiserImage').height();
+//     var canvasWidth = imgWidth*65/100 ;
+//     var canvasHeight = imgHeight*70/100 ;
+
+//     var bgWidth = canvasWidth-canvas_padding;
+//     var bgHeight = canvasHeight-canvas_padding;
+
+//     // let bgLeft = canvas_padding / 2;
+//     // let bgTop = canvas_padding / 2;
+
+//     minX = bgLeft;
+//     maxX = bgLeft+bgWidth;
+//     minY = bgTop;
+//     maxY = bgTop+bgHeight;
+//     CANVAS_WIDTH = maxX;
+//     CANVAS_HEIGHT = maxY;
+
+//     canvas.setHeight(canvasHeight);
+//     canvas.setWidth(canvasWidth);
+//     canvas.backgroundImage.set({
+//         width:bgWidth,
+//         height:bgHeight,
+//         left:bgLeft,
+//         top:bgTop
+//     });
+//     canvas.renderAll();
+// }
+// resizeCanvas();
+
 // This function will work when click on canvas 
 canvas.on('mouse:down', function(options) {
     var obj_target = options.target
     
   // checking when you click on canvas then object was selected on not.
   if(obj_target) {
-    // actionIconPosition(obj_target);
-    if (obj_target.type == 'text' || obj_target.type == 'shape') {
+    if (obj_target.type == 'text') {
         console.log('Text object was clicked! ', obj_target);
         // editTextFunction(options.target);
         $('.ct_content_tab').removeClass("active_tab");
@@ -321,9 +523,43 @@ canvas.on('mouse:down', function(options) {
         $('#textSettings').addClass("active_tab");
 
         $('#addTextTab').css("display","none");
-        $('#editTextContent').val(options.target.text);
+        if(options.target.text == 'No Text'){
+            $('#editTextContent').val('');
+        }else{
+            $('#editTextContent').val(options.target.text);
+        }
         $('#editTextTab').css("display","block");
         $('.selected_font_name').text(options.target.fontFamily);
+
+        // default settings value when added new text
+        $('.selected_font_name').text(obj_target.text_font_family);
+        $('.selected_color_name').text(obj_target.text_color_name);
+        $('.selected_color>.color_box').css('background-color', obj_target.text_color);
+        $('.selected_color>.color_name').text(obj_target.text_color_name);
+        $(".color_box>input[name='text_color_input'][data-color-code='"+obj_target.text_color+"']").prop("checked",true);
+
+        
+        $('.txt_shape_container').removeClass('active_shape');
+        $('.txt_shape_container.'+obj_target.text_effect+'_text').addClass('active_shape');
+        if(obj_target.text_effect == 'normal'){
+            $('.selected_shape_name').text('None');
+        }else{
+            $('.selected_shape_name').text(obj_target.text_effect);
+        }
+
+        $('.selected_outline_color>.color_box').css('background-color', obj_target.outline_color);
+        $('.selected_outline_color>.color_name').text(obj_target.outline_color_name);
+        $('.selected_outline_name').text(obj_target.outline_color_name);
+
+        $('#rotatTextRangeSlide').val(obj_target.angle);
+        $('#rotatTextNumber').val(obj_target.angle);
+
+        $('#textFontSize').val(parseFloat(obj_target.text_font_size).toFixed(1));
+
+        var font_text = truncateString(obj_target.text, 10);
+        $('ul#allFonts>li>span.active_text').text(font_text);
+
+
     }else{
         $('#editTextTab').css("display","none");
         $('#addTextTab').css("display","block");
@@ -390,9 +626,8 @@ canvas.on('object:moving', function(e) {
 
     if(obj.height > CANVAS_HEIGHT || obj.width > CANVAS_WIDTH){
         return;
-    }else{
-        // actionIconPosition(obj);
-    }        
+    }
+
     obj.setCoords();   
     if(obj.getBoundingRect().top < minY || obj.getBoundingRect().left < minX){
         obj.top = Math.max(obj.top, obj.top-obj.getBoundingRect().top+minY);
@@ -426,11 +661,6 @@ canvas.on('object:scaling', function (e){
     // fitToObject(e.target);
     var obj = e.target;
 
-        if(obj.type == 'shape')
-        {
-            console.log("Inside function1");
-            // updatePathBoundingBox(obj);
-        } 
         obj.setCoords();
         var brNew = obj.getBoundingRect();
 
@@ -449,67 +679,54 @@ canvas.on('object:scaling', function (e){
             scale1y=obj.scaleY;
             width1=obj.width;
             height1=obj.height;
-            // actionIconPosition(obj);
         }
 
 });
 
 
 canvas.on('object:modified', function(event) {
-
-    // actionIconPosition(event.target);
-    // positionDelete(event.target);
     console.log("modified");
     if (event.target.type == 'text') {
-       var newfontsize = (event.target.fontSize * event.target.scaleX);
-
-       var tempData = $.measureText(event.target.text, {fontFamily: event.target.fontFamily, fontSize:newfontsize});
-
-       console.log('text width : ', tempData.width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", newfontsize);
-
-       event.target.set({
-            fontSize: parseInt(newfontsize, 10),
-            scaleX: 1,
-            scaleY:1,
-            width: tempData.width,
-            height: tempData.height
-        })
-        
-        $('#textFontSize').val(parseInt(newfontsize, 10));
-       // fitToObject(event.target)
-    }
-    if(event.target.type == 'shape'){
-
-        var newfontsize = (event.target.fontSize * event.target.scaleX);
-
-       var tempData = $.measureText(event.target.text, {fontFamily: event.target.fontFamily, fontSize:newfontsize});
-
-       console.log('text width : ', tempData.width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", newfontsize);
-
-       var get_path = event.target.path;
-        console.log("active path  before: ", get_path)
-       get_path.set({
-            scaleToWidth:tempData.width
-       })  
-      
-       // get_path.scaleToWidth(tempData.width);
-       
-       // console.log("active path  width : ", get_path.width * get_path.scaleX)
-
-       
-       event.target.set({
-            fontSize: parseInt(newfontsize, 10),
-            scaleX: 1,
-            scaleY:1,
-            width: tempData.width,
-        })
-       var new_height = event.target.path.height + tempData.height;
-       console.log("New height : ", new_height);
-       console.log("active path after: ", get_path)
-        event.target.set({ height: new_height });
-        $('#textFontSize').val(parseInt(newfontsize, 10));
-        var shape_val = $('.selected_shape_name').text();
-        changeTextEffect(shape_val);
+        console.log(" data => ", event.target);
+        var newWidth = (event.target.width * event.target.scaleX);
+        var newHeight = (event.target.height * event.target.scaleY);
+        let updateFontSize = calculateFontSize(event.target.text, newWidth, newHeight);
+        console.log("New font size :", updateFontSize);
+        if(parseFloat(event.target.scaleToWidth) !== parseFloat(newWidth)){
+        $.ajax({
+              url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+event.target.text+"&effect="+event.target.text_effect+"&font_color="+event.target.text_color.replace("#","")+"&font_size="+updateFontSize+"&fontName="+event.target.text_font_family+"&outline_color="+event.target.outline_color.replace("#","")+"&outline_width="+event.target.outline_width,
+              xhrFields: {
+                responseType: 'blob'
+              },
+              beforeSend: function() {
+                $('.customiseLoader').css("display","flex");
+              },
+              success: function (img, status, xhr) {
+                console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
+                console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
+                $('#textFontSize').val(parseFloat(updateFontSize).toFixed(1));
+                event.target.set({
+                    scaleToWidth:xhr.getResponseHeader('x-img-width'),
+                    scaleToHeight:xhr.getResponseHeader('x-img-height'),
+                    scaleX: 1,
+                    scaleY:1,
+                    "text_font_size": updateFontSize
+                })
+                event.target.setSrc(URL.createObjectURL(img));
+                        
+                setTimeout(function(){
+                    fitToObject(event.target)
+                    // setObjectInside(event.target);
+                    // canvas.renderAll(); 
+                    // $('.customiseLoader').css("display","none");
+                }, 200)
+              },
+              error: function (jqXhr, textStatus, errorMessage) {
+                console.log("Error => ",errorMessage);
+                $('.customiseLoader').css("display","none");
+              }
+            }) 
+         }
     }
     if (event.target.type == 'art' || event.target.type == 'image') {
         var newWidth = (event.target.width * event.target.scaleX);
@@ -524,6 +741,7 @@ canvas.on('object:modified', function(event) {
             scaleToHeight:newHeight
         })
     }
+
   });
 
 } // fireEvents fucntion end
@@ -537,64 +755,124 @@ const truncateString = (string = '', maxLength = 50) =>
     : string
 
 
-
-
+// call add text button when hit enter button
 $("#textContent").keypress(function(e) {
     if(e.which == 13){
         // alert('You pressed enter!');
         $("#addTextContent").trigger("click");
     }
 });
+// add text function
 $("#addTextContent").click(function(){
-    console.log("test");
+    
     var text_val = $("#textContent").val().trim();
     text_val = text_val.replace(/\s+/g, " ");;
-    console.log("value is => ", text_val);
     if(text_val != ""){
-        var font_size = 26;
+        var font_size = 30;
         var tempData = $.measureText(text_val, {fontFamily:"Arial", fontSize:font_size});
+        var textWidth = tempData.width;
+        var textHeight = tempData.height;
+
         console.log(tempData)
-        if(tempData.width > CANVAS_WIDTH-5){
+        if(tempData.width > (CANVAS_WIDTH-minX-5)){
             console.log("condition 1")
             var text_width = tempData.width;
-            while (text_width > CANVAS_WIDTH-5) {
-                console.log('text width : ', text_width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", font_size);
+            var text_height = tempData.height;
+            while (text_width > (CANVAS_WIDTH-minX-5)) {
+                console.log('text width : ', text_width , " | canvas width : ", (CANVAS_WIDTH-minX-5), " | font size : ", font_size);
               font_size = font_size-1;
-              var tempData = $.measureText(text_val, {fontFamily: "Arial", fontSize:font_size});
-              text_width = tempData.width;
+              var updateData = $.measureText(text_val, {fontFamily: "Arial", fontSize:font_size});
+              text_width = updateData.width;
+              text_height = updateData.height;
             }
+            textWidth = text_width;
+            textHeight = text_height;
         }
-        $('#textFontSize').val(font_size);
-    	var textBox = new fabric.Textbox(text_val,{
-    	    fontSize: font_size,
-    	    fontFamily: 'Arial',
-    	    textAlign: 'center', 
-    	    fontWeight:'normal', 
-    	    width: tempData.width, // for 20 characters
-            editable: false,
-            lockUniScaling: true,
-            fixedWidth:200,
-            type: 'text',
-            strokeWidth:0,
-            'strokeUniform': true,
-            top:minY,
-            left:minX
-	    });
-        textBox.setControlsVisibility({
-            tl: false,
-            bl: false,
-            tr: false,
-            br: true,
-            ml: false,
-            mb: false,
-            mr: false,
-            mt: false,
-            mtr: false
-        });
 
-	    canvas.add(textBox);
-        canvas.setActiveObject(textBox);
-	    canvas.renderAll();
+        $.ajax({
+          url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+text_val+"&effect=normal&font_color=000000&font_size="+font_size+"&fontName=Arial&outline_color=00000000&outline_width=1",
+          xhrFields: {
+            responseType: 'blob'
+          },
+          beforeSend: function() {
+            $('.customiseLoader').css("display","flex");
+          },
+          success: function (img, status, xhr) {
+            $('#textFontSize').val(parseFloat(font_size).toFixed(1));
+                fabric.Image.fromURL(window.URL.createObjectURL(img), function(img) {
+                    img.set({
+                        scaleToWidth:xhr.getResponseHeader('x-img-width'),
+                        scaleToHeight:xhr.getResponseHeader('x-img-height'),
+                        scaleX: 1,
+                        scaleY:1,
+                        "type":'text',
+                        "text":text_val,
+                        "text_effect":"normal",
+                        "text_color": "#000000",
+                        "text_color_name": "black",
+                        "text_font_size": font_size,
+                        "text_font_family": "Arial",
+                        "outline_color": "#00000000",
+                        "outline_color_name": "None",
+                        "outline_width": "1",
+                        left:minX,
+                        top:minY,
+                        lockScalingFlip: true
+                    })
+                    img.setControlsVisibility({
+                        tl: false,
+                        bl: false,
+                        tr: false,
+                        br: true,
+                        ml: false,
+                        mb: false,
+                        mr: false,
+                        mt: false,
+                        mtr: false
+                    });
+                    // add the image to the canvas
+                    canvas.add(img);
+                    var newWidth = (img.width * img.scaleX);
+                    var newHeight = (img.height * img.scaleY);
+                    img.set({
+                        scaleToWidth:newWidth,
+                        scaleToHeight:newHeight
+                    });
+                            
+                    setTimeout(function(){
+                        console.log("Active obejct omg => ", img);
+                        setObjectInside(img);
+                        canvas.setActiveObject(img);
+                        canvas.renderAll(); 
+                        $('.customiseLoader').css("display","none");
+                    }, 200)
+                });
+              },
+              error: function (jqXhr, textStatus, errorMessage) {
+                console.log("Error => ",errorMessage);
+                $('.customiseLoader').css("display","none");
+              }
+
+        }) 
+
+        // default settings value when added new text
+        $('.selected_font_name').text('Arial');
+        $('.selected_color_name').text('Black');
+        $('.selected_color>.color_box').css('background-color', '#000000');
+        $('.selected_color>.color_name').text('Black');
+        $(".color_box>input[name='text_color_input'][data-color-name='Black']").prop("checked",true);
+
+        $('.txt_shape_container').removeClass('active_shape');
+        $('.txt_shape_container.normal_text').addClass('active_shape');
+        $('.selected_shape_name').text('None');
+
+        $('.selected_outline_color>.color_box').css('background-color', '#00000000');
+        $('.selected_outline_color>.color_name').text('None');
+        $('.selected_outline_name').text('None');
+
+        $('#rotatTextRangeSlide').val(0);
+        $('#rotatTextNumber').val(0);
+
 	    $("#textContent").val("");
         $('#addTextTab').css("display","none");
         $('#editTextContent').val(text_val);
@@ -606,56 +884,79 @@ $("#addTextContent").click(function(){
 })
 
 
-$("#editTextContent").keyup(function(){
-    var text_val = $(this).val().trim();
+$("#editTextContent").change(function(){
+    let text_val = $(this).val().trim();
     text_val = text_val.replace(/\s+/g, " ");
     console.log("value is => ", text_val);
 
-    var selectedObject = canvas.getActiveObject(); 
+    let selectedObject = canvas.getActiveObject(); 
+    var canvas_space_width = 5;
+    if(parseInt(selectedObject.outline_width) > 5 && selectedObject.outline_color_name !== "none"){
+        canvas_space_width = 15;
+    }else if(parseInt(selectedObject.outline_width) > 1 && selectedObject.outline_color_name !== "none"){
+        canvas_space_width = 10;
+    }else{
+        canvas_space_width = 0;
+    }
 
         if(text_val == ''){
-            var text_static_val = 'No Text';
-                var noTextData = $.measureText(text_static_val, {fontFamily: selectedObject.fontFamily, fontSize:selectedObject.fontSize});
-                console.log('text width : ', noTextData.width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", selectedObject.fontSize);
-                selectedObject.set({
-                    text: text_static_val,
-                    width: noTextData.width,
-                    height: noTextData.height,
-                    fontSize: selectedObject.fontSize
-                });
-        }else{
-            var tempData = $.measureText(text_val, {fontFamily: selectedObject.fontFamily, fontSize:selectedObject.fontSize});
+            text_val = 'No Text';
+            // var text_static_val = 'No Text';
+            //     var noTextData = $.measureText(text_static_val, {fontFamily: selectedObject.fontFamily, fontSize:selectedObject.fontSize});
+            //     console.log('text width : ', noTextData.width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", selectedObject.fontSize);
+               
+        }
+        var font_size = selectedObject.text_font_size;
+        var tempData = $.measureText(text_val, {fontFamily: selectedObject.text_font_family, fontSize:selectedObject.text_font_size});
 
-            // selectedObject.set('text', text_val);  
-            var font_size = selectedObject.fontSize;
-            console.log('text width : ', tempData.width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", font_size);
+        // selectedObject.set('text', text_val);  
+        
+        console.log('text width : ', tempData.width , " | canvas width : ", CANVAS_WIDTH-minX-canvas_space_width, " | font size : ", font_size);
 
-            if(tempData.width > CANVAS_WIDTH){
-                console.log("condition 1")
-                var text_width = tempData.width;
-                while (text_width > CANVAS_WIDTH) {
-                    
-                  font_size = font_size-1;
-                  var tempData = $.measureText(text_val, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
-                  text_width = tempData.width;
-                }
-            }else{
-                console.log("condition 2")
+        if(tempData.width > (CANVAS_WIDTH-minX-canvas_space_width)){
+            console.log("Width is greater than canvas width1")
+            var text_width = tempData.width;
+            while (text_width > (CANVAS_WIDTH-minX-canvas_space_width)){
+                
+              font_size = font_size-1;
+              var updateData = $.measureText(text_val, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
+              text_width = updateData.width;
             }
+        }
 
-            selectedObject.set({
-                text: text_val,
-                width: tempData.width,
-                height: tempData.height,
-                fontSize: font_size
-            }); 
-            $('#textFontSize').val(font_size);
-        } 
 
-    if(selectedObject.type == "shape"){
-        var shape_val = $('.selected_shape_name').text();
-        changeTextEffect(shape_val);
-    }
+            $.ajax({
+              url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+text_val+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+              xhrFields: {
+                responseType: 'blob'
+              },
+              beforeSend: function() {
+                $('.customiseLoader').css("display","flex");
+              },
+              success: function (img, status, xhr) {
+                $('#textFontSize').val(parseFloat(font_size).toFixed(1));
+
+                selectedObject.set({
+                    scaleToWidth:xhr.getResponseHeader('x-img-width'),
+                    scaleToHeight:xhr.getResponseHeader('x-img-height'),
+                    scaleX: 1,
+                    scaleY:1,
+                    "text_font_size": font_size,
+                    "text": text_val
+                })
+                selectedObject.setSrc(URL.createObjectURL(img));                
+                        
+                setTimeout(function(){
+                    setObjectInside(selectedObject);
+                    canvas.renderAll(); 
+                    $('.customiseLoader').css("display","none");
+                }, 200)
+              },
+              error: function (jqXhr, textStatus, errorMessage) {
+                console.log("Error => ",errorMessage);
+                $('.customiseLoader').css("display","none");
+              }
+            })         
       
     setObjectInside(selectedObject);
     canvas.renderAll(); 
@@ -664,211 +965,139 @@ $("#editTextContent").keyup(function(){
 })
 
 // text font family js
-function changeTextFont(font){
+const changeTextFont = async(font) => {
     var selectedObject = canvas.getActiveObject();
-    selectedObject.set('fontFamily', font);
-    $('.selected_font_name').text(font);
-    fitToObject(selectedObject);
-    if(selectedObject.type == "shape"){
-        var shape_val = $('.selected_shape_name').text();
-        changeTextEffect(shape_val);
-    }
-
-    
-    setObjectInside(selectedObject);
-    canvas.renderAll(); 
-    
+    $.ajax({
+      url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+font+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+      xhrFields: {
+        responseType: 'blob'
+      },
+      beforeSend: function() {
+        $('.customiseLoader').css("display","flex");
+      },
+      success: function (img, status, xhr) {
+        selectedObject.set({
+            scaleToWidth:xhr.getResponseHeader('x-img-width'),
+            scaleToHeight:xhr.getResponseHeader('x-img-height'),
+            scaleX: 1,
+            scaleY:1,
+            "text_font_size": selectedObject.text_font_size,
+            "text": selectedObject.text
+        })
+        selectedObject.setSrc(URL.createObjectURL(img));
+        // $('.customiseLoader').css("display","none");            
+        setTimeout(function(){
+            fitToObject(selectedObject);
+            // setObjectInside(selectedObject);
+            // canvas.renderAll(); 
+            
+        }, 200)
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log("Error => ",errorMessage);
+        $('.customiseLoader').css("display","none");
+      }
+    })
+    selectedObject.set("text_font_family", font)
+     $('.selected_font_name').text(font);    
+     setObjectInside(selectedObject);
+     canvas.renderAll();
 }
 
-// text curve section
 
-function changeTextEffect(effect){
-    $('.txt_shape_container').removeClass('active_shape');
-    console.log('type => ', effect)
-    var selectedObject = canvas.getActiveObject();
-    var selected_shap = $('.selected_shape_name').text();
-    console.log('selected_shap => ', selected_shap)
-    if(effect == 'curve'){
-        changeTextEffect('none'); // called this function for reset option
-       var textLength = selectedObject.measureLine(0);
-       console.log("Text length width : ", textLength);
-       var angle = 100;
-       var shapeString = `m 0 0 a ${angle} ${angle} 0 0 1 ${textLength.width} 0`;
-       var textPath = new fabric.Path(shapeString);
-       textPath.set('fill','transparent')
-       var tempData = $.measureText(selectedObject.text, {fontFamily: selectedObject.fontFamily, fontSize:selectedObject.fontSize});
-        // console.log("Path width : ", textPath.width , " | heihght : ", textPath.height);
-       var new_height = tempData.height + textPath.height;
-       var new_width = tempData.width;
-       var font_size = selectedObject.fontSize;
-
-        if(tempData.width > CANVAS_WIDTH){
-            console.log("condition 1")
-            var text_width = tempData.width;
-            while (text_width > CANVAS_WIDTH) {
-                
-              font_size = font_size-1;
-              var checkData = $.measureText(selectedObject.text, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
-              text_width = checkData.width;
-            }
-            new_width = text_width
-        }
-
-       console.log(" => height : ", new_height, " |   : ", tempData.width);
-       selectedObject.set({
-        path: textPath,
-        width: new_width,
-        height: new_height,
-        font_size: font_size,
-        'type': 'shape'
-       });
-       // canvas.add(obj);
-       selectedObject.set('height', new_height);
-       $('#textFontSize').val(font_size);
-    }else if(effect == 'downward'){
-        changeTextEffect('none'); // called this function for reset option
-        var text_val = selectedObject.text.toUpperCase();
-        var i = 0;
-        var font_size = selectedObject.fontSize-15;
-        var add_size = (1500 / selectedObject._text.length) * .01;
-        console.log("font size : ", font_size , " | add size in point : ", add_size);
-        var style_json = {};
-        while(selectedObject._text.length > i){
-          if(selectedObject._text[i] !== ''){
-            var updated_font_size = font_size+add_size;
-            style_json[parseInt(i)] = { fontSize: updated_font_size, fontWeight:600}
-            font_size = updated_font_size;
-          }else{
-            style_json[i] = { fontSize : font_size }
-          }
-          i++;
-        }
-
-        selectedObject.set({
-          text: text_val,
-          skewY: 10,
-          styles: {
-            0 : style_json
-          }
-        })
-    }else if(effect == 'upward'){
-        changeTextEffect('none'); // called this function for reset option
-        var text_val = selectedObject.text.toUpperCase();
-        var i = 0;
-        var font_size = selectedObject.fontSize-15;
-        var add_size = (1500 / selectedObject._text.length) * .01;
-        console.log("font size : ", font_size , " | add size in point : ", add_size);
-        var style_json = {};
-        while(selectedObject._text.length > i){
-          if(selectedObject._text[i] !== ''){
-            var updated_font_size = font_size+add_size;
-            style_json[parseInt(i)] = { fontSize: updated_font_size, fontWeight:600}
-            font_size = updated_font_size;
-          }else{
-            style_json[i] = { fontSize : font_size }
-          }
-          i++;
-        }
-
-        selectedObject.set({
-          text: text_val,
-          styles: {
-            0 : style_json
-          }
-        })
-    }else if(effect == 'cone'){
-        changeTextEffect('none'); // called this function for reset option
-        var text_val = selectedObject.text.toUpperCase();
-        var i = 0;
-        var font_size = selectedObject.fontSize-15;
-        var add_size = (1500 / selectedObject._text.length) * .01;
-        console.log("font size : ", font_size , " | add size in point : ", add_size);
-        var style_json = {};
-        while(selectedObject._text.length > i){
-          if(selectedObject._text[i] !== ''){
-            var updated_font_size = font_size+add_size;
-            style_json[parseInt(i)] = { fontSize: updated_font_size, fontWeight:600}
-            font_size = updated_font_size;
-          }else{
-            style_json[i] = { fontSize : font_size }
-          }
-          i++;
-        }
-
-        selectedObject.set({
-          text: text_val,
-          skewY: 5,
-          angle: -1,
-          styles: {
-            0 : style_json
-          }
-        })
-    }
-    else{
-        var tempData = $.measureText(selectedObject.text, {fontFamily: selectedObject.fontFamily, fontSize:selectedObject.fontSize});
-        selectedObject.set({
-            path: '',
-            width: tempData.width,
-            height: tempData.height,
-            'type': 'text',
-            skewY: 0,
-            angle: 0,
-            fontWeight:500,
-            styles: {
-                0 : {}
-            }
-       });
-    }
-
-
-
-    setObjectInside(selectedObject);
-    canvas.renderAll();
-    if(effect == 'normal'){
-        $('.selected_shape_name').text('none');
-    }else{
-        $('.selected_shape_name').text(effect);
-    }
-    $('.txt_shape_container.'+effect+'_text').addClass('active_shape');
-    
-}
 // text color js
 function changeTextColor(color, name){
     var selectedObject = canvas.getActiveObject();
-    selectedObject.set('fill', color);
-    $('.selected_color_name').text(name);
+    $.ajax({
+      url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+      xhrFields: {
+        responseType: 'blob'
+      },
+      beforeSend: function() {
+        $('.customiseLoader').css("display","flex");
+      },
+      success: function (img) {
+        selectedObject.set({"text_color": color, "text_color_name": name});
+        $('.selected_color_name').text(name);
+        selectedObject.setSrc(URL.createObjectURL(img));
+                
+        setTimeout(function(){
+            setObjectInside(selectedObject);
+            canvas.renderAll(); 
+            $('.customiseLoader').css("display","none");
+        }, 200)
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log("Error => ",errorMessage);
+        $('.customiseLoader').css("display","none");
+      }
+    })
+
     canvas.renderAll(); 
 }
 
 // text Rotation js
 function changeRangeValue(val){
     document.getElementById("rotatTextRangeSlide").value = isNaN(parseInt(val, 10)) ? 0 : parseInt(val, 10);
-    // showValue1(val);
     var selectedObject = canvas.getActiveObject();
     // selectedObject.set('angle', parseFloat(val));
     selectedObject.rotate(parseFloat(val));
     fitToObject(selectedObject);
-    setObjectInside(selectedObject);
-    canvas.renderAll();
+    // setObjectInside(selectedObject);
+    // canvas.renderAll();
 }
 function changeInputValue(val){
     document.getElementById("rotatTextNumber").value = isNaN(parseInt(val, 10)) ? 0 : parseInt(val, 10);
-    // showValue1(val);
     var selectedObject = canvas.getActiveObject();
     // selectedObject.set('angle', parseFloat(val));
     selectedObject.rotate(parseFloat(val));
     fitToObject(selectedObject);
-    setObjectInside(selectedObject);
-    canvas.renderAll();
+    // setObjectInside(selectedObject);
+    // canvas.renderAll();
 }
 
 // text outline js
 function changeTxtOutlineColor(color, name){
     var thickness_val =  $('#textOutlineThickness').val();
     var selectedObject = canvas.getActiveObject();
-    selectedObject.set({'stroke': color, 'strokeWidth': thickness_val, 'paintFirst': "stroke"});
-    $('.selected_outline_name').text(name);
-    canvas.renderAll(); 
+
+    $.ajax({
+      url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+color.replace("#","")+"&outline_width="+thickness_val,
+      xhrFields: {
+        responseType: 'blob'
+      },
+      beforeSend: function() {
+        $('.customiseLoader').css("display","flex");
+      },
+      success: function (img, status, xhr) {
+        $('.selected_outline_name').text(name);
+        selectedObject.set({
+            scaleToWidth:xhr.getResponseHeader('x-img-width'),
+            scaleToHeight:xhr.getResponseHeader('x-img-height'),
+            scaleX: 1,
+            scaleY:1,
+            "outline_color":color,
+            "outline_width": thickness_val,
+            "outline_color_name": name
+        })
+        selectedObject.setSrc(URL.createObjectURL(img));
+        // $('.customiseLoader').css("display","none");
+              
+        setTimeout(function(){
+            fitToObject(selectedObject)
+            // setObjectInside(selectedObject);  
+            // canvas.renderAll(); 
+        }, 200)
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log("Error => ",errorMessage);
+        $('.customiseLoader').css("display","none");
+      }
+    })      
+
+    // selectedObject.set({"outline_color":color, "outline_width": thickness_val, "outline_color_name": name});
+    // $('.selected_outline_name').text(name);
+    // canvas.renderAll(); 
 }
 function changeTextOutlineThick(){
     var selected_color = $(".color_box>input[name='text_outline_input']:checked").attr('data-color-code');
@@ -877,14 +1106,116 @@ function changeTextOutlineThick(){
 }
 function removeTxtOutline(){
     var selectedObject = canvas.getActiveObject();
-    selectedObject.set({'stroke': "transparent", 'strokeWidth': 0, 'paintFirst': "none"});
-    $('.selected_outline_name').text("none");
-    canvas.renderAll(); 
-    $('#textOutlineThickness').val(2);
-    $(".color_box>input[name='text_outline_input'][data-color-name='none']").prop("checked", true);
-    $('.text_outline_wrapper').css("display","none");
+
+    $.ajax({
+      url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color=00000000&outline_width="+1,
+      xhrFields: {
+        responseType: 'blob'
+      },
+      beforeSend: function() {
+        $('.customiseLoader').css("display","flex");
+      },
+      success: function (img, status, xhr) {
+        $('.selected_outline_name').text("none");
+        $('#textOutlineThickness').val(1);
+        $(".color_box>input[name='text_outline_input'][data-color-name='none']").prop("checked", true);
+        $('.text_outline_wrapper').css("display","none");
+        $('.selected_outline_color>.color_box').css('background-color', '#00000000');
+        $('.selected_outline_color>.color_name').text('None');
+
+        selectedObject.set({
+            scaleToWidth:xhr.getResponseHeader('x-img-width'),
+            scaleToHeight:xhr.getResponseHeader('x-img-height'),
+            scaleX: 1,
+            scaleY:1,
+            "outline_color":'#00000000',
+            "outline_width": 1,
+            "outline_color_name": "none"
+        })
+        selectedObject.setSrc(URL.createObjectURL(img));
+        // $('.customiseLoader').css("display","none");
+               
+        setTimeout(function(){
+            fitToObject(selectedObject)
+            // setObjectInside(selectedObject); 
+            // canvas.renderAll(); 
+        }, 200)
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log("Error => ",errorMessage);
+        $('.customiseLoader').css("display","none");
+      }
+    })
+    // selectedObject.set({'stroke': "transparent", 'strokeWidth': 0, 'paintFirst': "none"});
+    
+    // canvas.renderAll(); 
+    
 }
 // end text outline js
+
+
+// text transform effect section js
+
+function changeTextEffect(effect){
+    $('.txt_shape_container').removeClass('active_shape');
+    console.log('type => ', effect)
+    var selectedObject = canvas.getActiveObject();
+    var selected_shap = $('.selected_shape_name').text();
+    console.log('selected_shap => ', selected_shap)
+    
+    $.ajax({
+      url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+      xhrFields: {
+        responseType: 'blob'
+      },
+      beforeSend: function() {
+        $('.customiseLoader').css("display","flex");
+      },
+      success: function (img, status, xhr){
+        if(effect == 'normal'){
+            $('.selected_shape_name').text('None');
+        }else{
+            $('.selected_shape_name').text(effect);
+        }
+        $('.txt_shape_container.'+effect+'_text').addClass('active_shape');
+
+        selectedObject.set({
+            "text_effect": effect,
+            scaleToWidth:xhr.getResponseHeader('x-img-width'),
+            scaleToHeight:xhr.getResponseHeader('x-img-height'),
+            scaleX: 1,
+            scaleY:1,
+        });
+        selectedObject.setSrc(URL.createObjectURL(img));
+        
+               
+        setTimeout(function(){
+            fitToObject(selectedObject);
+            // setObjectInside(selectedObject); 
+            // canvas.renderAll(); 
+            // $('.customiseLoader').css("display","none");
+        }, 200)
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log("Error => ",errorMessage);
+        $('.customiseLoader').css("display","none");
+      }
+    })
+
+
+    
+    setObjectInside(selectedObject);
+    canvas.renderAll();
+    
+    
+}
+
+function removeTxtShape(){
+    changeTextEffect('normal');
+    $('.text_shape_wrapper').css("display","none");
+}
+
+
 
 // text font size js
 function changeTxtFontSize(value){
@@ -897,41 +1228,77 @@ function changeTxtFontSize(value){
     // console.log(newData)
     // console.log("MY DATA END--------");
     // return true;
-    if(value < 10){
-        $('#textFontSize').val(10);
-        selectedObject.set('fontSize', 10);
-    }else{
-        // selectedObject.set('fontSize', value);
-        var font_size = Number(value);
-        console.log("active text => ", selectedObject.text, " | font family => ", selectedObject.fontFamily ," | text size val => ", value);
-        var newData = $.measureText(selectedObject.text, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
+    if(value < 5){
+        value = 5; 
+    }
+
+        $.ajax({
+          url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+value+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+          xhrFields: {
+            responseType: 'blob'
+          },
+          beforeSend: function() {
+            $('.customiseLoader').css("display","flex");
+          },
+          success: function (img, status, xhr) {
+            $('#textFontSize').val(parseFloat(value).toFixed(1));
+            selectedObject.set({
+                scaleToWidth:xhr.getResponseHeader('x-img-width'),
+                scaleToHeight:xhr.getResponseHeader('x-img-height'),
+                scaleX: 1,
+                scaleY:1,
+                "text_font_size": value,
+            })
+            selectedObject.setSrc(URL.createObjectURL(img));
+            
+                    
+            setTimeout(function(){
+                fitToObject(selectedObject)
+                // setObjectInside(selectedObject);
+                // canvas.renderAll(); 
+                // $('.customiseLoader').css("display","none");
+            }, 200)
+          },
+          error: function (jqXhr, textStatus, errorMessage) {
+            console.log("Error => ",errorMessage);
+            $('.customiseLoader').css("display","none");
+          }
+        })   
+    
+
+    // if(value < 10){
+    //     $('#textFontSize').val(10);
+    //     selectedObject.set('fontSize', 10);
+    // }else{
+    //     // selectedObject.set('fontSize', value);
+    //     var font_size = Number(value);
+    //     console.log("active text => ", selectedObject.text, " | font family => ", selectedObject.fontFamily ," | text size val => ", value);
+    //     var newData = $.measureText(selectedObject.text, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
 
  
-        console.log('text width : ', newData.width , " | canvas width : ", CANVAS_WIDTH," | font size : ", font_size);
+    //     console.log('text width : ', newData.width , " | canvas width : ", CANVAS_WIDTH," | font size : ", font_size);
 
-        if(newData.width > CANVAS_WIDTH){
-            console.log("condition 1");
-            var text_width = newData.width;
-            while (text_width > CANVAS_WIDTH) {
-              font_size = font_size-1;
-              var newData = $.measureText(selectedObject.text, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
-              text_width = newData.width;
-            }
-        }else{
-            console.log("condition 2")
-        }
+    //     if(newData.width > CANVAS_WIDTH){
+    //         console.log("condition 1");
+    //         var text_width = newData.width;
+    //         while (text_width > CANVAS_WIDTH) {
+    //           font_size = font_size-1;
+    //           var newData = $.measureText(selectedObject.text, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
+    //           text_width = newData.width;
+    //         }
+    //     }else{
+    //         console.log("condition 2")
+    //     }
 
-        selectedObject.set({
-            width: newData.width,
-            height: newData.height,
-            fontSize: font_size,
-        }); 
-        $('#textFontSize').val(font_size);
-    }
-    if(selectedObject.type == "shape"){
-        var shape_val = $('.selected_shape_name').text();
-        changeTextEffect(shape_val);
-    }
+    //     selectedObject.set({
+    //         width: newData.width,
+    //         height: newData.height,
+    //         fontSize: font_size,
+    //     }); 
+    //     $('#textFontSize').val(font_size);
+    // }
+    
+
     setObjectInside(selectedObject);
     canvas.renderAll();
 }
@@ -1012,7 +1379,6 @@ function Paste() {
     });
 }
 
-
 function updateTshirtImage(imageURL){
     fabric.Image.fromURL(imageURL, function(img) {                   
         img.scaleToHeight(80);
@@ -1054,9 +1420,27 @@ function updateTshirtImage(imageURL){
 }
 
 function addArtDesign(path) {
-   updateTshirtImage(path);
-   $('#addArtTab').css("display","none");
-   $('#editArtTab').css("display","block");
+   if(edit_art == true){
+    console.log("Update Art !")
+      let selectedObject = canvas.getActiveObject();
+       selectedObject.set({
+            scaleToWidth:selectedObject.scaleToWidth,
+        });
+       selectedObject.setSrc(path);
+       edit_art == false;
+       $('#addArtTab').css("display","none");
+       $('#editArtTab').css("display","block");
+       setTimeout(function(){
+        setObjectInside(selectedObject);
+        canvas.setActiveObject(selectedObject);
+        canvas.renderAll();
+       }, 200);
+       
+   }else{
+       updateTshirtImage(path);
+       $('#addArtTab').css("display","none");
+       $('#editArtTab').css("display","block");
+    }
 }
 
 // Art center js
@@ -1191,6 +1575,8 @@ document.addEventListener("keydown", function(e) {
     if(keyCode == 46){
         console.log("Removing selected element on Fabric.js on DELETE key !");
         canvas.remove(canvas.getActiveObject());
+        $('#editTextTab').css("display","none");
+        $('#addTextTab').css("display","block");
     }
 }, false);
 

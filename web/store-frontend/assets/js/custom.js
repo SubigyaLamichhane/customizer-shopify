@@ -1,6 +1,7 @@
 
 
 let canvasObj = {};
+var edit_art = false;
 
 function ChooseSettingtab(tab, name){
 	$('.ct_content_tab').removeClass("active_tab");
@@ -11,6 +12,9 @@ function ChooseSettingtab(tab, name){
 	$('.top_layer').css("display","block");
 	$('.child_layer').css("display","none");
 }
+$('.close_content_tab.edit_art').click(function(){
+
+});
 $('.close_content_tab').click(function(){
 	$('.ct_content_tab').removeClass("active_tab");
 	$('.settings_title_wrapper>ul>li').removeClass("active");
@@ -112,28 +116,45 @@ $(".open_child_options").click(function (){
 })
 
 $(".art_header .back_btn").click(function() {
-	var current_attr = $(this).attr("current-option");
-	var get_level = $(this).attr("level");
-	var pre_menu_text = $('.'+current_attr+"_child").attr("parent_menu");
-	var current_level = get_level-1;
-	
-	if(current_level < 1){
-		$('.'+current_attr+'_child').removeClass("active_art_tab");
-		$('.art_header .back_btn').css("display","none");
-		$('.art_header h4').text("Artwork Categories");
-		$('.art_header .back_btn').attr("current-option", "");
-		$('.art_header .back_btn').attr("level", 0);
+	if($(this).hasClass('edit_art') && $(this).attr('level') == 0){
+		$('#editArtTab').css("display","block");
+    	$('#addArtTab').css("display","none");
+    	$('.art_header .back_btn').addClass("edit_art");
+	    $('.art_header .close_content_tab').addClass("edit_art");
+	    $('.art_header .back_btn').css("display","block");
 	}else{
-		$('.'+current_attr+'_child').removeClass("active_art_tab");
-		$('.art_header h4').text(pre_menu_text);
-    console.log('heading text => ', pre_menu_text);
-		pre_menu_text = pre_menu_text.replace(/[^a-zA-Z0-9 ]/g, "");
-		pre_menu_text = pre_menu_text.trim().toLowerCase().replaceAll(" ", "_");
-    pre_menu_text = pre_menu_text.replace("__", "_");
-		$('.art_header .back_btn').attr("current-option", pre_menu_text);
-		$(this).attr("level", current_level);
+		var current_attr = $(this).attr("current-option");
+		var get_level = $(this).attr("level");
+		var pre_menu_text = $('.'+current_attr+"_child").attr("parent_menu");
+		var current_level = get_level-1;
+		
+		if(current_level < 1){
+			$('.'+current_attr+'_child').removeClass("active_art_tab");
+			$('.art_header .back_btn').css("display","none");
+			$('.art_header h4').text("Artwork Categories");
+			$('.art_header .back_btn').attr("current-option", "");
+			$('.art_header .back_btn').attr("level", 0);
+		}else{
+			$('.'+current_attr+'_child').removeClass("active_art_tab");
+			$('.art_header h4').text(pre_menu_text);
+	    console.log('heading text => ', pre_menu_text);
+			pre_menu_text = pre_menu_text.replace(/[^a-zA-Z0-9 ]/g, "");
+			pre_menu_text = pre_menu_text.trim().toLowerCase().replaceAll(" ", "_");
+	    	pre_menu_text = pre_menu_text.replace("__", "_");
+			$('.art_header .back_btn').attr("current-option", pre_menu_text);
+			$(this).attr("level", current_level);
+		}
 	}
 });
+
+function openEditArt(){
+	$('#editArtTab').css("display","none");
+    $('#addArtTab').css("display","block");
+    edit_art = true;
+    $('.art_header .back_btn').addClass("edit_art");
+    $('.art_header .close_content_tab').addClass("edit_art");
+    $('.art_header .back_btn').css("display","block");
+}
 
 
 setTimeout(function(){
@@ -255,6 +276,11 @@ colorsdata.forEach((item)=>{
 })
 
 // Append all color for text outline
+$('.outline_color_container  .all_outline_colors_list').append(`  <div class="color_box" style="background-color: transparent;border:1px solid #cacaca">
+	<input type="radio" name="text_outline_input" class="text_color_input" data-color-code="#00000000" data-color-name="none" onclick="changeTxtOutlineColor("#00000000", "none")" checked />
+	<span class="check_icon"><i class="fa fa-check"></i></span>
+	<span class="box_outline"></span>
+</div>`);
 colorsdata.forEach((item)=>{
 	$('.outline_color_container  .all_outline_colors_list').append(`  <div class="color_box" style="background-color: ${item.color_code};">
 	<input type="radio" name="text_outline_input" class="text_color_input" data-color-code="${item.color_code}" data-color-name="${item.color_name}" onclick="changeTxtOutlineColor('${item.color_code}','${item.color_name}')" />

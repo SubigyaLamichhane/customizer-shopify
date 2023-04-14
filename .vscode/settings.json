@@ -1,0 +1,6 @@
+{
+    "powermode.enabled": true,
+    "powermode.presets": "flames",
+    "powermode.combo.timerEnabled": "show",
+    "powermode.combo.location": "off"
+}
