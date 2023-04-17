@@ -30,7 +30,7 @@ const __dirname = path.resolve();
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
         //    cb(null, 'uploads');
-        cb(null, path.join(__dirname, '/uploads/'));
+        cb(null, path.join(__dirname, '/public/uploads/'));
     },
     filename: function (req, file, cb) {
         cb(null, Date.now() + '-' + file.originalname);
@@ -64,7 +64,7 @@ app.post(
 
 app.use(express.json());
 app.use(bodyParser.json());
-
+app.use("/public", express.static(path.join(__dirname, 'public')));
 // ...................................
 // Front end api's.
 
@@ -85,7 +85,8 @@ app.post("/api/convert-file", upload.single('image'), async (req: Request, res: 
             res.status(200).send({
                 "status": true,
                 "message": "File converted from " + fileExtension + " to png formate successfully!",
-                "data": destination + fileName
+                "data": destination + fileName,
+                "data1": image
             });
         });
     } else {
