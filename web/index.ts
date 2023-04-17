@@ -19,7 +19,8 @@ import { shopifyApp } from "@shopify/shopify-app-express";
 
 import { Session } from '@shopify/shopify-api';
 import { fromPath } from "pdf2pic";
-
+import gm from "gm";
+const gmSubClass = gm.subClass({ imageMagick: true });
 
 // upload image
 import multer from "multer";
@@ -67,32 +68,30 @@ app.use(bodyParser.json());
 // ...................................
 // Front end api's.
 
-// Upload file api
-app.post("/api/upload-file", upload.single('image'), async (req: Request, res: Response) => {
+// Convert pdf/ai/eps/jpg/jpeg/psd file into png formate
+app.post("/api/convert-file", upload.single('image'), async (req: Request, res: Response) => {
     let image: any = await req.file;
-    if (image.mimetype == "application/pdf") {
-        let options = {
-            density: 100,
-            saveFilename: image.filename,
-            savePath: "./uploads",
-            format: "png",
-            width: 600,
-            height: 600
-        };
-        let storeAsImage = await fromPath(image.path, options);
-        let pageToConvertAsImage = 1;
-    
-        storeAsImage(pageToConvertAsImage).then((resolve) => {
+    let fileExtension: string = image.filename.split('.').pop();
+    let fileName: string = image.filename.replace(fileExtension, "png");
+    let destination: string = image.destination;
+    if (fileExtension == "pdf" || fileExtension == "PDF"
+        || fileExtension == "ai" || fileExtension == "AI"
+        || fileExtension == "eps" || fileExtension == "EPS"
+        || fileExtension == "jpg" || fileExtension == "JPG"
+        || fileExtension == "jpeg" || fileExtension == "JPEG"
+        || fileExtension == "psd" || fileExtension == "PSD") {
+        gm(image.path).in("-colorspace").in("srgb").write(destination + fileName, function (err: any) {
+            if (err) throw err
             res.status(200).send({
                 "status": true,
-                "message": "File converted successfully!",
-                "data": resolve
+                "message": "File converted from " + fileExtension + " to png formate successfully!",
+                "data": destination + fileName
             });
         });
     } else {
         res.status(200).send({
-            "status": true,
-            "message": "Unable to convert!",
+            "status": false,
+            "message": "Invalid file formate!",
             "data": []
         });
     }
