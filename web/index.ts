@@ -85,8 +85,7 @@ app.post("/api/convert-file", upload.single('image'), async (req: Request, res: 
             res.status(200).send({
                 "status": true,
                 "message": "File converted from " + fileExtension + " to png formate successfully!",
-                "data": destination + fileName,
-                "data1": image
+                "data": destination + fileName
             });
         });
     } else {
@@ -98,6 +97,7 @@ app.post("/api/convert-file", upload.single('image'), async (req: Request, res: 
     }
 });
 
+// api for testing
 app.get("/api/test", (req: Request, res: Response) => {
     res.status(200).send({
         "status": true,
