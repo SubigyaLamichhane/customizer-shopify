@@ -64,7 +64,8 @@ app.post(
 
 app.use(express.json());
 app.use(bodyParser.json());
-app.use("/public", express.static(path.join(__dirname, 'public')));
+// app.use("/public", express.static(path.join(__dirname, 'public')));
+
 // ...................................
 // Front end api's.
 
@@ -726,3 +727,8 @@ app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
 });
 
 app.listen(PORT);
+
+// make changes on server
+// replace some lines 
+// cb(null, path.join(__dirname, '/public/uploads/')); = cb(null, path.join(__dirname, '/web/public/uploads/'));
+// const PORT = process.env.BACKEND_PORT || process.env.PORT; = const PORT = 3000;
