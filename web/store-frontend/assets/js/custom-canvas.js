@@ -262,28 +262,26 @@ function fitToObject(event) {
     console.log("Call fit to object function")
    var obj = event;
 
-   if if(obj.type == 'text' && obj.text_effect == 'curve'){
-
-   }else if(obj.type == 'text'){
-        var canvas_space_width = 5;
-        if(parseInt(obj.outline_width) > 5 && obj.outline_color_name !== "none"){
-            canvas_space_width = 15;
-        }else if(parseInt(obj.outline_width) > 1 && obj.outline_color_name !== "none"){
-            canvas_space_width = 10;
-        }else{
-            canvas_space_width = 0;
-        }
+    if(obj.type == 'text'){
+        var canvas_space_width = 0;
+        // if(parseInt(obj.outline_width) > 5 && obj.outline_color_name !== "none"){
+        //     canvas_space_width = 15;
+        // }else if(parseInt(obj.outline_width) > 1 && obj.outline_color_name !== "none"){
+        //     canvas_space_width = 10;
+        // }else{
+        //     canvas_space_width = 0;
+        // }
         console.log("canvas space => ", canvas_space_width);
         console.log("canvas => scale to width : ",  obj.scaleToWidth , " | width " , (CANVAS_WIDTH-minX) , " | height : ", obj.scaleToHeight, " | ", parseInt(obj.scaleToWidth) > parseInt(CANVAS_WIDTH-minX) )
-        if(parseInt(obj.scaleToWidth) > parseInt(CANVAS_WIDTH-minX)){
+        if(parseFloat(obj.scaleToWidth) > parseFloat(CANVAS_WIDTH-minX)){
             var font_size = obj.text_font_size;
             var text_val = obj.text;
             var font_family = obj.text_font_family;
             var tempData = $.measureText(text_val, {fontFamily:font_family, fontSize:parseFloat(font_size)});
-            console.log("canvas => temp to width : ",  tempData.width , " | width " , parseInt(CANVAS_WIDTH-minX-canvas_space_width), " | font_size ", font_size );
-            if(tempData.width > parseInt(CANVAS_WIDTH-minX-canvas_space_width)){
+            console.log("canvas => temp to width : ",  tempData.width , " | width " , parseFloat(CANVAS_WIDTH-minX-canvas_space_width), " | font_size ", font_size );
+            if(tempData.width > parseFloat(CANVAS_WIDTH-minX-canvas_space_width)){
                     var text_width = tempData.width;
-                    while (text_width > (CANVAS_WIDTH-minX-canvas_space_width)){
+                    while(text_width > (CANVAS_WIDTH-minX-canvas_space_width)){
                         console.log('text width : ', text_width , " | canvas width : ", (CANVAS_WIDTH-minX-canvas_space_width), " | font size : ", font_size);
                         font_size = font_size-0.1;
                         var updateData = $.measureText(text_val, {fontFamily: font_family, fontSize:font_size});
@@ -396,66 +394,105 @@ function setObjectInside(e) {
 // calculate text font size when object scaling or modified
 function calculateFontSize(text, width, height){
     let selectedObject = canvas.getActiveObject();
-    let fontSize = selectedObject.text_font_size; // Starting font size
+    let fontSize = parseFloat(selectedObject.text_font_size); // Starting font size
     let font_family = selectedObject.text_font_family;
     let lowest_font_size = 5;
 
-    let tempData = $.measureText(text, {fontFamily:font_family, fontSize:fontSize});
-    let tempWidthTolerance = 4;
+    if(selectedObject.text_effect == 'curve'){
 
-    const content_canvas = document.createElement('canvas');
-    const context = content_canvas.getContext('2d');
-    
-    // Set content_canvas dimensions to match text element
-    content_canvas.width = width;
-    content_canvas.height = height;
-    console.log("=== check first ====");
-    console.log(parseFloat(selectedObject.scaleToWidth) ," > ", parseFloat(width));
-    console.log("=== check last ====");
-    if(parseFloat(selectedObject.scaleToWidth) > parseFloat(width)){
-        console.log("Decrease size");
-        while (fontSize >= lowest_font_size) { // Add minimum font size condition
-          // Set the font size and measure the text
-          context.font = fontSize + 'px '+font_family;
-          const textWidth = context.measureText(text).width;
-          const textHeight = context.measureText(text).height;
-          
-          // Add a tolerance value to the text width calculation
-          const widthWithTolerance = width;
-          // If the text fits within the canvas, return the font size
-          console.log("Condition | ", textWidth ," <= ", widthWithTolerance ," | ", fontSize , " <= ", height)
-          if (textWidth <= widthWithTolerance || textHeight <= height) {
-            return fontSize;
-          }      
-          // Decrease the font size by 1 and try again
-          fontSize = fontSize-0.1;
-          // fontSize--;
+        // var scaleTempWidth = parseFloat(selectedObject.scaleToWidth);
+        // var scaleTempHeight = parseFloat(selectedObject.scaleToHeight);
+        // const prev_height = scaleTempHeight;
+        // var increase_height = 0;
+
+        // let tempData = $.measureText(text, {fontFamily:font_family, fontSize:fontSize});
+
+        // if(parseFloat(selectedObject.scaleToWidth) > parseFloat(width)){
+        //     // decrease
+        //     // console.log("Decrease : ", scaleTempWidth, " > ", parseFloat(width));
+        //     while(scaleTempWidth > parseFloat(width)){
+        //         console.log("Decrease : ", scaleTempWidth, " > ", parseFloat(width), " | font_size : ", fontSize);
+        //         scaleTempWidth = scaleTempWidth-1;
+        //         scaleTempHeight = scaleTempHeight-0.1;
+        //         // fontSize = fontSize - 0.1;
+        //     }
+        //     increase_height = scaleTempHeight - prev_height;
+
+        // }else if(parseFloat(selectedObject.scaleToWidth) < parseFloat(width)){
+        //     // increase
+        //     while(scaleTempWidth < parseFloat(width)){
+        //         console.log("Increase : ", scaleTempWidth, " > ", parseFloat(width), " | font_size : ", fontSize);
+        //         scaleTempWidth = scaleTempWidth+1;
+        //         scaleTempHeight = scaleTempHeight+0.1;
+        //         // fontSize = fontSize + 0.1;
+        //     }
+        //     increase_height = scaleTempHeight - prev_height;
+        // }
+
+        // let new_size = fontSize + increase_height;
+        // console.log("Increase height => ", increase_height, " + ", fontSize);
+        // console.log("New font size height => ", new_size);
+        // fontSize = new_size;
+        return fontSize;
+    }else{
+
+        let tempData = $.measureText(text, {fontFamily:font_family, fontSize:fontSize});
+        let tempWidthTolerance = 4;
+
+        const content_canvas = document.createElement('canvas');
+        const context = content_canvas.getContext('2d');
+        
+        // Set content_canvas dimensions to match text element
+        content_canvas.width = width;
+        content_canvas.height = height;
+        console.log("=== check first ====");
+        console.log(parseFloat(selectedObject.scaleToWidth) ," > ", parseFloat(width));
+        console.log("=== check last ====");
+        if(parseFloat(selectedObject.scaleToWidth) > parseFloat(width)){
+            console.log("Decrease size");
+            while (fontSize >= lowest_font_size) { // Add minimum font size condition
+              // Set the font size and measure the text
+              context.font = fontSize + 'px '+font_family;
+              const textWidth = context.measureText(text).width;
+              const textHeight = context.measureText(text).height;
+              
+              // Add a tolerance value to the text width calculation
+              const widthWithTolerance = width;
+              // If the text fits within the canvas, return the font size
+              console.log("Condition | ", textWidth ," <= ", widthWithTolerance ," | ", fontSize , " <= ", height)
+              if (textWidth <= widthWithTolerance || textHeight <= height) {
+                return fontSize;
+              }      
+              // Decrease the font size by 1 and try again
+              fontSize = fontSize-0.1;
+              // fontSize--;
+            }
+        }else if(parseFloat(selectedObject.scaleToWidth) < parseFloat(width)){
+            console.log("Increase size");
+            while (fontSize >= lowest_font_size) { // Add minimum font size condition
+              // Set the font size and measure the text
+              context.font = fontSize + 'px '+font_family;
+              const textWidth = context.measureText(text).width;
+              const textHeight = context.measureText(text).height;
+              
+              // Add a tolerance value to the text width calculation
+              const widthWithTolerance = width;
+              // If the text fits within the canvas, return the font size
+              console.log("Condition | ", textWidth ," <= ", widthWithTolerance ," | ", fontSize , " <= ", height)
+              if (textWidth >= widthWithTolerance || textHeight >= height) {
+                return fontSize;
+              }      
+              // Increase the font size by 1 and try again
+              // fontSize++;
+              fontSize = fontSize+0.1;
+            }
+        }else if(parseFloat(selectedObject.scaleToWidth) == parseFloat(width)){
+            console.log("same size");
+            return fontSize; // Return null if font size is too small
         }
-    }else if(parseFloat(selectedObject.scaleToWidth) < parseFloat(width)){
-        console.log("Increase size");
-        while (fontSize >= lowest_font_size) { // Add minimum font size condition
-          // Set the font size and measure the text
-          context.font = fontSize + 'px '+font_family;
-          const textWidth = context.measureText(text).width;
-          const textHeight = context.measureText(text).height;
-          
-          // Add a tolerance value to the text width calculation
-          const widthWithTolerance = width;
-          // If the text fits within the canvas, return the font size
-          console.log("Condition | ", textWidth ," <= ", widthWithTolerance ," | ", fontSize , " <= ", height)
-          if (textWidth >= widthWithTolerance || textHeight >= height) {
-            return fontSize;
-          }      
-          // Increase the font size by 1 and try again
-          // fontSize++;
-          fontSize = fontSize+0.1;
-        }
-    }else if(parseFloat(selectedObject.scaleToWidth) == parseFloat(width)){
-        console.log("same size");
-        return fontSize; // Return null if font size is too small
-    }
-    
-    return lowest_font_size; // Return null if font size is too small
+        
+        return lowest_font_size; // Return null if font size is too small
+   } 
     
 }
 
@@ -515,7 +552,12 @@ canvas.on('mouse:down', function(options) {
   // checking when you click on canvas then object was selected on not.
   if(obj_target) {
     if (obj_target.type == 'text') {
+
+        let tempData = $.measureText(obj_target.text, {fontFamily:obj_target.text_font_family, fontSize:parseFloat(obj_target.text_font_size)});
+        console.log('Text => ', obj_target.text, " | font family ", obj_target.text_font_family, " | font size ", obj_target.text_font_size);
+        console.log('Temporary data => ', tempData);
         console.log('Text object was clicked! ', obj_target);
+
         // editTextFunction(options.target);
         $('.ct_content_tab').removeClass("active_tab");
         $('.settings_title_wrapper>ul>li').removeClass("active");
@@ -609,7 +651,6 @@ canvas.on('mouse:down', function(options) {
 
     $('#defaultSettings').addClass("active_tab");
   }
-  console.log(options)
   //  Show context menu when click on right button of mouse
   if(options.e.button === 2) {
         var top_pos = options.e.layerY + 10;
@@ -653,7 +694,7 @@ var scale1y = 0 ;
 var width1 = 0 ;    
 var height1 = 0 ;
 
-// function work on object scaling
+function work on object scaling
 canvas.on('object:scaling', function (e){
 
     console.log("scaling => ", e.target.type);
@@ -683,13 +724,127 @@ canvas.on('object:scaling', function (e){
 
 });
 
+// canvas.on('object:scaling', function (e) {
+//       var obj = e.target;
+//       obj.setCoords();
+//       let top = obj.getBoundingRect().top;
+//       let left = obj.getBoundingRect().left;
+//       let height = obj.getBoundingRect().height;
+//       let width = obj.getBoundingRect().width;
+
+//       // restrict scaling below bottom of canvas
+//       if (top + height > CANVAS_HEIGHT-minY) {
+//         obj.scaleY = 1;
+//         obj.setCoords();
+//         let h = obj.getScaledHeight();
+
+//         obj.scaleY = (CANVAS_HEIGHT - top) / h;
+//         obj.setCoords();
+//         canvas.renderAll();
+
+//         obj.lockScalingX = true;
+//         obj.lockScalingY = true;
+//         // obj.lockMovementX = true;
+//         // obj.lockMovementY = true;
+//       }
+
+//       // restrict scaling above top of canvas
+//       if (top < minY) {
+//         obj.scaleY = 1;
+//         obj.setCoords();
+//         let h = obj.getScaledHeight();
+//         obj.scaleY = (height + top) / h;
+//         obj.top = minY;
+//         obj.setCoords();
+//         canvas.renderAll();
+
+//         obj.lockScalingX = true;
+//         obj.lockScalingY = true;
+//         // obj.lockMovementX = true;
+//         // obj.lockMovementY = true;
+//       }
+
+//       // restrict scaling over right of canvas
+//       if (left + width > CANVAS_WIDTH-minX) {
+//         obj.scaleX = 1;
+//         obj.setCoords();
+//         let w = obj.getScaledWidth();
+
+//         obj.scaleX = (CANVAS_WIDTH - left) / w;
+//         obj.setCoords();
+//         canvas.renderAll();
+
+//         obj.lockScalingX = true;
+//         obj.lockScalingY = true;
+//         // obj.lockMovementX = true;
+//         // obj.lockMovementY = true;
+//       }
+
+//       // restrict scaling over left of canvas
+//       if(left < minX) {
+//         obj.scaleX = 1;
+//         obj.setCoords();
+//         let w = obj.getScaledWidth();
+//         obj.scaleX = (width + left) / w;
+//         obj.left = minX;
+//         obj.setCoords();
+//         canvas.renderAll();
+//         obj.lockScalingX = true;
+//         obj.lockScalingY = true;
+//         // obj.lockMovementX = true;
+//         // obj.lockMovementY = true;
+//       }
+//     });
+
 
 canvas.on('object:modified', function(event) {
+    event.target.lockScalingX = false;
+        event.target.lockScalingY = false;
     console.log("modified");
     if (event.target.type == 'text') {
         console.log(" data => ", event.target);
         var newWidth = (event.target.width * event.target.scaleX);
         var newHeight = (event.target.height * event.target.scaleY);
+
+        if(event.target.text_effect == 'curve'){
+            if(parseFloat(event.target.scaleToWidth) !== parseFloat(newWidth)){
+            $.ajax({
+              url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+event.target.text+"&effect="+event.target.text_effect+"&font_color="+event.target.text_color.replace("#","")+"&font_size="+event.target.text_font_size+"&font_width="+parseFloat(event.target.scaleToWidth).toFixed(2)+","+parseFloat(newWidth).toFixed(2)+"&font_height="+parseFloat(event.target.scaleToHeight).toFixed(2)+","+parseFloat(newHeight).toFixed(2)+"&fontName="+event.target.text_font_family+"&outline_color="+event.target.outline_color.replace("#","")+"&outline_width="+event.target.outline_width,
+              xhrFields: {
+                responseType: 'blob'
+              },
+              beforeSend: function() {
+                $('.customiseLoader').css("display","flex");
+              },
+              success: function (img, status, xhr) {
+                console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
+                console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
+                $('#textFontSize').val(parseFloat(xhr.getResponseHeader('x-font-size')).toFixed(1));
+                event.target.set({
+                    scaleToWidth:xhr.getResponseHeader('x-img-width'),
+                    scaleToHeight:xhr.getResponseHeader('x-img-height'),
+                    scaleX: 1,
+                    scaleY:1,
+                    "text_font_size": xhr.getResponseHeader('x-font-size')
+                })
+                event.target.setSrc(URL.createObjectURL(img));
+                        
+                setTimeout(function(){
+                    // fitToObject(event.target)
+                    setObjectInside(event.target);
+                    canvas.renderAll(); 
+                    $('.customiseLoader').css("display","none");
+                }, 200)
+              },
+              error: function (jqXhr, textStatus, errorMessage) {
+                console.log("Error => ",errorMessage);
+                $('.customiseLoader').css("display","none");
+              }
+            }) 
+         }
+
+        }else{
+
         let updateFontSize = calculateFontSize(event.target.text, newWidth, newHeight);
         console.log("New font size :", updateFontSize);
         if(parseFloat(event.target.scaleToWidth) !== parseFloat(newWidth)){
@@ -710,15 +865,15 @@ canvas.on('object:modified', function(event) {
                     scaleToHeight:xhr.getResponseHeader('x-img-height'),
                     scaleX: 1,
                     scaleY:1,
-                    "text_font_size": updateFontSize
+                    "text_font_size": parseFloat(updateFontSize)
                 })
                 event.target.setSrc(URL.createObjectURL(img));
                         
                 setTimeout(function(){
-                    fitToObject(event.target)
-                    // setObjectInside(event.target);
-                    // canvas.renderAll(); 
-                    // $('.customiseLoader').css("display","none");
+                    // fitToObject(event.target)
+                    setObjectInside(event.target);
+                    canvas.renderAll(); 
+                    $('.customiseLoader').css("display","none");
                 }, 200)
               },
               error: function (jqXhr, textStatus, errorMessage) {
@@ -727,11 +882,14 @@ canvas.on('object:modified', function(event) {
               }
             }) 
          }
+      }
     }
     if (event.target.type == 'art' || event.target.type == 'image') {
         var newWidth = (event.target.width * event.target.scaleX);
         var newHeight = (event.target.height * event.target.scaleY);
         console.log("Image width :", newWidth , " | height : ", newHeight);
+        $("#artWidth").val(parseFloat(newWidth).toFixed(2));
+        $("#artHeight").val(parseFloat(newHeight).toFixed(2));
         event.target.set({
             // width: newWidth,
             // height: newHeight,
@@ -817,7 +975,8 @@ $("#addTextContent").click(function(){
                         "outline_width": "1",
                         left:minX,
                         top:minY,
-                        lockScalingFlip: true
+                        lockScalingFlip: true,
+                        padding:1
                     })
                     img.setControlsVisibility({
                         tl: false,
@@ -890,14 +1049,14 @@ $("#editTextContent").change(function(){
     console.log("value is => ", text_val);
 
     let selectedObject = canvas.getActiveObject(); 
-    var canvas_space_width = 5;
-    if(parseInt(selectedObject.outline_width) > 5 && selectedObject.outline_color_name !== "none"){
-        canvas_space_width = 15;
-    }else if(parseInt(selectedObject.outline_width) > 1 && selectedObject.outline_color_name !== "none"){
-        canvas_space_width = 10;
-    }else{
-        canvas_space_width = 0;
-    }
+    var canvas_space_width = 0;
+    // if(parseInt(selectedObject.outline_width) > 5 && selectedObject.outline_color_name !== "none"){
+    //     canvas_space_width = 15;
+    // }else if(parseInt(selectedObject.outline_width) > 1 && selectedObject.outline_color_name !== "none"){
+    //     canvas_space_width = 10;
+    // }else{
+    //     canvas_space_width = 0;
+    // }
 
         if(text_val == ''){
             text_val = 'No Text';
@@ -906,7 +1065,47 @@ $("#editTextContent").change(function(){
             //     console.log('text width : ', noTextData.width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", selectedObject.fontSize);
                
         }
-        var font_size = selectedObject.text_font_size;
+        var font_size = parseFloat(selectedObject.text_font_size);
+
+        if(selectedObject.text_effect == 'curve'){
+
+            $.ajax({
+              url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+text_val+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+              xhrFields: {
+                responseType: 'blob'
+              },
+              beforeSend: function() {
+                $('.customiseLoader').css("display","flex");
+              },
+              success: function (img, status, xhr) {
+                console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
+                console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
+                $('#textFontSize').val(parseFloat(xhr.getResponseHeader('x-font-size')).toFixed(1));
+                selectedObject.set({
+                    scaleToWidth:xhr.getResponseHeader('x-img-width'),
+                    scaleToHeight:xhr.getResponseHeader('x-img-height'),
+                    scaleX: 1,
+                    scaleY:1,
+                    "text_font_size": xhr.getResponseHeader('x-font-size'),
+                    "text": text_val
+                })
+                selectedObject.setSrc(URL.createObjectURL(img));
+                        
+                setTimeout(function(){
+                    // fitToObject(selectedObject)
+                    setObjectInside(selectedObject);
+                    canvas.renderAll(); 
+                    $('.customiseLoader').css("display","none");
+                }, 200)
+              },
+              error: function (jqXhr, textStatus, errorMessage) {
+                console.log("Error => ",errorMessage);
+                $('.customiseLoader').css("display","none");
+              }
+            }) 
+
+        }else{
+
         var tempData = $.measureText(text_val, {fontFamily: selectedObject.text_font_family, fontSize:selectedObject.text_font_size});
 
         // selectedObject.set('text', text_val);  
@@ -918,7 +1117,7 @@ $("#editTextContent").change(function(){
             var text_width = tempData.width;
             while (text_width > (CANVAS_WIDTH-minX-canvas_space_width)){
                 
-              font_size = font_size-1;
+              font_size = font_size-0.1;
               var updateData = $.measureText(text_val, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
               text_width = updateData.width;
             }
@@ -941,7 +1140,7 @@ $("#editTextContent").change(function(){
                     scaleToHeight:xhr.getResponseHeader('x-img-height'),
                     scaleX: 1,
                     scaleY:1,
-                    "text_font_size": font_size,
+                    "text_font_size": parseFloat(font_size),
                     "text": text_val
                 })
                 selectedObject.setSrc(URL.createObjectURL(img));                
@@ -957,6 +1156,7 @@ $("#editTextContent").change(function(){
                 $('.customiseLoader').css("display","none");
               }
             })         
+        }
       
     setObjectInside(selectedObject);
     canvas.renderAll(); 
@@ -967,6 +1167,47 @@ $("#editTextContent").change(function(){
 // text font family js
 const changeTextFont = async(font) => {
     var selectedObject = canvas.getActiveObject();
+
+    if(selectedObject.text_effect == 'curve'){
+
+            $.ajax({
+              url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+font+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+              xhrFields: {
+                responseType: 'blob'
+              },
+              beforeSend: function() {
+                $('.customiseLoader').css("display","flex");
+              },
+              success: function (img, status, xhr) {
+                console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
+                console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
+                $('#textFontSize').val(parseFloat(xhr.getResponseHeader('x-font-size')).toFixed(1));
+                selectedObject.set({
+                    scaleToWidth:xhr.getResponseHeader('x-img-width'),
+                    scaleToHeight:xhr.getResponseHeader('x-img-height'),
+                    scaleX: 1,
+                    scaleY:1,
+                    "text_font_size": xhr.getResponseHeader('x-font-size'),
+                    "text_font_family": font
+                })
+                selectedObject.setSrc(URL.createObjectURL(img));
+                        
+                setTimeout(function(){
+                    // fitToObject(selectedObject)
+                    $('.selected_font_name').text(font);
+                    setObjectInside(selectedObject);
+                    canvas.renderAll(); 
+                    $('.customiseLoader').css("display","none");
+                }, 200)
+              },
+              error: function (jqXhr, textStatus, errorMessage) {
+                console.log("Error => ",errorMessage);
+                $('.customiseLoader').css("display","none");
+              }
+            }) 
+
+        }else{
+
     $.ajax({
       url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+font+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
       xhrFields: {
@@ -998,10 +1239,12 @@ const changeTextFont = async(font) => {
         $('.customiseLoader').css("display","none");
       }
     })
+}
     selectedObject.set("text_font_family", font)
      $('.selected_font_name').text(font);    
      setObjectInside(selectedObject);
      canvas.renderAll();
+
 }
 
 
@@ -1061,6 +1304,48 @@ function changeTxtOutlineColor(color, name){
     var thickness_val =  $('#textOutlineThickness').val();
     var selectedObject = canvas.getActiveObject();
 
+    if(selectedObject.text_effect == 'curve'){
+
+            $.ajax({
+              url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+parseFloat(selectedObject.text_font_size)+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+color.replace("#","")+"&outline_width="+thickness_val,
+              xhrFields: {
+                responseType: 'blob'
+              },
+              beforeSend: function() {
+                $('.customiseLoader').css("display","flex");
+              },
+              success: function (img, status, xhr) {
+                console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
+                console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
+                 $('.selected_outline_name').text(name);
+                selectedObject.set({
+                    scaleToWidth:xhr.getResponseHeader('x-img-width'),
+                    scaleToHeight:xhr.getResponseHeader('x-img-height'),
+                    scaleX: 1,
+                    scaleY:1,
+                    "outline_color":color,
+                    "outline_width": thickness_val,
+                    "outline_color_name": name
+                });
+                selectedObject.setSrc(URL.createObjectURL(img));
+                        
+                setTimeout(function(){
+                    // fitToObject(selectedObject)
+                    $('#textFontSize').val(parseFloat(xhr.getResponseHeader('x-font-size')).toFixed(1));
+                    setObjectInside(selectedObject);
+                    canvas.renderAll(); 
+                    $('.customiseLoader').css("display","none");
+                }, 200)
+              },
+              error: function (jqXhr, textStatus, errorMessage) {
+                console.log("Error => ",errorMessage);
+                $('.customiseLoader').css("display","none");
+              }
+            }) 
+
+        }else{
+
+
     $.ajax({
       url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+color.replace("#","")+"&outline_width="+thickness_val,
       xhrFields: {
@@ -1094,6 +1379,7 @@ function changeTxtOutlineColor(color, name){
         $('.customiseLoader').css("display","none");
       }
     })      
+}
 
     // selectedObject.set({"outline_color":color, "outline_width": thickness_val, "outline_color_name": name});
     // $('.selected_outline_name').text(name);
@@ -1232,6 +1518,45 @@ function changeTxtFontSize(value){
         value = 5; 
     }
 
+    if(selectedObject.text_effect == 'curve'){
+
+            $.ajax({
+              url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+parseFloat(value)+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+              xhrFields: {
+                responseType: 'blob'
+              },
+              beforeSend: function() {
+                $('.customiseLoader').css("display","flex");
+              },
+              success: function (img, status, xhr) {
+                console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
+                console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
+                $('#textFontSize').val(parseFloat(xhr.getResponseHeader('x-font-size')).toFixed(1));
+                selectedObject.set({
+                    scaleToWidth:xhr.getResponseHeader('x-img-width'),
+                    scaleToHeight:xhr.getResponseHeader('x-img-height'),
+                    scaleX: 1,
+                    scaleY:1,
+                    "text_font_size": xhr.getResponseHeader('x-font-size')
+                })
+                selectedObject.setSrc(URL.createObjectURL(img));
+                        
+                setTimeout(function(){
+                    // fitToObject(selectedObject)
+                    $('#textFontSize').val(parseFloat(xhr.getResponseHeader('x-font-size')).toFixed(1));
+                    setObjectInside(selectedObject);
+                    canvas.renderAll(); 
+                    $('.customiseLoader').css("display","none");
+                }, 200)
+              },
+              error: function (jqXhr, textStatus, errorMessage) {
+                console.log("Error => ",errorMessage);
+                $('.customiseLoader').css("display","none");
+              }
+            }) 
+
+        }else{
+
         $.ajax({
           url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+value+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
           xhrFields: {
@@ -1264,6 +1589,7 @@ function changeTxtFontSize(value){
             $('.customiseLoader').css("display","none");
           }
         })   
+    }
     
 
     // if(value < 10){
@@ -1405,6 +1731,8 @@ function updateTshirtImage(imageURL){
         console.log(" before : width => ", img.width ," | height => ", img.height );
         var newWidth = (img.width * img.scaleX);
         var newHeight = (img.height * img.scaleY);
+        $("#artWidth").val(parseFloat(newWidth).toFixed(2));
+        $("#artHeight").val(parseFloat(newHeight).toFixed(2));
         img.set({
             // width: newWidth,
             // height: newHeight,
@@ -1420,28 +1748,69 @@ function updateTshirtImage(imageURL){
 }
 
 function addArtDesign(path) {
-   if(edit_art == true){
-    console.log("Update Art !")
-      let selectedObject = canvas.getActiveObject();
-       selectedObject.set({
-            scaleToWidth:selectedObject.scaleToWidth,
-        });
+    if(edit_art == true){
+       console.log("Update Art !")
+       let selectedObject = canvas.getActiveObject();
+        
        selectedObject.setSrc(path);
-       edit_art == false;
+
        $('#addArtTab').css("display","none");
        $('#editArtTab').css("display","block");
        setTimeout(function(){
+
+        var newWidth = (selectedObject.width * selectedObject.scaleX);
+        var newHeight = (selectedObject.height * selectedObject.scaleY);
+        selectedObject.set({
+            scaleToWidth:newWidth,
+            scaleToHeight:newHeight
+        });
+
         setObjectInside(selectedObject);
         canvas.setActiveObject(selectedObject);
         canvas.renderAll();
+        $("#artWidth").val(parseFloat(newWidth).toFixed(2));
+        $("#artHeight").val(parseFloat(newHeight).toFixed(2));
        }, 200);
+       edit_art = false;
        
-   }else{
+    }else{
        updateTshirtImage(path);
        $('#addArtTab').css("display","none");
-       $('#editArtTab').css("display","block");
+       $('#editArtTab').css("display","block");        
     }
+
 }
+
+function changeArtSize(val, val_type) {
+    console.log("value is => ", val, " | value type => ", val_type);
+    let selectedObject = canvas.getActiveObject();
+    let scaleType = "scaleToWidth";
+    // set new size for art
+    if(val_type == "height"){
+        selectedObject.set({
+            scaleToHeight: val,
+        });
+    }else{
+        selectedObject.set({
+            scaleToWidth: val,
+        });
+    }
+    
+   console.log("choosed object => ", selectedObject)
+
+     // Update new size for art
+    // var newWidth = (selectedObject.width * selectedObject.scaleX);
+    // var newHeight = (selectedObject.height * selectedObject.scaleY);
+    // selectedObject.set({
+    //     scaleToWidth:newWidth,
+    //     scaleToHeight:newHeight
+    // });
+    // $("#artWidth").val(parseFloat(newWidth).toFixed(2));
+    // $("#artHeight").val(parseFloat(newHeight).toFixed(2));
+
+    canvas.renderAll();
+}
+
 
 // Art center js
 function centerArtObject(){

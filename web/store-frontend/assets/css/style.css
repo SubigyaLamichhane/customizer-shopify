@@ -1088,8 +1088,34 @@ img#customiserImage {
     border: 2px solid #5b00ff;
 }
 
+.art_size_wrapper {
+    display: flex;
+    justify-content: space-between;
+}
+div#artSizeWrapper {
+        display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+#artSizeWrapper>div {
+    margin: 0px 10px;
+}
+#artSizeWrapper input {
+    height: 30px;
+    text-align: center;
+    max-width: 80px;
+    min-width: 50px;
+}
+.art_size_wrapper p>small {
+    display: block;
+}   
 
 
+#artSizeWrapper .multi_icon{
+    color: #000;
+    font-weight: 600;
+    font-size: 18px;
+}
 
 
 /*media query start*/
