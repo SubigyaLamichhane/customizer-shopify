@@ -185,7 +185,7 @@ setTimeout(function(){
       fontSize: '1em',
       fontStyle: 'normal',
       fontWeight: 'normal',
-      fontFamily: 'arial',
+      fontFamily: 'Abel',
       lineHeight : 0.8,
       letterSpacing: 0
     }, fontOptions);
@@ -216,7 +216,7 @@ var fonts_name = 'ABeeZee|Abel|Aclonica|Acme|Actor|Adamina|Akronim|Aladin|Alata|
 const font_array = fonts_name.split("|");
 var font_html = ``;
 for(var i = 0; font_array.length-1 > i; i++){
-  font_html += `<li onClick="changeTextFont('`+font_array[i]+`')"><span class="active_text" style="font-family:`+font_array[i]+`">Test</span><small style="font-family:arial">`+font_array[i]+`</small></li>`;
+  font_html += `<li onClick="changeTextFont('`+font_array[i]+`')"><span class="active_text" style="font-family:`+font_array[i]+`">Test</span><small style="font-family:Abel">`+font_array[i]+`</small></li>`;
 }
 setTimeout(function(){
    $('ul#allFonts').html(font_html);
@@ -300,7 +300,8 @@ colorsdata.forEach((item)=>{
 
 // Append all color for text outline
 $('.outline_color_container  .all_outline_colors_list').append(`  <div class="color_box" style="background-color: transparent;border:1px solid #cacaca">
-	<input type="radio" name="text_outline_input" class="text_color_input" data-color-code="#00000000" data-color-name="none" onclick="changeTxtOutlineColor("#00000000", "none")" checked />
+	<span class="color_none_icon">X</span>
+	<input type="radio" name="text_outline_input" class="text_color_input" data-color-code="#00000000" data-color-name="none" onclick="changeTxtOutlineColor('#00000000', 'none')" checked />
 	<span class="check_icon"><i class="fa fa-check"></i></span>
 	<span class="box_outline"></span>
 </div>`);
@@ -481,6 +482,14 @@ function changeProductVariant(val){
 }
 
 
-
+// change zoom option status function
+function changeZoomStatus(option){
+	$('.zoom_icon').css("display","none");
+	if(option == 'plus'){
+		$('.zoom_plus_option').css("display","block");
+	}else{
+		$('.zoom_minus_option').css("display","block");
+	}	
+}
 
 

@@ -108,6 +108,38 @@ maxY = frontbgRect.top+frontbgRect.height;
 CANVAS_WIDTH = maxX;
 CANVAS_HEIGHT = maxY;
 
+// window.addEventListener('resize', resizeCanvas, false);
+// function resizeCanvas() {
+//     console.log("function called");
+//     var imgWidth = $('#customiserImage').width();
+//     var imgHeight = $('#customiserImage').height();
+//     var canvasWidth = imgWidth*40/100;
+//     var canvasHeight = imgHeight*70/100;
+
+//     var bgWidth = canvasWidth-canvas_padding;
+//     var bgHeight = canvasHeight-canvas_padding;
+
+//     // let bgLeft = canvas_padding / 2;
+//     // let bgTop = canvas_padding / 2;
+
+//     minX = bgLeft;
+//     maxX = bgLeft+bgWidth;
+//     minY = bgTop;
+//     maxY = bgTop+bgHeight;
+//     CANVAS_WIDTH = maxX;
+//     CANVAS_HEIGHT = maxY;
+
+//     canvas.setHeight(canvasHeight);
+//     canvas.setWidth(canvasWidth);
+//     canvas.backgroundImage.set({
+//         width:bgWidth,
+//         height:bgHeight,
+//         left:bgLeft,
+//         top:bgTop
+//     });
+//     canvas.renderAll();
+// }
+
 
 // Change canvas type like :- [front, back, right, left]
 function changeCanvasType(type) {
@@ -126,6 +158,7 @@ function changeCanvasType(type) {
         CANVAS_HEIGHT = maxY;
         canvas = back_canvas;
         fireEvents();
+        // resizeCanvas();
         // canvas.calcOffset();
     }else if(type == 'right'){
         $('#rightCanvasWrap').css('display','block');
@@ -137,6 +170,7 @@ function changeCanvasType(type) {
         CANVAS_HEIGHT = maxY;
         canvas = right_canvas;
         fireEvents();
+        // resizeCanvas();
     }else if(type =='left'){
         $('#leftCanvasWrap').css('display','block');
         minX = leftbgRect.left;
@@ -147,6 +181,7 @@ function changeCanvasType(type) {
         CANVAS_HEIGHT = maxY;
         canvas = left_canvas;
         fireEvents();
+        // resizeCanvas();
     }else{
         $('#frontCanvasWrap').css('display','block');
         minX = frontbgRect.left;
@@ -157,6 +192,7 @@ function changeCanvasType(type) {
         CANVAS_HEIGHT = maxY;
         canvas = front_canvas;
         fireEvents();
+        // resizeCanvas();
     }
 }
  
@@ -166,7 +202,7 @@ fabric.util.addListener(document.getElementsByClassName('upper-canvas')[0], 'con
 });
 
 // delete object code START
-var deleteIcon = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJMYXllcl8xIiB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHg9IjAiIHk9IjAiIHZpZXdCb3g9IjAgMCAxNyAxNyIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PGNpcmNsZSBmaWxsPSIjRkZGIiBjeD0iOC41IiBjeT0iOC41IiByPSI4LjUiPjwvY2lyY2xlPjxnIGZpbGw9IiNlZTM1MjQiPjxwYXRoIGQ9Im0xMS4xMyA0Ljk3LTYuMTYgNi4xNmMtLjI1LjI1LS4yNS42NSAwIC45cy42NS4yNS45IDBsNi4xNi02LjE2Yy4yNS0uMjUuMjUtLjY1IDAtLjlhLjYzNC42MzQgMCAwIDAtLjkgMCI+PC9wYXRoPjxwYXRoIGQ9Ik0xMi4wMyAxMS4xNCA1Ljg2IDQuOTdhLjYzNC42MzQgMCAwIDAtLjkgMGMtLjI1LjI1LS4yNS42NSAwIC45bDYuMTYgNi4xNmMuMjUuMjUuNjUuMjUuOSAwIC4yNi0uMjQuMjYtLjY1LjAxLS44OSI+PC9wYXRoPjwvZz48L3N2Zz4=';
+var deleteIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABEAAAARCAYAAAA7bUf6AAAABmJLR0QA/wD/AP+gvaeTAAABM0lEQVQ4jZ2TO07DQBCGRxQ0OLdAuQHKEWgokcUdAikQBUZCHIYQhYQoQBUlhNv4EQSuXNiW7I9ibYg3u+HxN6udnfl2NPuviCagBfSAJRAAebUugTPA0Wt0wAmwYrsiwLUBroDyB0CtEvBMHfwWsA5ya4BTtVgdlRSr0FhVRIEeWgEtQQ3xOzH0iTtt0umwkZ1OBsSdtumCU0FNvVkwHSrQuK/2j/dqP7o1NbgQwNh7DUquz7cBAHwBMttpcnNBfLBP4vVsKQDpjoh8mJ48expJPnuW3cMjyV9nkj3c2ez1LsDLBlqbgT4jTXNBWflLRRSogsmgCR731eu8RWjq1j5pDNfgB1tc+aQynMv/HHusW9/7A6gELm2f0MXimzWFGx0YQA7QBRaAj/KRD8yr+J5e8wku5nAYlAMFMAAAAABJRU5ErkJggg==';
 
 var deleteImg = document.createElement('img');
 deleteImg.src = deleteIcon;
@@ -200,7 +236,7 @@ fabric.Image.prototype.controls.deleteControl = new fabric.Control({
 });
  
 // Change bottom right scalling (resize) option icon
-var resizeIcon = 'data:image/svg+xml;base64,PHN2ZyB2ZXJzaW9uPSIxLjEiIGlkPSJfMDAtYm91bmRpbmctc2NhbGUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeD0iMCIgeT0iMCIgdmlld0JveD0iMCAwIDM5IDM5IiB4bWw6c3BhY2U9InByZXNlcnZlIj48cGF0aCBmaWxsPSIjMDM5Q0I1IiBkPSJNMjUuNiAxOS43djMuOEwxNS41IDEzLjRoMy43di0zaC04Ljh2OC44aDN2LTMuN2wxMC4xIDEwLjFoLTMuOHYzaDguOXYtOC45eiI+PC9wYXRoPjwvc3ZnPg==';
+var resizeIcon = 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACcAAAAnCAMAAAC7faEHAAAAP1BMVEUAAAAA//8AgIAAmbMAmbMAnLUAnrQGm7cFm7QDnLYDnLQDm7QDm7QCnLUDnbUDnLUDnbYDm7UDnLUDnLX////SASVmAAAAE3RSTlMAAQIUHh8iLjNNVVxmZ5SYmZzfrqPYfQAAAAFiS0dEFJLfyTUAAAB2SURBVDjL7dMxDoAgDAVQUFGEIljuf1chlJV2YGDwzy8/LSlK/Vk0PlGOsUuZYic6DAC7pO/duD2KwwKj5h08gsbqtABWpwTQWFs21ZFmPJ0bPlBvhJyTEkDWEQysazMi71oj6wxAQIG7++FMclc/bP9/8lXzAeGoC3Obh6WqAAAAAElFTkSuQmCC';
 
 var resizeImg = document.createElement('img');
 resizeImg.src = resizeIcon;
@@ -290,7 +326,7 @@ function fitToObject(event) {
             }
 
             $.ajax({
-              url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+text_val+"&effect="+obj.text_effect+"&font_color="+obj.text_color.replace("#","")+"&font_size="+font_size+"&fontName="+obj.text_font_family+"&outline_color="+obj.outline_color.replace("#","")+"&outline_width="+obj.outline_width,
+              url: "http://customizer.sketchthemes.com:8080/testing.php?text="+text_val+"&effect="+obj.text_effect+"&font_color="+obj.text_color.replace("#","")+"&font_size="+font_size+"&fontName="+obj.text_font_family+"&outline_color="+obj.outline_color.replace("#","")+"&outline_width="+obj.outline_width,
               xhrFields: {
                 responseType: 'blob'
               },
@@ -310,6 +346,7 @@ function fitToObject(event) {
                 obj.setSrc(URL.createObjectURL(img));                
                         
                 setTimeout(function(){
+                    
                     setObjectInside(obj);
                     canvas.renderAll(); 
                     $('.customiseLoader').css("display","none");
@@ -497,6 +534,8 @@ function calculateFontSize(text, width, height){
 }
 
 
+// ------------ Resize canvas function --------
+
 
 //function fire event start this function will call whenever we change canvas type(front, back)
 function fireEvents(){
@@ -510,40 +549,6 @@ canvas.clipTo = function(ctx) {
   ctx.restore();
 };
 canvas.renderAllBoundaries = true;
-
-// ------------ Resize canvas function --------
-
-// window.addEventListener('resize', resizeCanvas, false);
-// function resizeCanvas() {
-//     var imgWidth = $('#customiserImage').width();
-//     var imgHeight = $('#customiserImage').height();
-//     var canvasWidth = imgWidth*65/100 ;
-//     var canvasHeight = imgHeight*70/100 ;
-
-//     var bgWidth = canvasWidth-canvas_padding;
-//     var bgHeight = canvasHeight-canvas_padding;
-
-//     // let bgLeft = canvas_padding / 2;
-//     // let bgTop = canvas_padding / 2;
-
-//     minX = bgLeft;
-//     maxX = bgLeft+bgWidth;
-//     minY = bgTop;
-//     maxY = bgTop+bgHeight;
-//     CANVAS_WIDTH = maxX;
-//     CANVAS_HEIGHT = maxY;
-
-//     canvas.setHeight(canvasHeight);
-//     canvas.setWidth(canvasWidth);
-//     canvas.backgroundImage.set({
-//         width:bgWidth,
-//         height:bgHeight,
-//         left:bgLeft,
-//         top:bgTop
-//     });
-//     canvas.renderAll();
-// }
-// resizeCanvas();
 
 // This function will work when click on canvas 
 canvas.on('mouse:down', function(options) {
@@ -571,11 +576,12 @@ canvas.on('mouse:down', function(options) {
             $('#editTextContent').val(options.target.text);
         }
         $('#editTextTab').css("display","block");
-        $('.selected_font_name').text(options.target.fontFamily);
+        // $('.selected_font_name').text(options.target.fontFamily);
 
         // default settings value when added new text
         $('.selected_font_name').text(obj_target.text_font_family);
-        $('.selected_color_name').text(obj_target.text_color_name);
+        $('.selected_font_name').css('font-family',obj_target.text_font_family);
+        // $('.selected_color_name').text(obj_target.text_color_name);
         $('.selected_color>.color_box').css('background-color', obj_target.text_color);
         $('.selected_color>.color_name').text(obj_target.text_color_name);
         $(".color_box>input[name='text_color_input'][data-color-code='"+obj_target.text_color+"']").prop("checked",true);
@@ -585,13 +591,16 @@ canvas.on('mouse:down', function(options) {
         $('.txt_shape_container.'+obj_target.text_effect+'_text').addClass('active_shape');
         if(obj_target.text_effect == 'normal'){
             $('.selected_shape_name').text('None');
+            $('.selected_shape_name').attr('shape-type','none');
         }else{
             $('.selected_shape_name').text(obj_target.text_effect);
+            $('.selected_shape_name').attr('shape-type',obj_target.text_effect);
         }
 
         $('.selected_outline_color>.color_box').css('background-color', obj_target.outline_color);
+        $('.selected_outline_color>.color_box').attr("color-name",obj_target.outline_color_name);
         $('.selected_outline_color>.color_name').text(obj_target.outline_color_name);
-        $('.selected_outline_name').text(obj_target.outline_color_name);
+        // $('.selected_outline_name').text(obj_target.outline_color_name);
 
         $('#rotatTextRangeSlide').val(obj_target.angle);
         $('#rotatTextNumber').val(obj_target.angle);
@@ -665,9 +674,17 @@ canvas.on('mouse:down', function(options) {
 canvas.on('object:moving', function(e) {
     var obj = e.target;
 
-    if(obj.height > CANVAS_HEIGHT || obj.width > CANVAS_WIDTH){
-        return;
+    if(obj.type == 'image'){
+        if(obj.scaleToHeight > CANVAS_HEIGHT || obj.scaleToWidth > CANVAS_WIDTH){
+            return;
+        }
+    }else{
+        if(obj.height > CANVAS_HEIGHT || obj.width > CANVAS_WIDTH){
+            return;
+        }
     }
+
+    
 
     obj.setCoords();   
     if(obj.getBoundingRect().top < minY || obj.getBoundingRect().left < minX){
@@ -694,7 +711,7 @@ var scale1y = 0 ;
 var width1 = 0 ;    
 var height1 = 0 ;
 
-function work on object scaling
+// function work on object scaling
 canvas.on('object:scaling', function (e){
 
     console.log("scaling => ", e.target.type);
@@ -806,10 +823,10 @@ canvas.on('object:modified', function(event) {
         var newWidth = (event.target.width * event.target.scaleX);
         var newHeight = (event.target.height * event.target.scaleY);
 
-        if(event.target.text_effect == 'curve'){
+        // if(event.target.text_effect == 'curve'){
             if(parseFloat(event.target.scaleToWidth) !== parseFloat(newWidth)){
             $.ajax({
-              url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+event.target.text+"&effect="+event.target.text_effect+"&font_color="+event.target.text_color.replace("#","")+"&font_size="+event.target.text_font_size+"&font_width="+parseFloat(event.target.scaleToWidth).toFixed(2)+","+parseFloat(newWidth).toFixed(2)+"&font_height="+parseFloat(event.target.scaleToHeight).toFixed(2)+","+parseFloat(newHeight).toFixed(2)+"&fontName="+event.target.text_font_family+"&outline_color="+event.target.outline_color.replace("#","")+"&outline_width="+event.target.outline_width,
+              url: "http://customizer.sketchthemes.com:8080/testing.php?text="+event.target.text+"&effect="+event.target.text_effect+"&font_color="+event.target.text_color.replace("#","")+"&font_size="+event.target.text_font_size+"&font_width="+parseFloat(event.target.scaleToWidth).toFixed(2)+","+parseFloat(newWidth).toFixed(2)+"&font_height="+parseFloat(event.target.scaleToHeight).toFixed(2)+","+parseFloat(newHeight).toFixed(2)+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+event.target.text_font_family+"&outline_color="+event.target.outline_color.replace("#","")+"&outline_width="+event.target.outline_width,
               xhrFields: {
                 responseType: 'blob'
               },
@@ -821,15 +838,20 @@ canvas.on('object:modified', function(event) {
                 console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
                 $('#textFontSize').val(parseFloat(xhr.getResponseHeader('x-font-size')).toFixed(1));
                 event.target.set({
-                    scaleToWidth:xhr.getResponseHeader('x-img-width'),
-                    scaleToHeight:xhr.getResponseHeader('x-img-height'),
-                    scaleX: 1,
-                    scaleY:1,
-                    "text_font_size": xhr.getResponseHeader('x-font-size')
-                })
+                        scaleToWidth:xhr.getResponseHeader('x-img-width'),
+                        scaleToHeight:xhr.getResponseHeader('x-img-height'),
+                        // width: xhr.getResponseHeader('x-img-width'),
+                        // height: xhr.getResponseHeader('x-img-height'),
+                        scaleX: 1,
+                        scaleY:1,
+                        "text_font_size": xhr.getResponseHeader('x-font-size')
+                    })
                 event.target.setSrc(URL.createObjectURL(img));
                         
                 setTimeout(function(){
+                    
+                    // event.target.scaleToWidth(parseFloat(newWidth))
+
                     // fitToObject(event.target)
                     setObjectInside(event.target);
                     canvas.renderAll(); 
@@ -843,48 +865,52 @@ canvas.on('object:modified', function(event) {
             }) 
          }
 
-        }else{
+      //   }else{
 
-        let updateFontSize = calculateFontSize(event.target.text, newWidth, newHeight);
-        console.log("New font size :", updateFontSize);
-        if(parseFloat(event.target.scaleToWidth) !== parseFloat(newWidth)){
-        $.ajax({
-              url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+event.target.text+"&effect="+event.target.text_effect+"&font_color="+event.target.text_color.replace("#","")+"&font_size="+updateFontSize+"&fontName="+event.target.text_font_family+"&outline_color="+event.target.outline_color.replace("#","")+"&outline_width="+event.target.outline_width,
-              xhrFields: {
-                responseType: 'blob'
-              },
-              beforeSend: function() {
-                $('.customiseLoader').css("display","flex");
-              },
-              success: function (img, status, xhr) {
-                console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
-                console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
-                $('#textFontSize').val(parseFloat(updateFontSize).toFixed(1));
-                event.target.set({
-                    scaleToWidth:xhr.getResponseHeader('x-img-width'),
-                    scaleToHeight:xhr.getResponseHeader('x-img-height'),
-                    scaleX: 1,
-                    scaleY:1,
-                    "text_font_size": parseFloat(updateFontSize)
-                })
-                event.target.setSrc(URL.createObjectURL(img));
+      //   let updateFontSize = calculateFontSize(event.target.text, newWidth, newHeight);
+      //   console.log("New font size :", updateFontSize);
+      //   if(parseFloat(event.target.scaleToWidth) !== parseFloat(newWidth)){
+      //   $.ajax({
+      //         url: "http://customizer.sketchthemes.com:8080/testing.php?text="+event.target.text+"&effect="+event.target.text_effect+"&font_color="+event.target.text_color.replace("#","")+"&font_size="+updateFontSize+"&fontName="+event.target.text_font_family+"&outline_color="+event.target.outline_color.replace("#","")+"&outline_width="+event.target.outline_width,
+      //         xhrFields: {
+      //           responseType: 'blob'
+      //         },
+      //         beforeSend: function() {
+      //           $('.customiseLoader').css("display","flex");
+      //         },
+      //         success: function (img, status, xhr) {
+      //           console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
+      //           console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
+      //           $('#textFontSize').val(parseFloat(updateFontSize).toFixed(1));
+
+      //           event.target.setSrc(URL.createObjectURL(img));
+
                         
-                setTimeout(function(){
-                    // fitToObject(event.target)
-                    setObjectInside(event.target);
-                    canvas.renderAll(); 
-                    $('.customiseLoader').css("display","none");
-                }, 200)
-              },
-              error: function (jqXhr, textStatus, errorMessage) {
-                console.log("Error => ",errorMessage);
-                $('.customiseLoader').css("display","none");
-              }
-            }) 
-         }
-      }
-    }
-    if (event.target.type == 'art' || event.target.type == 'image') {
+      //           setTimeout(function(){
+      //               event.target.set({
+      //                   scaleToWidth:xhr.getResponseHeader('x-img-width'),
+      //                   scaleToHeight:xhr.getResponseHeader('x-img-height'),
+      //                   // width: xhr.getResponseHeader('x-img-width'),
+      //                   // height: xhr.getResponseHeader('x-img-height'),
+      //                   scaleX: 1,
+      //                   scaleY:1,
+      //                   "text_font_size": parseFloat(updateFontSize)
+      //               })
+
+      //               // fitToObject(event.target)
+      //               setObjectInside(event.target);
+      //               canvas.renderAll(); 
+      //               $('.customiseLoader').css("display","none");
+      //           }, 200)
+      //         },
+      //         error: function (jqXhr, textStatus, errorMessage) {
+      //           console.log("Error => ",errorMessage);
+      //           $('.customiseLoader').css("display","none");
+      //         }
+      //       }) 
+      //    }
+      // }
+    }else if (event.target.type == 'art') {
         var newWidth = (event.target.width * event.target.scaleX);
         var newHeight = (event.target.height * event.target.scaleY);
         console.log("Image width :", newWidth , " | height : ", newHeight);
@@ -898,13 +924,30 @@ canvas.on('object:modified', function(event) {
             scaleToWidth:newWidth,
             scaleToHeight:newHeight
         })
+    }else if(event.target.type == 'image'){
+        var newWidth = (event.target.width * event.target.scaleX);
+        var newHeight = (event.target.height * event.target.scaleY);
+        console.log("Image width :", newWidth , " | height : ", newHeight);
+        $("#imageWidth").val(parseFloat(newWidth).toFixed(2));
+        $("#imageHeight").val(parseFloat(newHeight).toFixed(2));
+        event.target.set({
+            // width: newWidth,
+            // height: newHeight,
+            // scaleX:1,
+            // scaleY:1,
+            scaleToWidth:newWidth,
+            scaleToHeight:newHeight
+        })
     }
 
   });
 
+// resizeCanvas();
+
 } // fireEvents fucntion end
 
 fireEvents();
+
 
 // truncate fucntion for font family section text
 const truncateString = (string = '', maxLength = 50) => 
@@ -927,7 +970,7 @@ $("#addTextContent").click(function(){
     text_val = text_val.replace(/\s+/g, " ");;
     if(text_val != ""){
         var font_size = 30;
-        var tempData = $.measureText(text_val, {fontFamily:"Arial", fontSize:font_size});
+        var tempData = $.measureText(text_val, {fontFamily:"Abel", fontSize:font_size});
         var textWidth = tempData.width;
         var textHeight = tempData.height;
 
@@ -939,7 +982,7 @@ $("#addTextContent").click(function(){
             while (text_width > (CANVAS_WIDTH-minX-5)) {
                 console.log('text width : ', text_width , " | canvas width : ", (CANVAS_WIDTH-minX-5), " | font size : ", font_size);
               font_size = font_size-1;
-              var updateData = $.measureText(text_val, {fontFamily: "Arial", fontSize:font_size});
+              var updateData = $.measureText(text_val, {fontFamily: "Abel", fontSize:font_size});
               text_width = updateData.width;
               text_height = updateData.height;
             }
@@ -948,7 +991,7 @@ $("#addTextContent").click(function(){
         }
 
         $.ajax({
-          url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+text_val+"&effect=normal&font_color=000000&font_size="+font_size+"&fontName=Arial&outline_color=00000000&outline_width=1",
+          url: "http://customizer.sketchthemes.com:8080/testing.php?text="+text_val+"&effect=normal&font_color=000000&font_size="+font_size+"&fontName=Abel&outline_color=00000000&outline_width=1",
           xhrFields: {
             responseType: 'blob'
           },
@@ -969,7 +1012,7 @@ $("#addTextContent").click(function(){
                         "text_color": "#000000",
                         "text_color_name": "black",
                         "text_font_size": font_size,
-                        "text_font_family": "Arial",
+                        "text_font_family": "Abel",
                         "outline_color": "#00000000",
                         "outline_color_name": "None",
                         "outline_width": "1",
@@ -1015,8 +1058,9 @@ $("#addTextContent").click(function(){
         }) 
 
         // default settings value when added new text
-        $('.selected_font_name').text('Arial');
-        $('.selected_color_name').text('Black');
+        $('.selected_font_name').text('Abel');
+        $('.selected_font_name').css('font-family', 'Abel');
+        // $('.selected_color_name').text('Black');
         $('.selected_color>.color_box').css('background-color', '#000000');
         $('.selected_color>.color_name').text('Black');
         $(".color_box>input[name='text_color_input'][data-color-name='Black']").prop("checked",true);
@@ -1024,10 +1068,12 @@ $("#addTextContent").click(function(){
         $('.txt_shape_container').removeClass('active_shape');
         $('.txt_shape_container.normal_text').addClass('active_shape');
         $('.selected_shape_name').text('None');
+        $('.selected_shape_name').attr('shape-type','none');
 
         $('.selected_outline_color>.color_box').css('background-color', '#00000000');
+        $('.selected_outline_color>.color_box').attr("color-name","none");
         $('.selected_outline_color>.color_name').text('None');
-        $('.selected_outline_name').text('None');
+        // $('.selected_outline_name').text('None');
 
         $('#rotatTextRangeSlide').val(0);
         $('#rotatTextNumber').val(0);
@@ -1067,10 +1113,10 @@ $("#editTextContent").change(function(){
         }
         var font_size = parseFloat(selectedObject.text_font_size);
 
-        if(selectedObject.text_effect == 'curve'){
+        // if(selectedObject.text_effect == 'curve'){
 
             $.ajax({
-              url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+text_val+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+              url: "http://customizer.sketchthemes.com:8080/testing.php?text="+text_val+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
               xhrFields: {
                 responseType: 'blob'
               },
@@ -1104,59 +1150,59 @@ $("#editTextContent").change(function(){
               }
             }) 
 
-        }else{
+        // }else{
 
-        var tempData = $.measureText(text_val, {fontFamily: selectedObject.text_font_family, fontSize:selectedObject.text_font_size});
+        // var tempData = $.measureText(text_val, {fontFamily: selectedObject.text_font_family, fontSize:selectedObject.text_font_size});
 
-        // selectedObject.set('text', text_val);  
+        // // selectedObject.set('text', text_val);  
         
-        console.log('text width : ', tempData.width , " | canvas width : ", CANVAS_WIDTH-minX-canvas_space_width, " | font size : ", font_size);
+        // console.log('text width : ', tempData.width , " | canvas width : ", CANVAS_WIDTH-minX-canvas_space_width, " | font size : ", font_size);
 
-        if(tempData.width > (CANVAS_WIDTH-minX-canvas_space_width)){
-            console.log("Width is greater than canvas width1")
-            var text_width = tempData.width;
-            while (text_width > (CANVAS_WIDTH-minX-canvas_space_width)){
+        // if(tempData.width > (CANVAS_WIDTH-minX-canvas_space_width)){
+        //     console.log("Width is greater than canvas width1")
+        //     var text_width = tempData.width;
+        //     while (text_width > (CANVAS_WIDTH-minX-canvas_space_width)){
                 
-              font_size = font_size-0.1;
-              var updateData = $.measureText(text_val, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
-              text_width = updateData.width;
-            }
-        }
+        //       font_size = font_size-0.1;
+        //       var updateData = $.measureText(text_val, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
+        //       text_width = updateData.width;
+        //     }
+        // }
 
 
-            $.ajax({
-              url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+text_val+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
-              xhrFields: {
-                responseType: 'blob'
-              },
-              beforeSend: function() {
-                $('.customiseLoader').css("display","flex");
-              },
-              success: function (img, status, xhr) {
-                $('#textFontSize').val(parseFloat(font_size).toFixed(1));
+        //     $.ajax({
+        //       url: "http://customizer.sketchthemes.com:8080/testing.php?text="+text_val+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+        //       xhrFields: {
+        //         responseType: 'blob'
+        //       },
+        //       beforeSend: function() {
+        //         $('.customiseLoader').css("display","flex");
+        //       },
+        //       success: function (img, status, xhr) {
+        //         $('#textFontSize').val(parseFloat(font_size).toFixed(1));
 
-                selectedObject.set({
-                    scaleToWidth:xhr.getResponseHeader('x-img-width'),
-                    scaleToHeight:xhr.getResponseHeader('x-img-height'),
-                    scaleX: 1,
-                    scaleY:1,
-                    "text_font_size": parseFloat(font_size),
-                    "text": text_val
-                })
-                selectedObject.setSrc(URL.createObjectURL(img));                
+        //         selectedObject.set({
+        //             scaleToWidth:xhr.getResponseHeader('x-img-width'),
+        //             scaleToHeight:xhr.getResponseHeader('x-img-height'),
+        //             scaleX: 1,
+        //             scaleY:1,
+        //             "text_font_size": parseFloat(font_size),
+        //             "text": text_val
+        //         })
+        //         selectedObject.setSrc(URL.createObjectURL(img));                
                         
-                setTimeout(function(){
-                    setObjectInside(selectedObject);
-                    canvas.renderAll(); 
-                    $('.customiseLoader').css("display","none");
-                }, 200)
-              },
-              error: function (jqXhr, textStatus, errorMessage) {
-                console.log("Error => ",errorMessage);
-                $('.customiseLoader').css("display","none");
-              }
-            })         
-        }
+        //         setTimeout(function(){
+        //             setObjectInside(selectedObject);
+        //             canvas.renderAll(); 
+        //             $('.customiseLoader').css("display","none");
+        //         }, 200)
+        //       },
+        //       error: function (jqXhr, textStatus, errorMessage) {
+        //         console.log("Error => ",errorMessage);
+        //         $('.customiseLoader').css("display","none");
+        //       }
+        //     })         
+        // }
       
     setObjectInside(selectedObject);
     canvas.renderAll(); 
@@ -1168,10 +1214,10 @@ $("#editTextContent").change(function(){
 const changeTextFont = async(font) => {
     var selectedObject = canvas.getActiveObject();
 
-    if(selectedObject.text_effect == 'curve'){
+    // if(selectedObject.text_effect == 'curve'){
 
             $.ajax({
-              url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+font+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+              url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+font+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
               xhrFields: {
                 responseType: 'blob'
               },
@@ -1195,6 +1241,7 @@ const changeTextFont = async(font) => {
                 setTimeout(function(){
                     // fitToObject(selectedObject)
                     $('.selected_font_name').text(font);
+                    $('.selected_font_name').css('font-family',font);
                     setObjectInside(selectedObject);
                     canvas.renderAll(); 
                     $('.customiseLoader').css("display","none");
@@ -1206,42 +1253,43 @@ const changeTextFont = async(font) => {
               }
             }) 
 
-        }else{
+//         }else{
 
-    $.ajax({
-      url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+font+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
-      xhrFields: {
-        responseType: 'blob'
-      },
-      beforeSend: function() {
-        $('.customiseLoader').css("display","flex");
-      },
-      success: function (img, status, xhr) {
-        selectedObject.set({
-            scaleToWidth:xhr.getResponseHeader('x-img-width'),
-            scaleToHeight:xhr.getResponseHeader('x-img-height'),
-            scaleX: 1,
-            scaleY:1,
-            "text_font_size": selectedObject.text_font_size,
-            "text": selectedObject.text
-        })
-        selectedObject.setSrc(URL.createObjectURL(img));
-        // $('.customiseLoader').css("display","none");            
-        setTimeout(function(){
-            fitToObject(selectedObject);
-            // setObjectInside(selectedObject);
-            // canvas.renderAll(); 
+//     $.ajax({
+//       url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+font+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+//       xhrFields: {
+//         responseType: 'blob'
+//       },
+//       beforeSend: function() {
+//         $('.customiseLoader').css("display","flex");
+//       },
+//       success: function (img, status, xhr) {
+//         selectedObject.set({
+//             scaleToWidth:xhr.getResponseHeader('x-img-width'),
+//             scaleToHeight:xhr.getResponseHeader('x-img-height'),
+//             scaleX: 1,
+//             scaleY:1,
+//             "text_font_size": selectedObject.text_font_size,
+//             "text": selectedObject.text
+//         })
+//         selectedObject.setSrc(URL.createObjectURL(img));
+//         // $('.customiseLoader').css("display","none");            
+//         setTimeout(function(){
+//             fitToObject(selectedObject);
+//             // setObjectInside(selectedObject);
+//             // canvas.renderAll(); 
             
-        }, 200)
-      },
-      error: function (jqXhr, textStatus, errorMessage) {
-        console.log("Error => ",errorMessage);
-        $('.customiseLoader').css("display","none");
-      }
-    })
-}
+//         }, 200)
+//       },
+//       error: function (jqXhr, textStatus, errorMessage) {
+//         console.log("Error => ",errorMessage);
+//         $('.customiseLoader').css("display","none");
+//       }
+//     })
+// }
     selectedObject.set("text_font_family", font)
      $('.selected_font_name').text(font);    
+     $('.selected_font_name').css('font-family',font);
      setObjectInside(selectedObject);
      canvas.renderAll();
 
@@ -1252,7 +1300,7 @@ const changeTextFont = async(font) => {
 function changeTextColor(color, name){
     var selectedObject = canvas.getActiveObject();
     $.ajax({
-      url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+      url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
       xhrFields: {
         responseType: 'blob'
       },
@@ -1261,7 +1309,7 @@ function changeTextColor(color, name){
       },
       success: function (img) {
         selectedObject.set({"text_color": color, "text_color_name": name});
-        $('.selected_color_name').text(name);
+        // $('.selected_color_name').text(name);
         selectedObject.setSrc(URL.createObjectURL(img));
                 
         setTimeout(function(){
@@ -1281,10 +1329,18 @@ function changeTextColor(color, name){
 
 // text Rotation js
 function changeRangeValue(val){
-    document.getElementById("rotatTextRangeSlide").value = isNaN(parseInt(val, 10)) ? 0 : parseInt(val, 10);
+    var angleValue = isNaN(parseInt(val, 10)) ? 0 : parseInt(val, 10);
+
+    if(angleValue>181){
+        angleValue = 180;
+    }else if(angleValue<-181){
+        angleValue = -180;
+    }
+    document.getElementById("rotatTextRangeSlide").value = angleValue;
+    document.getElementById("rotatTextNumber").value = angleValue
     var selectedObject = canvas.getActiveObject();
     // selectedObject.set('angle', parseFloat(val));
-    selectedObject.rotate(parseFloat(val));
+    selectedObject.rotate(parseFloat(angleValue));
     fitToObject(selectedObject);
     // setObjectInside(selectedObject);
     // canvas.renderAll();
@@ -1304,10 +1360,10 @@ function changeTxtOutlineColor(color, name){
     var thickness_val =  $('#textOutlineThickness').val();
     var selectedObject = canvas.getActiveObject();
 
-    if(selectedObject.text_effect == 'curve'){
+    // if(selectedObject.text_effect == 'curve'){
 
             $.ajax({
-              url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+parseFloat(selectedObject.text_font_size)+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+color.replace("#","")+"&outline_width="+thickness_val,
+              url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+parseFloat(selectedObject.text_font_size)+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+color.replace("#","")+"&outline_width="+thickness_val,
               xhrFields: {
                 responseType: 'blob'
               },
@@ -1317,7 +1373,9 @@ function changeTxtOutlineColor(color, name){
               success: function (img, status, xhr) {
                 console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
                 console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
-                 $('.selected_outline_name').text(name);
+                 // $('.selected_outline_name').text(name);
+                
+
                 selectedObject.set({
                     scaleToWidth:xhr.getResponseHeader('x-img-width'),
                     scaleToHeight:xhr.getResponseHeader('x-img-height'),
@@ -1334,6 +1392,10 @@ function changeTxtOutlineColor(color, name){
                     $('#textFontSize').val(parseFloat(xhr.getResponseHeader('x-font-size')).toFixed(1));
                     setObjectInside(selectedObject);
                     canvas.renderAll(); 
+
+                    $('.selected_outline_color>.color_box').css('background-color', selectedObject.outline_color);
+                $('.selected_outline_color>.color_box').attr("color-name",selectedObject.outline_color_name);
+                $('.selected_outline_color>.color_name').text(selectedObject.outline_color_name);
                     $('.customiseLoader').css("display","none");
                 }, 200)
               },
@@ -1343,43 +1405,43 @@ function changeTxtOutlineColor(color, name){
               }
             }) 
 
-        }else{
+//         }else{
 
 
-    $.ajax({
-      url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+color.replace("#","")+"&outline_width="+thickness_val,
-      xhrFields: {
-        responseType: 'blob'
-      },
-      beforeSend: function() {
-        $('.customiseLoader').css("display","flex");
-      },
-      success: function (img, status, xhr) {
-        $('.selected_outline_name').text(name);
-        selectedObject.set({
-            scaleToWidth:xhr.getResponseHeader('x-img-width'),
-            scaleToHeight:xhr.getResponseHeader('x-img-height'),
-            scaleX: 1,
-            scaleY:1,
-            "outline_color":color,
-            "outline_width": thickness_val,
-            "outline_color_name": name
-        })
-        selectedObject.setSrc(URL.createObjectURL(img));
-        // $('.customiseLoader').css("display","none");
+//     $.ajax({
+//       url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+color.replace("#","")+"&outline_width="+thickness_val,
+//       xhrFields: {
+//         responseType: 'blob'
+//       },
+//       beforeSend: function() {
+//         $('.customiseLoader').css("display","flex");
+//       },
+//       success: function (img, status, xhr) {
+//         $('.selected_outline_name').text(name);
+//         selectedObject.set({
+//             scaleToWidth:xhr.getResponseHeader('x-img-width'),
+//             scaleToHeight:xhr.getResponseHeader('x-img-height'),
+//             scaleX: 1,
+//             scaleY:1,
+//             "outline_color":color,
+//             "outline_width": thickness_val,
+//             "outline_color_name": name
+//         })
+//         selectedObject.setSrc(URL.createObjectURL(img));
+//         // $('.customiseLoader').css("display","none");
               
-        setTimeout(function(){
-            fitToObject(selectedObject)
-            // setObjectInside(selectedObject);  
-            // canvas.renderAll(); 
-        }, 200)
-      },
-      error: function (jqXhr, textStatus, errorMessage) {
-        console.log("Error => ",errorMessage);
-        $('.customiseLoader').css("display","none");
-      }
-    })      
-}
+//         setTimeout(function(){
+//             fitToObject(selectedObject)
+//             // setObjectInside(selectedObject);  
+//             // canvas.renderAll(); 
+//         }, 200)
+//       },
+//       error: function (jqXhr, textStatus, errorMessage) {
+//         console.log("Error => ",errorMessage);
+//         $('.customiseLoader').css("display","none");
+//       }
+//     })      
+// }
 
     // selectedObject.set({"outline_color":color, "outline_width": thickness_val, "outline_color_name": name});
     // $('.selected_outline_name').text(name);
@@ -1394,7 +1456,7 @@ function removeTxtOutline(){
     var selectedObject = canvas.getActiveObject();
 
     $.ajax({
-      url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color=00000000&outline_width="+1,
+      url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color=00000000&outline_width="+1,
       xhrFields: {
         responseType: 'blob'
       },
@@ -1402,11 +1464,12 @@ function removeTxtOutline(){
         $('.customiseLoader').css("display","flex");
       },
       success: function (img, status, xhr) {
-        $('.selected_outline_name').text("none");
+        // $('.selected_outline_name').text("none");
         $('#textOutlineThickness').val(1);
         $(".color_box>input[name='text_outline_input'][data-color-name='none']").prop("checked", true);
         $('.text_outline_wrapper').css("display","none");
         $('.selected_outline_color>.color_box').css('background-color', '#00000000');
+        $('.selected_outline_color>.color_box').attr("color-name",'none');
         $('.selected_outline_color>.color_name').text('None');
 
         selectedObject.set({
@@ -1450,7 +1513,7 @@ function changeTextEffect(effect){
     console.log('selected_shap => ', selected_shap)
     
     $.ajax({
-      url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+      url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
       xhrFields: {
         responseType: 'blob'
       },
@@ -1460,26 +1523,29 @@ function changeTextEffect(effect){
       success: function (img, status, xhr){
         if(effect == 'normal'){
             $('.selected_shape_name').text('None');
+            $('.selected_shape_name').attr('shape-type','none');
         }else{
             $('.selected_shape_name').text(effect);
+            $('.selected_shape_name').attr('shape-type',effect);
         }
         $('.txt_shape_container.'+effect+'_text').addClass('active_shape');
-
-        selectedObject.set({
-            "text_effect": effect,
-            scaleToWidth:xhr.getResponseHeader('x-img-width'),
-            scaleToHeight:xhr.getResponseHeader('x-img-height'),
-            scaleX: 1,
-            scaleY:1,
-        });
-        selectedObject.setSrc(URL.createObjectURL(img));
         
+        selectedObject.setSrc(URL.createObjectURL(img));
                
         setTimeout(function(){
-            fitToObject(selectedObject);
-            // setObjectInside(selectedObject); 
-            // canvas.renderAll(); 
-            // $('.customiseLoader').css("display","none");
+
+            selectedObject.set({
+                "text_effect": effect,
+                scaleToWidth:xhr.getResponseHeader('x-img-width'),
+                scaleToHeight:xhr.getResponseHeader('x-img-height'),
+                scaleX: 1,
+                scaleY:1,
+            });
+
+            // fitToObject(selectedObject);
+            setObjectInside(selectedObject); 
+            canvas.renderAll(); 
+            $('.customiseLoader').css("display","none");
         }, 200)
       },
       error: function (jqXhr, textStatus, errorMessage) {
@@ -1518,10 +1584,10 @@ function changeTxtFontSize(value){
         value = 5; 
     }
 
-    if(selectedObject.text_effect == 'curve'){
+    // if(selectedObject.text_effect == 'curve'){
 
             $.ajax({
-              url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+parseFloat(value)+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+              url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+parseFloat(value)+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
               xhrFields: {
                 responseType: 'blob'
               },
@@ -1555,74 +1621,42 @@ function changeTxtFontSize(value){
               }
             }) 
 
-        }else{
+    //     }else{
 
-        $.ajax({
-          url: "http://customizer.sketchthemes.com:8080/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+value+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
-          xhrFields: {
-            responseType: 'blob'
-          },
-          beforeSend: function() {
-            $('.customiseLoader').css("display","flex");
-          },
-          success: function (img, status, xhr) {
-            $('#textFontSize').val(parseFloat(value).toFixed(1));
-            selectedObject.set({
-                scaleToWidth:xhr.getResponseHeader('x-img-width'),
-                scaleToHeight:xhr.getResponseHeader('x-img-height'),
-                scaleX: 1,
-                scaleY:1,
-                "text_font_size": value,
-            })
-            selectedObject.setSrc(URL.createObjectURL(img));
+    //     $.ajax({
+    //       url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+value+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+    //       xhrFields: {
+    //         responseType: 'blob'
+    //       },
+    //       beforeSend: function() {
+    //         $('.customiseLoader').css("display","flex");
+    //       },
+    //       success: function (img, status, xhr) {
+    //         $('#textFontSize').val(parseFloat(value).toFixed(1));
+    //         selectedObject.set({
+    //             scaleToWidth:xhr.getResponseHeader('x-img-width'),
+    //             scaleToHeight:xhr.getResponseHeader('x-img-height'),
+    //             scaleX: 1,
+    //             scaleY:1,
+    //             "text_font_size": value,
+    //         })
+    //         selectedObject.setSrc(URL.createObjectURL(img));
             
                     
-            setTimeout(function(){
-                fitToObject(selectedObject)
-                // setObjectInside(selectedObject);
-                // canvas.renderAll(); 
-                // $('.customiseLoader').css("display","none");
-            }, 200)
-          },
-          error: function (jqXhr, textStatus, errorMessage) {
-            console.log("Error => ",errorMessage);
-            $('.customiseLoader').css("display","none");
-          }
-        })   
-    }
-    
-
-    // if(value < 10){
-    //     $('#textFontSize').val(10);
-    //     selectedObject.set('fontSize', 10);
-    // }else{
-    //     // selectedObject.set('fontSize', value);
-    //     var font_size = Number(value);
-    //     console.log("active text => ", selectedObject.text, " | font family => ", selectedObject.fontFamily ," | text size val => ", value);
-    //     var newData = $.measureText(selectedObject.text, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
-
- 
-    //     console.log('text width : ', newData.width , " | canvas width : ", CANVAS_WIDTH," | font size : ", font_size);
-
-    //     if(newData.width > CANVAS_WIDTH){
-    //         console.log("condition 1");
-    //         var text_width = newData.width;
-    //         while (text_width > CANVAS_WIDTH) {
-    //           font_size = font_size-1;
-    //           var newData = $.measureText(selectedObject.text, {fontFamily: selectedObject.fontFamily, fontSize:font_size});
-    //           text_width = newData.width;
-    //         }
-    //     }else{
-    //         console.log("condition 2")
-    //     }
-
-    //     selectedObject.set({
-    //         width: newData.width,
-    //         height: newData.height,
-    //         fontSize: font_size,
-    //     }); 
-    //     $('#textFontSize').val(font_size);
+    //         setTimeout(function(){
+    //             fitToObject(selectedObject)
+    //             // setObjectInside(selectedObject);
+    //             // canvas.renderAll(); 
+    //             // $('.customiseLoader').css("display","none");
+    //         }, 200)
+    //       },
+    //       error: function (jqXhr, textStatus, errorMessage) {
+    //         console.log("Error => ",errorMessage);
+    //         $('.customiseLoader').css("display","none");
+    //       }
+    //     })   
     // }
+    
     
 
     setObjectInside(selectedObject);
@@ -1778,37 +1812,57 @@ function addArtDesign(path) {
        $('#addArtTab').css("display","none");
        $('#editArtTab').css("display","block");        
     }
-
 }
 
-function changeArtSize(val, val_type) {
-    console.log("value is => ", val, " | value type => ", val_type);
-    let selectedObject = canvas.getActiveObject();
-    let scaleType = "scaleToWidth";
-    // set new size for art
-    if(val_type == "height"){
-        selectedObject.set({
-            scaleToHeight: val,
-        });
-    }else{
-        selectedObject.set({
-            scaleToWidth: val,
-        });
-    }
-    
-   console.log("choosed object => ", selectedObject)
 
-     // Update new size for art
-    // var newWidth = (selectedObject.width * selectedObject.scaleX);
-    // var newHeight = (selectedObject.height * selectedObject.scaleY);
-    // selectedObject.set({
-    //     scaleToWidth:newWidth,
-    //     scaleToHeight:newHeight
-    // });
-    // $("#artWidth").val(parseFloat(newWidth).toFixed(2));
-    // $("#artHeight").val(parseFloat(newHeight).toFixed(2));
+// function for update image size when chnage input value
+function _scaleToDimensions(object, height, width, absolute){ 
+  var boundingRectFactorY = object.getBoundingRect(absolute, true).width / object.getScaledWidth();
+  var boundingRectFactorX = object.getBoundingRect(absolute, true).height / object.getScaledHeight();
+  object._set('scaleY', height / object.height / boundingRectFactorX);
+  object._set('scaleX', width / object.width / boundingRectFactorY);
+  object.setCoords();
+  canvas.renderAll();
+  return true;
+}
 
-    canvas.renderAll();
+function changeArtSize(value, dimension){
+    console.log("value is => ", value, " | value type => ", dimension);
+    const activeObject = canvas.getActiveObject();
+      if (activeObject) {
+        console.log("canvas width => ", CANVAS_WIDTH-minX)
+
+        let newHeight, newWidth;
+        if (dimension === "height") {
+            if(value > (CANVAS_HEIGHT-minY)){
+                value = CANVAS_HEIGHT-minY;
+            }
+          newHeight = parseFloat(value);
+          newWidth = parseFloat(value) * activeObject.width / activeObject.height;
+          if(newWidth > (CANVAS_WIDTH-minY)){
+                newWidth = CANVAS_WIDTH-minY;
+          }
+        } else if (dimension === "width") {
+            if(value > (CANVAS_WIDTH-minY)){
+                value = CANVAS_WIDTH-minY;
+            }
+          newWidth = parseFloat(value);
+          newHeight = parseFloat(value) * activeObject.height / activeObject.width;
+          if(newHeight > (CANVAS_HEIGHT-minY)){
+                newHeight = CANVAS_HEIGHT-minY;
+            }
+        } else {
+          console.error("Invalid dimension specified. Please specify 'width' or 'height'.");
+          return;
+        }
+         _scaleToDimensions(activeObject, newHeight, newWidth, 1);
+
+        $("#artWidth").val(parseFloat(newWidth).toFixed(2));
+        $("#artHeight").val(parseFloat(newHeight).toFixed(2));
+        
+      }else{
+        console.error("No active object found.");
+      }
 }
 
 
@@ -1844,13 +1898,18 @@ function flipYArt(){
 
 // Art Rotation js
 function changeArtRangeValue(val){
-    document.getElementById("rotatArtRangeSlide").value = isNaN(parseInt(val, 10)) ? 0 : parseInt(val, 10);
-    // showValue1(val);
+    var angleValue = isNaN(parseInt(val, 10)) ? 0 : parseInt(val, 10);
+
+    if(angleValue>181){
+        angleValue = 180;
+    }else if(angleValue<-181){
+        angleValue = -180;
+    }
+    document.getElementById("rotatArtRangeSlide").value = angleValue;
+    document.getElementById("rotatArtNumber").value = angleValue
     var selectedObject = canvas.getActiveObject();
-    // selectedObject.set('angle', parseInt(val));
-    selectedObject.rotate(parseFloat(val));
-    // fitToObject(selectedObject);
-    setObjectInside(selectedObject);
+    selectedObject.rotate(parseFloat(angleValue));
+    fitToObject(selectedObject);
     canvas.renderAll();
 }
 function changeArtInputValue(val){
@@ -1882,58 +1941,170 @@ function changeArtInputValue(val){
 
 // When the user clicks on upload a custom picture
 document.getElementById('uploadFile').addEventListener("change", function(e){
-    var reader = new FileReader();
-    
-    reader.onload = function (event){
-        console.log("first");
-        var imgObj = new Image();
-        imgObj.src = event.target.result;
 
-        // When the picture loads, create the image in Fabric.js
-        imgObj.onload = function () {
-            var img = new fabric.Image(imgObj);
+    console.log("Image data => ", e);
+    console.log("data type : ", e.target.files[0]);
 
-            img.scaleToHeight(80);
-            img.scaleToWidth(80); 
-            img.set({
-                "type":'image',
-                left:minX,
-                top:minY,
-                width:80,
-                height:80
-            })
-            // canvas.centerObject(img);
-            img.setControlsVisibility({
-                tl: false,
-                bl: false,
-                tr: false,
-                br: true,
-                ml: false,
-                mb: false,
-                mr: false,
-                mt: false,
-                mtr: false
-            });
-            // canvas.centerObject(img);
-            canvas.add(img);
-            canvas.setActiveObject(img);
-            canvas.renderAll();
-
-            $('#addUploadTab').css("display","none");
-            $('#editUploadTab').css("display","block");
-        };
-    };
-
-    // If the user selected a picture, load it
-    if(e.target.files[0]){
-        var file = e.target.files[0]
-        if(file.type == "application/pdf"){
-            console.log("last | file type => ", file.type);
-        }else{
-            reader.readAsDataURL(e.target.files[0]);
-        }        
+    var fd = new FormData();
+    var files = e.target.files[0];
+    if(files.size > 5000000){
+        $("#uploadFile").val(null);  // set input file field value null
+        $('.error_file_modal').css("display","none");
+        $('#maxFileSizeError').css("display","block");
+        $('#upload_error_modal').css("display","flex");
+        return false;
     }
+
+    fd.append('image',files);
+
+
+    $.ajax({
+          url: "https://customizer.sketchthemes.com/api/convert-file",
+          type: 'post',
+          data: fd,
+          contentType: false,
+          processData: false,
+          // xhrFields: {
+          //   responseType: 'blob'
+          // },
+          beforeSend: function() {
+            $('.customiseLoader').css("display","flex");
+          },
+          success: function (response, status) {
+            console.log("Uploaded image successfull : ", response);
+
+            if(response.status == true){
+                fabric.Image.fromURL(response.data, function(img) {                   
+                    img.scaleToHeight(80);
+                    img.scaleToWidth(80); 
+                    img.set({
+                        "type":'image',
+                        left:minX,
+                        top:minY
+                    })
+                    // canvas.centerObject(img);
+                    img.setControlsVisibility({
+                        tl: false,
+                        bl: false,
+                        tr: false,
+                        br: true,
+                        ml: false,
+                        mb: false,
+                        mr: false,
+                        mt: false,
+                        mtr: false
+                    });
+                    canvas.add(img);
+
+                    console.log(" before : width => ", img.width ," | height => ", img.height );
+                    var newWidth = (img.width * img.scaleX);
+                    var newHeight = (img.height * img.scaleY);
+                    $("#imageWidth").val(parseFloat(newWidth).toFixed(2));
+                    $("#imageHeight").val(parseFloat(newHeight).toFixed(2));
+                    img.set({
+                        // width: newWidth,
+                        // height: newHeight,
+                        // scaleX:1,
+                        // scaleY:1,
+                        scaleToWidth:newWidth,
+                        scaleToHeight:newHeight
+                    });
+                    console.log(" After Image width : ", newWidth , " | height : ", newHeight);
+                    setObjectInside(img);
+                    canvas.setActiveObject(img);
+                    canvas.renderAll();
+
+                    $('#addUploadTab').css("display","none");
+                    $('#editUploadTab').css("display","block");
+                    $("#uploadFile").val(null);  // set input file field value null
+                    $('.customiseLoader').css("display","none");
+                });
+            }else{
+                $("#uploadFile").val(null);  // set input file field value null
+                $('.error_file_modal').css("display","none");
+                $('#fileNotSupportError').css("display","block");
+                $('#upload_error_modal').css("display","flex");
+                $('.customiseLoader').css("display","none");
+            }
+          },
+          error: function (jqXhr, textStatus, errorMessage) {
+            console.log("1. Error => ",jqXhr);
+            console.log("2. Error => ",textStatus);
+            console.log("3. Error => ",errorMessage);
+            $("#uploadFile").val(null);  // set input file field value null
+            $('.error_file_modal').css("display","none");
+            $('#fileNotSupportError').css("display","block");
+            $('#upload_error_modal').css("display","flex");
+            $('.customiseLoader').css("display","none");
+          }
+        })   
 }, false);
+
+// Image Rotation js
+function changeImageRangeValue(val){
+
+    var angleValue = isNaN(parseInt(val, 10)) ? 0 : parseInt(val, 10);
+
+    if(angleValue>181){
+        angleValue = 180;
+    }else if(angleValue<-181){
+        angleValue = -180;
+    }
+    document.getElementById("rotatImageRangeSlide").value = angleValue;
+    document.getElementById("rotatImageNumber").value = angleValue
+    var selectedObject = canvas.getActiveObject();
+    selectedObject.rotate(parseFloat(angleValue));
+    fitToObject(selectedObject);
+    canvas.renderAll();
+}
+function changeImageInputValue(val){
+    document.getElementById("rotatImageNumber").value = isNaN(parseInt(val, 10)) ? 0 : parseInt(val, 10);
+    // showValue1(val);
+    var selectedObject = canvas.getActiveObject();
+    selectedObject.rotate(parseFloat(val));
+    setObjectInside(selectedObject);
+    canvas.renderAll();
+}
+
+// change image size from input field
+function changeImageSize(value, dimension){
+    const activeObject = canvas.getActiveObject();
+      if (activeObject) {   
+        let newHeight, newWidth;
+        if (dimension === "height") {
+            if(value > (CANVAS_HEIGHT-minY)){
+                value = CANVAS_HEIGHT-minY;
+            }
+          newHeight = parseFloat(value);
+          newWidth = parseFloat(value) * activeObject.width / activeObject.height;
+          if(newWidth > (CANVAS_WIDTH-minY)){
+                newWidth = CANVAS_WIDTH-minY;
+          }
+        } else if (dimension === "width") {
+            if(value > (CANVAS_WIDTH-minY)){
+                value = CANVAS_WIDTH-minY;
+            }
+          newWidth = parseFloat(value);
+          newHeight = parseFloat(value) * activeObject.height / activeObject.width;
+          if(newHeight > (CANVAS_HEIGHT-minY)){
+                newHeight = CANVAS_HEIGHT-minY;
+            }
+        } else {
+          console.error("Invalid dimension specified. Please specify 'width' or 'height'.");
+          return;
+        }
+         _scaleToDimensions(activeObject, newHeight, newWidth, 1);
+
+        setObjectInside(activeObject);
+        $("#imageWidth").val(parseFloat(newWidth).toFixed(2));
+        $("#imageHeight").val(parseFloat(newHeight).toFixed(2));
+        
+      }else{
+        console.error("No active object found.");
+      }
+}
+
+
 
 // When the user selects a picture that has been added and press the DEL key
 // The object will be removed !
@@ -1950,3 +2121,21 @@ document.addEventListener("keydown", function(e) {
 }, false);
 
 
+
+
+
+// After loading all content
+// document.addEventListener("DOMContentLoaded", function () {
+//     console.log("Loaded all content!")
+//    resizeCanvas();
+// });
+
+// function for clear all object from canvas
+function startOver(){
+    canvas.clear()
+}
+
+// function for close custom modal
+function closeCustomModal(){
+    $('.custom_modal').css("display","none");
+}

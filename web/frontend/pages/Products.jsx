@@ -1,0 +1,205 @@
+import { Page, Layout, LegacyCard, DataTable, Thumbnail, Button, Toast, Spinner, Frame } from "@shopify/polaris";
+import createApp, { Provider, ResourcePicker, TitleBar } from "@shopify/app-bridge-react";
+import ReactPaginate from "react-paginate";
+import { useEffect, useState } from "react";
+import { useAuthenticatedFetch } from "../hooks";
+import dummyImage from "../assets/images/dummy-image.jpg";
+
+export default function Products(props) {
+  const API_URL = props.API_URL;
+  const fetch = useAuthenticatedFetch();
+  const [loadingStatus, setLoadingStatus] = useState(true);
+  const [toastMsg, setToastMsg] = useState();
+  const [toastContent, setToastContent] = useState("");
+  const [toastErrStatus, setToastErrStatus] = useState(false);
+
+  // product selection variables
+  const [openResourcePicker, setOpenResourcePicker] = useState(false);
+  const hideResourcePicker = () => setOpenResourcePicker(false);
+  const showResourcePicker = () => setOpenResourcePicker(true);
+
+  const [rows, setRows] = useState([]);
+  const [rowUpdate, setRowUpdate] = useState(false);
+  const [pageNumber, setPageNumber] = useState(0);
+  const usersPerPage = 10;
+  const pagesVisited = pageNumber * usersPerPage;
+  useEffect(async () => {
+    const response = await fetch(`${API_URL}/get-product-list`);
+    const productList = await response.json();
+    setRows(productList.data);
+    setLoadingStatus(false);
+  }, [rowUpdate]);
+
+  var selectedPrdIds = [];
+  var checkSelectedProdIds = [];
+  var allProductData = rows?.map(product => {
+    selectedPrdIds.push({
+      id: `gid://shopify/Product/${product.product_id}`,
+    });
+    checkSelectedProdIds.push(product.product_id)
+    return (
+      [<Thumbnail
+        source={product.product_image}
+        alt={product.product_title}
+      />,
+      `${product.product_title}`,
+      <a href={void 0} style={{ marginLeft: "8px" }}><Button primary>Mark Region </Button></a>
+      ]
+    )
+  }).reverse();
+
+  var pageCount = 0;
+  var allProductTableData = [];
+  if (allProductData) {
+    pageCount = Math.ceil(allProductData.length / usersPerPage);
+    allProductTableData = allProductData.slice(pagesVisited, pagesVisited + usersPerPage);
+  }
+
+  const changePage = ({ selected }) => {
+    setPageNumber(selected);
+  };
+
+  // product selection code function
+  const selectedProduct = async (selectPayload) => {
+    const prodData = selectPayload.selection;
+    var data = {
+      'products': []
+    };
+    console.log('checkSelectedProdIds',checkSelectedProdIds)
+    let prodIndex = 0;
+    prodData.forEach((product, key) => {
+      var prd_image = "";
+      if (product.images !== undefined) {
+        if (typeof (product.images) === "string") {
+          prd_image = product.images;
+        } else if (typeof (product.images) === "object" && product.images !== null && product.images.length > 0) {
+          prd_image = product.images[0].originalSrc;
+        }
+        else {
+          prd_image = dummyImage;
+        }
+      }
+      let prodId = Number(product.id.replace("gid://shopify/Product/", ""));
+      console.log('checkSelectedProdIds.length > 0', checkSelectedProdIds.length > 0,'checkSelectedProdIds.includes(prodId) == false',checkSelectedProdIds.includes(prodId) == false)
+      if (checkSelectedProdIds.length > 0) {
+        if (checkSelectedProdIds.includes(prodId) == false) {
+          console.log('if')
+          data['products'][prodIndex] = {
+            "product_id": prodId,
+            "product_title": product.title,
+            "product_image": prd_image,
+            "product_color": product.options[0].values
+          };
+          prodIndex += 1;
+        }
+      } else {
+        console.log('else')
+        data['products'][key] = {
+          "product_id": prodId,
+          "product_title": product.title,
+          "product_image": prd_image,
+          "product_color": product.options[0].values
+        };
+        prodIndex += 1;
+      }
+    });
+    console.log('data', data)
+    if (data.products.length > 0) {
+      const response = await fetch(`${API_URL}/add-product`, {
+        method: 'post',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(data)
+      });
+      const resultData = await response.json();
+  
+      if (resultData.status === true) {
+        setToastContent(resultData.message);
+        setToastMsg(true);
+        setLoadingStatus(false);
+        setRowUpdate(!rowUpdate);
+      }
+      else {
+        setToastContent("Something went wrong!");
+        setToastErrStatus(true)
+      }
+      setOpenResourcePicker(false);
+      console.log('response', resultData)
+    } else {
+      console.log('data.products.length', data.products.length)
+      setOpenResourcePicker(false);
+    }
+    // hideResourcePicker();
+  }
+
+  return (
+    <Frame>
+      <Page fullWidth>
+        {toastMsg &&
+          <Toast content={toastContent} onDismiss={() => setToastMsg(false)} />
+        }
+        {toastErrStatus &&
+          <Toast content={toastContent} error onDismiss={() => setToastErrStatus(false)} />
+        }
+        {loadingStatus &&
+          <div className="loader_wrapper">
+            <div className="spinner_loader">
+              <Spinner accessibilityLabel="Spinner" size="large" />
+            </div>
+          </div>
+        }
+        <TitleBar
+          title="Products"
+          primaryAction={{
+            content: "Add Product",
+            onAction: showResourcePicker
+            // onAction: () => { setOpenResourcePicker(true) }
+          }}
+        />
+        <Layout>
+          <Layout.Section>
+            {/* <h1>Hello</h1> */}
+            <ResourcePicker
+              resourceType="Product"
+              open={openResourcePicker}
+              onCancel={hideResourcePicker}
+              initialSelectionIds={selectedPrdIds}
+              allowMultiple={true}
+              actionVerb="select"
+              showVariants={false}
+              onSelection={selectedProduct}
+            // selectMultiple={false}
+            />
+          </Layout.Section>
+          <Layout.Section>
+            <DataTable
+              columnContentTypes={[
+                'text',
+                'text',
+                'numeric',
+              ]}
+              headings={[
+                'Image',
+                'Title',
+                'Action'
+              ]}
+              rows={allProductTableData}
+            // totals={['', '', '',]}
+            />
+            <ReactPaginate
+              previousLabel={<svg viewBox="0 0 20 20" className="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path d="M12 16a.997.997 0 0 1-.707-.293l-5-5a.999.999 0 0 1 0-1.414l5-5a.999.999 0 1 1 1.414 1.414l-4.293 4.293 4.293 4.293a.999.999 0 0 1-.707 1.707z"></path></svg>}
+              nextLabel={<svg viewBox="0 0 20 20" className="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path d="M8 16a.999.999 0 0 1-.707-1.707l4.293-4.293-4.293-4.293a.999.999 0 1 1 1.414-1.414l5 5a.999.999 0 0 1 0 1.414l-5 5a.997.997 0 0 1-.707.293z"></path></svg>}
+              pageCount={pageCount}
+              onPageChange={changePage}
+              containerClassName={"paginationBttns"}
+              previousLinkClassName={"previousBttn"}
+              nextLinkClassName={"nextBttn"}
+              disabledClassName={"paginationDisabled"}
+              activeClassName={"paginationActive"}
+              forcePage={pageNumber}
+            />
+          </Layout.Section>
+        </Layout>
+      </Page>
+    </Frame>
+  );
+}

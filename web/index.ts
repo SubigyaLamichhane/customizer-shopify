@@ -80,7 +80,8 @@ app.post("/api/convert-file", upload.single('image'), async (req: Request, res: 
         || fileExtension == "eps" || fileExtension == "EPS"
         || fileExtension == "jpg" || fileExtension == "JPG"
         || fileExtension == "jpeg" || fileExtension == "JPEG"
-        || fileExtension == "psd" || fileExtension == "PSD") {
+        || fileExtension == "psd" || fileExtension == "PSD"
+        || fileExtension == "png" || fileExtension == "PNG") {
         gm(image.path).in("-colorspace").in("srgb").write(destination + fileName, function (err: any) {
             if (err) throw err
             res.status(200).send({
@@ -448,6 +449,7 @@ app.post("/api/add-product", (req: Request, res: Response) => {
     let session_id: string = res.locals.shopify.session.id;
     let productData: any = [];
     let products: any = req.body.products;
+    console.log('products', products);    
     let query: string = "INSERT INTO product_settings (session_id, product_id, product_title, product_image,product_color) VALUES ?";
     products.forEach((item: any, itemKey: any) => {
         productData[itemKey] = [
@@ -455,7 +457,7 @@ app.post("/api/add-product", (req: Request, res: Response) => {
             item.product_id,
             item.product_title,
             item.product_image,
-            item.product_color
+            JSON.stringify(item.product_color)
         ];
     });
     mysqlConnection.query(query, [productData], function (error: any, result: any, fields: any) {
