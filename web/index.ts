@@ -734,3 +734,5 @@ app.listen(PORT);
 // replace some lines 
 // cb(null, path.join(__dirname, '/public/uploads/')); = cb(null, path.join(__dirname, '/web/public/uploads/'));
 // const PORT = process.env.BACKEND_PORT || process.env.PORT; = const PORT = 3000;
+// `${process.cwd()}/frontend/dist` = `${process.cwd()}/web/frontend/dist`
+// `${process.cwd()}/frontend/` = `${process.cwd()}/web/frontend/`
