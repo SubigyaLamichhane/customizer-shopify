@@ -148,3 +148,27 @@ li.paginationActive a,
 li.paginationActive a:focus {
   color: var(--white);
 }
+
+.product_img {
+  position: relative;
+}
+.product_img img{
+  width: 100%;
+ }
+
+
+/* element.style {
+  top: 111px;
+  left: 78px;
+  width: 54.4px;
+  height: 69.6px;
+} */
+.ReactCrop__crop-selection {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate3d(0, 0, 0);
+  cursor: move;
+  border: 1px dashed #fff;
+  /* box-shadow: 0 0 0 9999em rgba(0,0,0,.5) */
+}

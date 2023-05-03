@@ -493,6 +493,30 @@ app.get("/api/get-product-list", (req: Request, res: Response) => {
     });
 });
 
+// Get product by id
+app.get("/api/get-product/:id", (req: Request, res: Response) => {
+    // let session_id: string = res.locals.shopify.session.id;
+    let query: string = `SELECT * FROM product_settings WHERE ? LIMIT 1`;
+    mysqlConnection.query(query, {
+        id: req.params.id,
+    }, function (err: any, result: any) {
+        if (err) throw err;
+        if (result.length > 0) {
+            res.status(200).send({
+                "status": true,
+                "message": "Data fetched",
+                "data": result[0]
+            });
+        } else {
+            res.status(404).send({
+                "status": true,
+                "message": `Invalid art product setting id: ${req.params.id}`,
+                "data": [],
+            });
+        }
+    });
+});
+
 // Mapped product from front side
 app.post("/api/map-product-front-side/:id", (req: Request, res: Response) => {
     let session_id: string = res.locals.shopify.session.id;

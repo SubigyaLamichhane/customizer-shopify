@@ -6,7 +6,9 @@ var edit_art = false;
 function ChooseSettingtab(tab, name){
 	$('.ct_content_tab').removeClass("active_tab");
 	$('.settings_title_wrapper>ul>li').removeClass("active");
-	$('li.'+tab+'_tab').addClass("active");
+	if(tab != ''){
+	 $('li.'+tab+'_tab').addClass("active");
+	}
 	$('#'+name).addClass("active_tab");
 	$('.art_design_wrapper>.parent ul').removeClass("active_art_tab");
 	$('.top_layer').css("display","block");
@@ -20,6 +22,9 @@ function ChooseSettingtab(tab, name){
     $('.art_header .back_btn').attr("current-option","");
 	$('.art_header .back_btn').attr("level",0);
 	$('.art_header h4').text("Artwork Categories");
+
+	canvas.discardActiveObject();
+    canvas.renderAll();
 }
 $('body').on('click', '.close_content_tab.edit_art', function(){
 	edit_art = false;
@@ -482,14 +487,34 @@ function changeProductVariant(val){
 }
 
 
-// change zoom option status function
-function changeZoomStatus(option){
-	$('.zoom_icon').css("display","none");
-	if(option == 'plus'){
-		$('.zoom_plus_option').css("display","block");
-	}else{
-		$('.zoom_minus_option').css("display","block");
-	}	
-}
 
+// Outline thickness slider
 
+document.addEventListener("DOMContentLoaded", function () {
+      window.clickPipsSlider = document.getElementById('textOutlineSlideThickness');
+      noUiSlider.create(window.clickPipsSlider, {
+        range: {
+          min: 0,
+          max: 10
+        },
+        start: [2],
+        step: 2,
+        pips: {mode: 'steps'}
+      });
+      var pips = window.clickPipsSlider.querySelectorAll('.noUi-value');
+      function clickOnPip() {
+        var value = Number(this.getAttribute('data-value'));
+        window.clickPipsSlider.noUiSlider.set(value);
+        $("#textOutlineThickness").val(value);
+        changeTextOutlineThick();
+      }
+      for (var i = 0; i < pips.length; i++) {
+        pips[i].style.cursor = 'pointer';
+        pips[i].addEventListener('click', clickOnPip);
+      }
+      window.clickPipsSlider.noUiSlider.on('change', function (values, handle) {
+	    $("#textOutlineThickness").val(parseInt(values[0]));
+	    var selected_color = $(".color_box>input[name='text_outline_input']:checked").attr('data-color-code');
+	    changeTextOutlineThick();
+	  });
+});

@@ -4,10 +4,12 @@ import ReactPaginate from "react-paginate";
 import { useEffect, useState } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import dummyImage from "../assets/images/dummy-image.jpg";
+import { Link, useNavigate } from "react-router-dom";
 
 export default function Products(props) {
   const API_URL = props.API_URL;
   const fetch = useAuthenticatedFetch();
+  const navigate = useNavigate();
   const [loadingStatus, setLoadingStatus] = useState(true);
   const [toastMsg, setToastMsg] = useState();
   const [toastContent, setToastContent] = useState("");
@@ -43,7 +45,8 @@ export default function Products(props) {
         alt={product.product_title}
       />,
       `${product.product_title}`,
-      <a href={void 0} style={{ marginLeft: "8px" }}><Button primary>Mark Region </Button></a>
+      <Link to={`/ProductMap?id=${product.id}`}><Button primary>Edit</Button></Link>
+      // <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={product.id} onClick={() => navigate(`/ProductMap/${product.id}`)}>Mark Region </Button></a>
       ]
     )
   }).reverse();

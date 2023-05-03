@@ -22,16 +22,15 @@ var right_canvas = new fabric.Canvas('right-canvas', {
     controlsAboveOverlay: true
 });
 
-var canvas_view_type = $('.canvas_view_input[name="canvas_view_type"]:checked').attr('view_type');
 var canvas = front_canvas;
 
 
 var minX, minY, maxX, maxY, CANVAS_WIDTH, CANVAS_HEIGHT;
-var canvas_padding = 80; // canvas padding like 50 = 25 for left + 25 for right(25 for each side)
+var canvas_padding = 20; // canvas padding like 50 = 25 for left + 25 for right(25 for each side)
 // Define the background rectangle dimensions
     // front canvas width height
-    var frontbgWidth = front_canvas.width - canvas_padding;
-    var frontbgHeight = front_canvas.height - canvas_padding;
+    var frontbgWidth = front_canvas.width - (front_canvas.width*canvas_padding)/100;
+    var frontbgHeight = front_canvas.height - (front_canvas.height*canvas_padding)/100;
 
     // back canvas width height
     var backbgWidth = back_canvas.width - canvas_padding;
@@ -45,8 +44,8 @@ var canvas_padding = 80; // canvas padding like 50 = 25 for left + 25 for right(
     var rightSlvbgWidth = right_canvas.width - canvas_padding;
     var rightSlvbgHeight = right_canvas.height - canvas_padding;
 
-    var bgLeft = canvas_padding / 2;
-    var bgTop = canvas_padding / 2;
+    var bgLeft = ((front_canvas.width*canvas_padding)/100) / 2;
+    var bgTop = ((front_canvas.height*canvas_padding)/100) / 2;
 
 // Create the background rectangle
 
@@ -108,37 +107,40 @@ maxY = frontbgRect.top+frontbgRect.height;
 CANVAS_WIDTH = maxX;
 CANVAS_HEIGHT = maxY;
 
-// window.addEventListener('resize', resizeCanvas, false);
-// function resizeCanvas() {
-//     console.log("function called");
-//     var imgWidth = $('#customiserImage').width();
-//     var imgHeight = $('#customiserImage').height();
-//     var canvasWidth = imgWidth*40/100;
-//     var canvasHeight = imgHeight*70/100;
+window.addEventListener('resize', resizeCanvas, false);
+function resizeCanvas() {
+    console.log("function called");
+    var imgWidth = $('#customiserImage').width();
+    var imgHeight = $('#customiserImage').height();
+    var canvasWidth = imgWidth*55/100;
+    var canvasHeight = imgHeight*70/100;
+    console.log(" canvas width : ",canvasWidth, " | height : ",canvasHeight );
 
-//     var bgWidth = canvasWidth-canvas_padding;
-//     var bgHeight = canvasHeight-canvas_padding;
+    var bgWidth = canvasWidth-(canvasWidth*canvas_padding)/100;
+    var bgHeight = canvasHeight-(canvasHeight*canvas_padding)/100;
 
-//     // let bgLeft = canvas_padding / 2;
-//     // let bgTop = canvas_padding / 2;
+    // let bgLeft = canvas_padding / 2;
+    // let bgTop = canvas_padding / 2;
+    bgLeft = ((canvasWidth*canvas_padding)/100) / 2;
+    bgTop = ((canvasHeight*canvas_padding)/100) / 2;
 
-//     minX = bgLeft;
-//     maxX = bgLeft+bgWidth;
-//     minY = bgTop;
-//     maxY = bgTop+bgHeight;
-//     CANVAS_WIDTH = maxX;
-//     CANVAS_HEIGHT = maxY;
+    minX = bgLeft;
+    maxX = bgLeft+bgWidth;
+    minY = bgTop;
+    maxY = bgTop+bgHeight;
+    CANVAS_WIDTH = maxX;
+    CANVAS_HEIGHT = maxY;
 
-//     canvas.setHeight(canvasHeight);
-//     canvas.setWidth(canvasWidth);
-//     canvas.backgroundImage.set({
-//         width:bgWidth,
-//         height:bgHeight,
-//         left:bgLeft,
-//         top:bgTop
-//     });
-//     canvas.renderAll();
-// }
+    canvas.setHeight(canvasHeight);
+    canvas.setWidth(canvasWidth);
+    canvas.backgroundImage.set({
+        width:bgWidth,
+        height:bgHeight,
+        left:bgLeft,
+        top:bgTop
+    });
+    canvas.renderAll();
+}
 
 
 // Change canvas type like :- [front, back, right, left]
@@ -194,7 +196,198 @@ function changeCanvasType(type) {
         fireEvents();
         // resizeCanvas();
     }
+    ChooseSettingtab('', 'defaultSettings');
+    canvas.discardActiveObject();
+    canvas.renderAll();
 }
+
+var state;
+var frontState;
+var backState;
+var leftState;
+var rightState;
+
+var undoFront = [];
+var undoBack = [];
+var undoLeft = [];
+var undoRight = [];
+
+var redoFront = [];
+var redoBack = [];
+var redoLeft = [];
+var redoRight = [];
+
+
+    async function saveState() {
+        var undo = [];
+        var redo = [];
+      let canvas_view_type = $('.canvas_view_input[name="canvas_view_type"]:checked').attr('view_type');
+      if(canvas_view_type == 'back'){
+        state = backState;
+        undo = undoBack;
+        redo = redoBack;
+      }else if(canvas_view_type == 'left'){
+        state = leftState;
+        undo = undoLeft;
+        redo = redoLeft;
+      }else if(canvas_view_type == 'right'){
+        state = rightState;
+        undo = undoRight;
+        redo = redoRight;
+      }else{
+        state = frontState;
+        undo = undoFront;
+        redo = redoFront;
+      }
+
+      redo = [];
+      $('#redo').prop('disabled', true);
+      if (state) {
+        undo.push(state);
+        $('#undo').prop('disabled', false);
+      }
+      
+   
+        var myCustomProperties = [];
+        await canvas.getObjects().forEach(function(object) {
+          // Get an array of all properties for this object
+          var allProperties = Object.getOwnPropertyNames(object);
+
+          // Filter out the default properties that come with Fabric.js
+          myCustomProperties = allProperties.filter(function(prop) {
+            return !fabric.Object.prototype.hasOwnProperty(prop);
+          });
+          myCustomProperties.concat(myCustomProperties);
+        });
+        forDeletion = ["canvas","_element","_originalElement","_cacheCanvas","_cacheContext"];
+        myCustomProperties = myCustomProperties.filter(item => !forDeletion.includes(item))
+        myCustomProperties.push("scaleToHeight");
+        myCustomProperties.push("scaleToWidth");
+        var myCustomJson = canvas.toJSON(myCustomProperties);
+        console.log(JSON.stringify(myCustomJson))
+        state = JSON.stringify(myCustomJson);
+
+          if(canvas_view_type == 'back'){
+            backState = state;
+             undoBack = undo;
+             redoBack = redo;
+          }else if(canvas_view_type == 'left'){
+            leftState = state;
+            undoLeft = undo;
+            redoLeft = redo;
+          }else if(canvas_view_type == 'right'){
+            rightState = state;
+            undoRight = undo;
+            redoRight = redo;
+          }else{
+            frontState = state;
+            undoFront = undo;
+            redoFront = redo;
+          }
+          // console.log("Undo val => ", undo);
+          // console.log("Redo val => ", redo);
+          console.log("canvas val => ", state);
+      
+
+    }
+    function replay(playStack, saveStack, buttonsOn, buttonsOff) {   
+    let canvas_view_type = $('.canvas_view_input[name="canvas_view_type"]:checked').attr('view_type');   
+      if(canvas_view_type == 'back'){
+        state = backState;
+      }else if(canvas_view_type == 'left'){
+        state = leftState;
+      }else if(canvas_view_type == 'right'){
+        state = rightState;
+      }else{
+        state = frontState;
+      }
+
+      // console.log("On click Undo val => ", playStack);
+      // console.log("On click Redo val => ", saveStack);
+      // console.log("On click canvas val => ", state);
+
+      saveStack.push(state);
+      state = playStack.pop();
+      var on = $(buttonsOn);
+      var off = $(buttonsOff);
+      // turn both buttons off for the moment to prevent rapid clicking
+      on.prop('disabled', true);
+      off.prop('disabled', true);
+      canvas.clear();
+      console.log("json state val => ", state);
+      canvas.loadFromJSON(state, function() {
+        canvas.renderAll();
+        // now turn the buttons back on if applicable
+        on.prop('disabled', false);
+        if (playStack.length) {
+          off.prop('disabled', false);
+        }
+        objectMouseDown(canvas.getActiveObject()) // call mouse down function for update values
+      });
+      if(canvas_view_type == 'back'){
+        backState = state;
+      }else if(canvas_view_type == 'left'){
+        leftState = state;
+      }else if(canvas_view_type == 'right'){
+        rightStat = state;
+      }else{
+        frontState = state;
+      }
+
+      // console.log("After click Undo val => ", playStack);
+      // console.log("After click Redo val => ", saveStack);
+      // console.log("After click canvas val => ", state);
+    }
+    // undo and redo buttons
+    $('#undo').click(function() {
+        console.log("click undo");
+
+      let canvas_view_type = $('.canvas_view_input[name="canvas_view_type"]:checked').attr('view_type');
+      if(canvas_view_type == 'back'){
+        state = backState;
+        undo = undoBack;
+        redo = redoBack;
+      }else if(canvas_view_type == 'left'){
+        state = leftState;
+        undo = undoLeft;
+        redo = redoLeft;
+      }else if(canvas_view_type == 'right'){
+        state = rightState;
+        undo = undoRight;
+        redo = redoRight;
+      }else{
+        state = frontState;
+        undo = undoFront;
+        redo = redoFront;
+      }
+
+        replay(undo, redo, '#redo', this);
+    });
+    $('#redo').click(function() {
+        console.log("click redo");
+        let canvas_view_type = $('.canvas_view_input[name="canvas_view_type"]:checked').attr('view_type');
+          if(canvas_view_type == 'back'){
+            state = backState;
+            undo = undoBack;
+            redo = redoBack;
+          }else if(canvas_view_type == 'left'){
+            state = leftState;
+            undo = undoLeft;
+            redo = redoLeft;
+          }else if(canvas_view_type == 'right'){
+            state = rightState;
+            undo = undoRight;
+            redo = redoRight;
+          }else{
+            state = frontState;
+            undo = undoFront;
+            redo = redoFront;
+          }
+
+
+        replay(redo, undo, '#undo', this);
+    })
+
  
 //Disable context menu
 fabric.util.addListener(document.getElementsByClassName('upper-canvas')[0], 'contextmenu', function(e) {
@@ -298,7 +491,7 @@ function fitToObject(event) {
     console.log("Call fit to object function")
    var obj = event;
 
-    if(obj.type == 'text'){
+    if(obj.object_type == 'text'){
         var canvas_space_width = 0;
         // if(parseInt(obj.outline_width) > 5 && obj.outline_color_name !== "none"){
         //     canvas_space_width = 15;
@@ -313,20 +506,22 @@ function fitToObject(event) {
             var font_size = obj.text_font_size;
             var text_val = obj.text;
             var font_family = obj.text_font_family;
-            var tempData = $.measureText(text_val, {fontFamily:font_family, fontSize:parseFloat(font_size)});
-            console.log("canvas => temp to width : ",  tempData.width , " | width " , parseFloat(CANVAS_WIDTH-minX-canvas_space_width), " | font_size ", font_size );
-            if(tempData.width > parseFloat(CANVAS_WIDTH-minX-canvas_space_width)){
-                    var text_width = tempData.width;
-                    while(text_width > (CANVAS_WIDTH-minX-canvas_space_width)){
-                        console.log('text width : ', text_width , " | canvas width : ", (CANVAS_WIDTH-minX-canvas_space_width), " | font size : ", font_size);
-                        font_size = font_size-0.1;
-                        var updateData = $.measureText(text_val, {fontFamily: font_family, fontSize:font_size});
-                        text_width = updateData.width;
-                    }
-            }
+            // var tempData = $.measureText(text_val, {fontFamily:font_family, fontSize:parseFloat(font_size)});
+            // console.log("canvas => temp to width : ",  tempData.width , " | width " , parseFloat(CANVAS_WIDTH-minX-canvas_space_width), " | font_size ", font_size );
+            // if(tempData.width > parseFloat(CANVAS_WIDTH-minX-canvas_space_width)){
+            //         var text_width = tempData.width;
+            //         while(text_width > (CANVAS_WIDTH-minX-canvas_space_width)){
+            //             console.log('text width : ', text_width , " | canvas width : ", (CANVAS_WIDTH-minX-canvas_space_width), " | font size : ", font_size);
+            //             font_size = font_size-0.1;
+            //             var updateData = $.measureText(text_val, {fontFamily: font_family, fontSize:font_size});
+            //             text_width = updateData.width;
+            //         }
+            // }
 
             $.ajax({
-              url: "http://customizer.sketchthemes.com:8080/testing.php?text="+text_val+"&effect="+obj.text_effect+"&font_color="+obj.text_color.replace("#","")+"&font_size="+font_size+"&fontName="+obj.text_font_family+"&outline_color="+obj.outline_color.replace("#","")+"&outline_width="+obj.outline_width,
+              url: "http://customizer.sketchthemes.com:8080/testing.php?text="+obj.text+"&effect="+obj.text_effect+"&font_color="+obj.text_color.replace("#","")+"&font_size="+obj.text_font_size+"&font_width="+parseFloat(obj.scaleToWidth).toFixed(2)+","+parseFloat(newWidth).toFixed(2)+"&font_height="+parseFloat(obj.scaleToHeight).toFixed(2)+","+parseFloat(newHeight).toFixed(2)+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+obj.text_font_family+"&outline_color="+obj.outline_color.replace("#","")+"&outline_width="+obj.outline_width,
+
+              // url: "http://customizer.sketchthemes.com:8080/testing.php?text="+text_val+"&effect="+obj.text_effect+"&font_color="+obj.text_color.replace("#","")+"&font_size="+font_size+"&fontName="+obj.text_font_family+"&outline_color="+obj.outline_color.replace("#","")+"&outline_width="+obj.outline_width,
               xhrFields: {
                 responseType: 'blob'
               },
@@ -334,14 +529,14 @@ function fitToObject(event) {
                 $('.customiseLoader').css("display","flex");
               },
               success: function (img, status, xhr) {
-                $('#textFontSize').val(parseFloat(font_size).toFixed(1));
+                $('#textFontSize').val(parseFloat(xhr.getResponseHeader('x-font-size')).toFixed(1));
 
                 obj.set({
                     scaleToWidth:xhr.getResponseHeader('x-img-width'),
                     scaleToHeight:xhr.getResponseHeader('x-img-height'),
                     scaleX: 1,
                     scaleY:1,
-                    "text_font_size": font_size,
+                    "text_font_size": xhr.getResponseHeader('x-font-size'),
                 })
                 obj.setSrc(URL.createObjectURL(img));                
                         
@@ -349,6 +544,7 @@ function fitToObject(event) {
                     
                     setObjectInside(obj);
                     canvas.renderAll(); 
+                    saveState()  // call this function for save object in undo redo
                     $('.customiseLoader').css("display","none");
                 }, 200)
               },
@@ -361,44 +557,11 @@ function fitToObject(event) {
         }else{
             setObjectInside(obj);
             canvas.renderAll(); 
+            saveState()  // call this function for save object in undo redo
             $('.customiseLoader').css("display","none"); 
-
         }
-        
    }
    console.log("End fit to object Function!");
-
-    // var font_size = obj.fontSize;
-    // var text_val = obj.text;
-    // var font_family = obj.fontFamily;
-    // var tempData = $.measureText(text_val, {fontFamily:font_family, fontSize:font_size});
-    // if(tempData.width > (CANVAS_WIDTH-minX)){
-    //         var text_width = tempData.width;
-    //         while (text_width > (CANVAS_WIDTH-minX)){
-    //            console.log('text width : ', text_width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", font_size);
-    //         font_size = font_size-1;
-    //         var updateData = $.measureText(text_val, {fontFamily: font_family, fontSize:font_size});
-    //         text_width = updateData.width;
-    //     }
-    // }
-    // if(obj.type == 'shape'){
-    //     var new_height = tempData.height+obj.path.height;
-    //     console.log("shape edit height => ", new_height);
-    //     obj.set({
-    //         text: text_val,
-    //         width: tempData.width,
-    //         fontSize: font_size
-    //     });
-    //     obj.set({height: new_height})
-    // }else{
-    //     obj.set({
-    //         text: text_val,
-    //         width: tempData.width,
-    //         height: tempData.height,
-    //         fontSize: font_size
-    //     });
-    // }
-    // $('#textFontSize').val(font_size);
 }
 
 // function for object can not go outside of canvas mark
@@ -427,136 +590,13 @@ function setObjectInside(e) {
     }  
 
 }
-
-// calculate text font size when object scaling or modified
-function calculateFontSize(text, width, height){
-    let selectedObject = canvas.getActiveObject();
-    let fontSize = parseFloat(selectedObject.text_font_size); // Starting font size
-    let font_family = selectedObject.text_font_family;
-    let lowest_font_size = 5;
-
-    if(selectedObject.text_effect == 'curve'){
-
-        // var scaleTempWidth = parseFloat(selectedObject.scaleToWidth);
-        // var scaleTempHeight = parseFloat(selectedObject.scaleToHeight);
-        // const prev_height = scaleTempHeight;
-        // var increase_height = 0;
-
-        // let tempData = $.measureText(text, {fontFamily:font_family, fontSize:fontSize});
-
-        // if(parseFloat(selectedObject.scaleToWidth) > parseFloat(width)){
-        //     // decrease
-        //     // console.log("Decrease : ", scaleTempWidth, " > ", parseFloat(width));
-        //     while(scaleTempWidth > parseFloat(width)){
-        //         console.log("Decrease : ", scaleTempWidth, " > ", parseFloat(width), " | font_size : ", fontSize);
-        //         scaleTempWidth = scaleTempWidth-1;
-        //         scaleTempHeight = scaleTempHeight-0.1;
-        //         // fontSize = fontSize - 0.1;
-        //     }
-        //     increase_height = scaleTempHeight - prev_height;
-
-        // }else if(parseFloat(selectedObject.scaleToWidth) < parseFloat(width)){
-        //     // increase
-        //     while(scaleTempWidth < parseFloat(width)){
-        //         console.log("Increase : ", scaleTempWidth, " > ", parseFloat(width), " | font_size : ", fontSize);
-        //         scaleTempWidth = scaleTempWidth+1;
-        //         scaleTempHeight = scaleTempHeight+0.1;
-        //         // fontSize = fontSize + 0.1;
-        //     }
-        //     increase_height = scaleTempHeight - prev_height;
-        // }
-
-        // let new_size = fontSize + increase_height;
-        // console.log("Increase height => ", increase_height, " + ", fontSize);
-        // console.log("New font size height => ", new_size);
-        // fontSize = new_size;
-        return fontSize;
-    }else{
-
-        let tempData = $.measureText(text, {fontFamily:font_family, fontSize:fontSize});
-        let tempWidthTolerance = 4;
-
-        const content_canvas = document.createElement('canvas');
-        const context = content_canvas.getContext('2d');
-        
-        // Set content_canvas dimensions to match text element
-        content_canvas.width = width;
-        content_canvas.height = height;
-        console.log("=== check first ====");
-        console.log(parseFloat(selectedObject.scaleToWidth) ," > ", parseFloat(width));
-        console.log("=== check last ====");
-        if(parseFloat(selectedObject.scaleToWidth) > parseFloat(width)){
-            console.log("Decrease size");
-            while (fontSize >= lowest_font_size) { // Add minimum font size condition
-              // Set the font size and measure the text
-              context.font = fontSize + 'px '+font_family;
-              const textWidth = context.measureText(text).width;
-              const textHeight = context.measureText(text).height;
-              
-              // Add a tolerance value to the text width calculation
-              const widthWithTolerance = width;
-              // If the text fits within the canvas, return the font size
-              console.log("Condition | ", textWidth ," <= ", widthWithTolerance ," | ", fontSize , " <= ", height)
-              if (textWidth <= widthWithTolerance || textHeight <= height) {
-                return fontSize;
-              }      
-              // Decrease the font size by 1 and try again
-              fontSize = fontSize-0.1;
-              // fontSize--;
-            }
-        }else if(parseFloat(selectedObject.scaleToWidth) < parseFloat(width)){
-            console.log("Increase size");
-            while (fontSize >= lowest_font_size) { // Add minimum font size condition
-              // Set the font size and measure the text
-              context.font = fontSize + 'px '+font_family;
-              const textWidth = context.measureText(text).width;
-              const textHeight = context.measureText(text).height;
-              
-              // Add a tolerance value to the text width calculation
-              const widthWithTolerance = width;
-              // If the text fits within the canvas, return the font size
-              console.log("Condition | ", textWidth ," <= ", widthWithTolerance ," | ", fontSize , " <= ", height)
-              if (textWidth >= widthWithTolerance || textHeight >= height) {
-                return fontSize;
-              }      
-              // Increase the font size by 1 and try again
-              // fontSize++;
-              fontSize = fontSize+0.1;
-            }
-        }else if(parseFloat(selectedObject.scaleToWidth) == parseFloat(width)){
-            console.log("same size");
-            return fontSize; // Return null if font size is too small
-        }
-        
-        return lowest_font_size; // Return null if font size is too small
-   } 
-    
-}
-
-
 // ------------ Resize canvas function --------
 
 
-//function fire event start this function will call whenever we change canvas type(front, back)
-function fireEvents(){
-
-canvas.clipTo = function(ctx) {
-  ctx.save();
-  ctx.setTransform(1, 0, 0, 1, 0, 0);
-  ctx.beginPath();
-  ctx.rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
-  ctx.closePath();
-  ctx.restore();
-};
-canvas.renderAllBoundaries = true;
-
-// This function will work when click on canvas 
-canvas.on('mouse:down', function(options) {
-    var obj_target = options.target
-    
-  // checking when you click on canvas then object was selected on not.
+function objectMouseDown(obj_target){
+    // checking when you click on canvas then object was selected on not.
   if(obj_target) {
-    if (obj_target.type == 'text') {
+    if (obj_target.object_type == 'text') {
 
         let tempData = $.measureText(obj_target.text, {fontFamily:obj_target.text_font_family, fontSize:parseFloat(obj_target.text_font_size)});
         console.log('Text => ', obj_target.text, " | font family ", obj_target.text_font_family, " | font size ", obj_target.text_font_size);
@@ -570,10 +610,10 @@ canvas.on('mouse:down', function(options) {
         $('#textSettings').addClass("active_tab");
 
         $('#addTextTab').css("display","none");
-        if(options.target.text == 'No Text'){
+        if(obj_target.text == 'No Text'){
             $('#editTextContent').val('');
         }else{
-            $('#editTextContent').val(options.target.text);
+            $('#editTextContent').val(obj_target.text);
         }
         $('#editTextTab').css("display","block");
         // $('.selected_font_name').text(options.target.fontFamily);
@@ -600,6 +640,9 @@ canvas.on('mouse:down', function(options) {
         $('.selected_outline_color>.color_box').css('background-color', obj_target.outline_color);
         $('.selected_outline_color>.color_box').attr("color-name",obj_target.outline_color_name);
         $('.selected_outline_color>.color_name').text(obj_target.outline_color_name);
+        
+        window.clickPipsSlider.noUiSlider.set(parseInt(obj_target.outline_width));
+
         // $('.selected_outline_name').text(obj_target.outline_color_name);
 
         $('#rotatTextRangeSlide').val(obj_target.angle);
@@ -616,10 +659,15 @@ canvas.on('mouse:down', function(options) {
         $('#addTextTab').css("display","block");
     }
 
-    if (obj_target.type == 'art') {
+    if (obj_target.object_type == 'art') {
         console.log('Art object was clicked! ', obj_target);
         console.log(" Width => ", obj_target.scaleToWidth);
         console.log(" height => ", obj_target.scaleToHeight);
+        $("#artWidth").val(parseFloat(obj_target.scaleToWidth).toFixed(2));
+        $("#artHeight").val(parseFloat(obj_target.scaleToHeight).toFixed(2));
+        document.getElementById("rotatArtRangeSlide").value = obj_target.angle;
+        document.getElementById("rotatArtNumber").value = obj_target.angle;
+
         // editTextFunction(options.target);
         $('.ct_content_tab').removeClass("active_tab");
         $('.settings_title_wrapper>ul>li').removeClass("active");
@@ -633,10 +681,14 @@ canvas.on('mouse:down', function(options) {
         $('#addArtTab').css("display","block");
     }
 
-    if(obj_target.type == 'image') {
+    if(obj_target.object_type == 'image') {
         console.log('Image object was clicked! ', obj_target);
         console.log(" Width => ", obj_target.scaleToWidth);
         console.log(" height => ", obj_target.scaleToHeight);
+         $("#imageWidth").val(parseFloat(obj_target.scaleToWidth).toFixed(2));
+        $("#imageHeight").val(parseFloat(obj_target.scaleToHeight).toFixed(2));
+        document.getElementById("rotatImageRangeSlide").value = obj_target.angle;
+        document.getElementById("rotatImageNumber").value = obj_target.angle;
         // editTextFunction(options.target);
         $('.ct_content_tab').removeClass("active_tab");
         $('.settings_title_wrapper>ul>li').removeClass("active");
@@ -660,6 +712,26 @@ canvas.on('mouse:down', function(options) {
 
     $('#defaultSettings').addClass("active_tab");
   }
+}
+
+//function fire event start this function will call whenever we change canvas type(front, back)
+function fireEvents(){
+
+canvas.clipTo = function(ctx) {
+  ctx.save();
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.beginPath();
+  ctx.rect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
+  ctx.closePath();
+  ctx.restore();
+};
+canvas.renderAllBoundaries = true;
+
+// This function will work when click on canvas 
+canvas.on('mouse:down', function(options) {
+    var obj_target = options.target
+    objectMouseDown(obj_target) // call mouse down function for update values
+  
   //  Show context menu when click on right button of mouse
   if(options.e.button === 2) {
         var top_pos = options.e.layerY + 10;
@@ -674,7 +746,7 @@ canvas.on('mouse:down', function(options) {
 canvas.on('object:moving', function(e) {
     var obj = e.target;
 
-    if(obj.type == 'image'){
+    if(obj.object_type == 'image'){
         if(obj.scaleToHeight > CANVAS_HEIGHT || obj.scaleToWidth > CANVAS_WIDTH){
             return;
         }
@@ -815,10 +887,8 @@ canvas.on('object:scaling', function (e){
 
 
 canvas.on('object:modified', function(event) {
-    event.target.lockScalingX = false;
-        event.target.lockScalingY = false;
     console.log("modified");
-    if (event.target.type == 'text') {
+    if (event.target.object_type == 'text') {
         console.log(" data => ", event.target);
         var newWidth = (event.target.width * event.target.scaleX);
         var newHeight = (event.target.height * event.target.scaleY);
@@ -855,6 +925,8 @@ canvas.on('object:modified', function(event) {
                     // fitToObject(event.target)
                     setObjectInside(event.target);
                     canvas.renderAll(); 
+                    saveState()  // call this function for save object in undo redo
+                    console.log("called save state function !")
                     $('.customiseLoader').css("display","none");
                 }, 200)
               },
@@ -863,59 +935,19 @@ canvas.on('object:modified', function(event) {
                 $('.customiseLoader').css("display","none");
               }
             }) 
+         }else{
+            saveState()  // call this function for save object in undo redo
          }
 
-      //   }else{
-
-      //   let updateFontSize = calculateFontSize(event.target.text, newWidth, newHeight);
-      //   console.log("New font size :", updateFontSize);
-      //   if(parseFloat(event.target.scaleToWidth) !== parseFloat(newWidth)){
-      //   $.ajax({
-      //         url: "http://customizer.sketchthemes.com:8080/testing.php?text="+event.target.text+"&effect="+event.target.text_effect+"&font_color="+event.target.text_color.replace("#","")+"&font_size="+updateFontSize+"&fontName="+event.target.text_font_family+"&outline_color="+event.target.outline_color.replace("#","")+"&outline_width="+event.target.outline_width,
-      //         xhrFields: {
-      //           responseType: 'blob'
-      //         },
-      //         beforeSend: function() {
-      //           $('.customiseLoader').css("display","flex");
-      //         },
-      //         success: function (img, status, xhr) {
-      //           console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
-      //           console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
-      //           $('#textFontSize').val(parseFloat(updateFontSize).toFixed(1));
-
-      //           event.target.setSrc(URL.createObjectURL(img));
-
-                        
-      //           setTimeout(function(){
-      //               event.target.set({
-      //                   scaleToWidth:xhr.getResponseHeader('x-img-width'),
-      //                   scaleToHeight:xhr.getResponseHeader('x-img-height'),
-      //                   // width: xhr.getResponseHeader('x-img-width'),
-      //                   // height: xhr.getResponseHeader('x-img-height'),
-      //                   scaleX: 1,
-      //                   scaleY:1,
-      //                   "text_font_size": parseFloat(updateFontSize)
-      //               })
-
-      //               // fitToObject(event.target)
-      //               setObjectInside(event.target);
-      //               canvas.renderAll(); 
-      //               $('.customiseLoader').css("display","none");
-      //           }, 200)
-      //         },
-      //         error: function (jqXhr, textStatus, errorMessage) {
-      //           console.log("Error => ",errorMessage);
-      //           $('.customiseLoader').css("display","none");
-      //         }
-      //       }) 
-      //    }
-      // }
-    }else if (event.target.type == 'art') {
+    }else if (event.target.object_type == 'art') {
         var newWidth = (event.target.width * event.target.scaleX);
         var newHeight = (event.target.height * event.target.scaleY);
         console.log("Image width :", newWidth , " | height : ", newHeight);
         $("#artWidth").val(parseFloat(newWidth).toFixed(2));
         $("#artHeight").val(parseFloat(newHeight).toFixed(2));
+        document.getElementById("rotatArtRangeSlide").value = event.target.angle;
+        document.getElementById("rotatArtNumber").value = event.target.angle;
+
         event.target.set({
             // width: newWidth,
             // height: newHeight,
@@ -924,12 +956,16 @@ canvas.on('object:modified', function(event) {
             scaleToWidth:newWidth,
             scaleToHeight:newHeight
         })
-    }else if(event.target.type == 'image'){
+        saveState()  // call this function for save object in undo redo
+    }else if(event.target.object_type == 'image'){
         var newWidth = (event.target.width * event.target.scaleX);
         var newHeight = (event.target.height * event.target.scaleY);
         console.log("Image width :", newWidth , " | height : ", newHeight);
         $("#imageWidth").val(parseFloat(newWidth).toFixed(2));
         $("#imageHeight").val(parseFloat(newHeight).toFixed(2));
+        document.getElementById("rotatImageRangeSlide").value = event.target.angle;
+        document.getElementById("rotatImageNumber").value = event.target.angle;
+
         event.target.set({
             // width: newWidth,
             // height: newHeight,
@@ -938,9 +974,10 @@ canvas.on('object:modified', function(event) {
             scaleToWidth:newWidth,
             scaleToHeight:newHeight
         })
+        saveState()  // call this function for save object in undo redo
     }
-
-  });
+    
+});
 
 // resizeCanvas();
 
@@ -991,7 +1028,7 @@ $("#addTextContent").click(function(){
         }
 
         $.ajax({
-          url: "http://customizer.sketchthemes.com:8080/testing.php?text="+text_val+"&effect=normal&font_color=000000&font_size="+font_size+"&fontName=Abel&outline_color=00000000&outline_width=1",
+          url: "http://customizer.sketchthemes.com:8080/testing.php?text="+text_val+"&effect=normal&font_color=000000&font_size="+font_size+"&fontName=Abel&outline_color=00000000&outline_width=2",
           xhrFields: {
             responseType: 'blob'
           },
@@ -1006,7 +1043,7 @@ $("#addTextContent").click(function(){
                         scaleToHeight:xhr.getResponseHeader('x-img-height'),
                         scaleX: 1,
                         scaleY:1,
-                        "type":'text',
+                        "object_type":'text',
                         "text":text_val,
                         "text_effect":"normal",
                         "text_color": "#000000",
@@ -1041,11 +1078,12 @@ $("#addTextContent").click(function(){
                         scaleToHeight:newHeight
                     });
                             
-                    setTimeout(function(){
-                        console.log("Active obejct omg => ", img);
+                    setTimeout(async function(){
+                        // console.log("Active obejct omg => ", img);
                         setObjectInside(img);
                         canvas.setActiveObject(img);
                         canvas.renderAll(); 
+                        saveState();  // call this function for save object in undo redo
                         $('.customiseLoader').css("display","none");
                     }, 200)
                 });
@@ -1073,6 +1111,8 @@ $("#addTextContent").click(function(){
         $('.selected_outline_color>.color_box').css('background-color', '#00000000');
         $('.selected_outline_color>.color_box').attr("color-name","none");
         $('.selected_outline_color>.color_name').text('None');
+
+        window.clickPipsSlider.noUiSlider.set(2);
         // $('.selected_outline_name').text('None');
 
         $('#rotatTextRangeSlide').val(0);
@@ -1085,6 +1125,7 @@ $("#addTextContent").click(function(){
         var font_text = truncateString(text_val, 10);
         $('ul#allFonts>li>span.active_text').text(font_text);
 	}
+    
 
 })
 
@@ -1141,6 +1182,7 @@ $("#editTextContent").change(function(){
                     // fitToObject(selectedObject)
                     setObjectInside(selectedObject);
                     canvas.renderAll(); 
+                    saveState()  // call this function for save object in undo redo
                     $('.customiseLoader').css("display","none");
                 }, 200)
               },
@@ -1244,6 +1286,7 @@ const changeTextFont = async(font) => {
                     $('.selected_font_name').css('font-family',font);
                     setObjectInside(selectedObject);
                     canvas.renderAll(); 
+                    saveState()  // call this function for save object in undo redo
                     $('.customiseLoader').css("display","none");
                 }, 200)
               },
@@ -1315,6 +1358,7 @@ function changeTextColor(color, name){
         setTimeout(function(){
             setObjectInside(selectedObject);
             canvas.renderAll(); 
+            saveState()  // call this function for save object in undo redo
             $('.customiseLoader').css("display","none");
         }, 200)
       },
@@ -1357,11 +1401,11 @@ function changeInputValue(val){
 
 // text outline js
 function changeTxtOutlineColor(color, name){
-    var thickness_val =  $('#textOutlineThickness').val();
+    var thickness_val =  window.clickPipsSlider.noUiSlider.get();
     var selectedObject = canvas.getActiveObject();
 
     // if(selectedObject.text_effect == 'curve'){
-
+        if(selectedObject != undefined){
             $.ajax({
               url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+parseFloat(selectedObject.text_font_size)+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+color.replace("#","")+"&outline_width="+thickness_val,
               xhrFields: {
@@ -1392,7 +1436,7 @@ function changeTxtOutlineColor(color, name){
                     $('#textFontSize').val(parseFloat(xhr.getResponseHeader('x-font-size')).toFixed(1));
                     setObjectInside(selectedObject);
                     canvas.renderAll(); 
-
+                    saveState()  // call this function for save object in undo redo
                     $('.selected_outline_color>.color_box').css('background-color', selectedObject.outline_color);
                 $('.selected_outline_color>.color_box').attr("color-name",selectedObject.outline_color_name);
                 $('.selected_outline_color>.color_name').text(selectedObject.outline_color_name);
@@ -1404,6 +1448,7 @@ function changeTxtOutlineColor(color, name){
                 $('.customiseLoader').css("display","none");
               }
             }) 
+          }
 
 //         }else{
 
@@ -1465,7 +1510,8 @@ function removeTxtOutline(){
       },
       success: function (img, status, xhr) {
         // $('.selected_outline_name').text("none");
-        $('#textOutlineThickness').val(1);
+      
+        window.clickPipsSlider.noUiSlider.set(0);
         $(".color_box>input[name='text_outline_input'][data-color-name='none']").prop("checked", true);
         $('.text_outline_wrapper').css("display","none");
         $('.selected_outline_color>.color_box').css('background-color', '#00000000');
@@ -1545,6 +1591,7 @@ function changeTextEffect(effect){
             // fitToObject(selectedObject);
             setObjectInside(selectedObject); 
             canvas.renderAll(); 
+            saveState()  // call this function for save object in undo redo
             $('.customiseLoader').css("display","none");
         }, 200)
       },
@@ -1612,6 +1659,7 @@ function changeTxtFontSize(value){
                     $('#textFontSize').val(parseFloat(xhr.getResponseHeader('x-font-size')).toFixed(1));
                     setObjectInside(selectedObject);
                     canvas.renderAll(); 
+                    saveState()  // call this function for save object in undo redo
                     $('.customiseLoader').css("display","none");
                 }, 200)
               },
@@ -1744,7 +1792,7 @@ function updateTshirtImage(imageURL){
         img.scaleToHeight(80);
         img.scaleToWidth(80); 
         img.set({
-            "type":'art',
+            "object_type":'art',
             left:minX,
             top:minY
         })
@@ -1767,6 +1815,8 @@ function updateTshirtImage(imageURL){
         var newHeight = (img.height * img.scaleY);
         $("#artWidth").val(parseFloat(newWidth).toFixed(2));
         $("#artHeight").val(parseFloat(newHeight).toFixed(2));
+        document.getElementById("rotatArtRangeSlide").value = 0;
+        document.getElementById("rotatArtNumber").value = 0;
         img.set({
             // width: newWidth,
             // height: newHeight,
@@ -1778,6 +1828,7 @@ function updateTshirtImage(imageURL){
         console.log("After Image width :", newWidth , " | height : ", newHeight);
         canvas.setActiveObject(img);
         canvas.renderAll();
+        saveState()  // call this function for save object in undo redo
     });
 }
 
@@ -1802,6 +1853,7 @@ function addArtDesign(path) {
         setObjectInside(selectedObject);
         canvas.setActiveObject(selectedObject);
         canvas.renderAll();
+        saveState()  // call this function for save object in undo redo
         $("#artWidth").val(parseFloat(newWidth).toFixed(2));
         $("#artHeight").val(parseFloat(newHeight).toFixed(2));
        }, 200);
@@ -1859,6 +1911,7 @@ function changeArtSize(value, dimension){
 
         $("#artWidth").val(parseFloat(newWidth).toFixed(2));
         $("#artHeight").val(parseFloat(newHeight).toFixed(2));
+        saveState()  // call this function for save object in undo redo
         
       }else{
         console.error("No active object found.");
@@ -1872,6 +1925,7 @@ function centerArtObject(){
     // canvas.centerObject(selectedObject);
     selectedObject.centerH();
     canvas.renderAll();
+    saveState()  // call this function for save object in undo redo
 }
 // Art flip x js
 function flipXArt(){
@@ -1881,6 +1935,7 @@ function flipXArt(){
     // selectedObject.set('flipX', true);
     selectedObject.setCoords();
     canvas.renderAll();
+    saveState()  // call this function for save object in undo redo
     // selectedObject.set('flipX', false);
     // canvas.renderAll();
 }
@@ -1893,6 +1948,7 @@ function flipYArt(){
     selectedObject.setCoords();
     // selectedObject.set('flipY', false);
     canvas.renderAll();
+    saveState()  // call this function for save object in undo redo
 }
 
 
@@ -1921,6 +1977,7 @@ function changeArtInputValue(val){
     // fitToObject(selectedObject);
     setObjectInside(selectedObject);
     canvas.renderAll();
+    saveState()  // call this function for save object in undo redo
 }
 
 
@@ -1978,7 +2035,7 @@ document.getElementById('uploadFile').addEventListener("change", function(e){
                     img.scaleToHeight(80);
                     img.scaleToWidth(80); 
                     img.set({
-                        "type":'image',
+                        "object_type":'image',
                         left:minX,
                         top:minY
                     })
@@ -2001,6 +2058,8 @@ document.getElementById('uploadFile').addEventListener("change", function(e){
                     var newHeight = (img.height * img.scaleY);
                     $("#imageWidth").val(parseFloat(newWidth).toFixed(2));
                     $("#imageHeight").val(parseFloat(newHeight).toFixed(2));
+                    document.getElementById("rotatImageRangeSlide").value = 0;
+                    document.getElementById("rotatImageNumber").value = 0;
                     img.set({
                         // width: newWidth,
                         // height: newHeight,
@@ -2013,7 +2072,7 @@ document.getElementById('uploadFile').addEventListener("change", function(e){
                     setObjectInside(img);
                     canvas.setActiveObject(img);
                     canvas.renderAll();
-
+                    saveState()  // call this function for save object in undo redo
                     $('#addUploadTab').css("display","none");
                     $('#editUploadTab').css("display","block");
                     $("#uploadFile").val(null);  // set input file field value null
@@ -2064,6 +2123,7 @@ function changeImageInputValue(val){
     selectedObject.rotate(parseFloat(val));
     setObjectInside(selectedObject);
     canvas.renderAll();
+    saveState()  // call this function for save object in undo redo
 }
 
 // change image size from input field
@@ -2125,10 +2185,10 @@ document.addEventListener("keydown", function(e) {
 
 
 // After loading all content
-// document.addEventListener("DOMContentLoaded", function () {
-//     console.log("Loaded all content!")
-//    resizeCanvas();
-// });
+document.addEventListener("DOMContentLoaded", function () {
+    console.log("Loaded all content!")
+   resizeCanvas();
+});
 
 // function for clear all object from canvas
 function startOver(){
@@ -2138,4 +2198,48 @@ function startOver(){
 // function for close custom modal
 function closeCustomModal(){
     $('.custom_modal').css("display","none");
+}
+
+var SCALE_FACTOR = 1.8;
+var zoomMax = 23;
+var canvasScale = 1;
+
+// Zoom In
+function zoomIn() {
+    if(canvas.getZoom().toFixed(5) > zoomMax){
+        console.log("zoomIn: Error: cannot zoom-in anymore");
+        return;
+    }
+
+    canvas.setZoom(canvas.getZoom()*SCALE_FACTOR);
+    canvas.setHeight(canvas.getHeight() * SCALE_FACTOR);
+    canvas.setWidth(canvas.getWidth() * SCALE_FACTOR);
+    canvas.renderAll();
+}
+
+// Zoom Out
+function zoomOut() {
+    if( canvas.getZoom().toFixed(5) <=1 ){
+        console.log("zoomOut: Error: cannot zoom-out anymore");
+        return;
+    }
+
+    canvas.setZoom(canvas.getZoom()/SCALE_FACTOR);
+    canvas.setHeight(canvas.getHeight() / SCALE_FACTOR);
+    canvas.setWidth(canvas.getWidth() / SCALE_FACTOR);
+    canvas.renderAll();
+}
+
+// change zoom option status function
+function changeZoomStatus(option){
+    $('.zoom_icon').css("display","none");
+    if(option == 'plus'){
+        $('img#customiserImage').css('object-fit','contain');
+        zoomOut();
+        $('.zoom_plus_option').css("display","block");
+    }else{
+        $('img#customiserImage').css('object-fit','cover');
+        zoomIn();
+        $('.zoom_minus_option').css("display","block");
+    }   
 }
