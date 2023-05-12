@@ -7,11 +7,9 @@ import serveStatic from "serve-static";
 import shopify from "./shopify.js";
 import productCreator from "./product-creator.js";
 import GDPRWebhookHandlers from "./gdpr.js";
-// import { MySqlConnection } from "@shopify/shopify-app-session-storage-mysql/build/ts/mysql-connection.js";
 import { MySQLSessionStorage } from '@shopify/shopify-app-session-storage-mysql';
-// import connection from "./mySqlConnection.js";
-
 import mysqlConnection from "./mySqlConnection.js";
+import cors from "cors";
 
 // use body-parser for fetch request body
 import bodyParser from "body-parser";
@@ -64,6 +62,7 @@ app.post(
 
 app.use(express.json());
 app.use(bodyParser.json());
+app.use(cors());
 // app.use("/public", express.static(path.join(__dirname, 'public')));
 
 // ...................................
@@ -449,8 +448,8 @@ app.post("/api/add-product", (req: Request, res: Response) => {
     let session_id: string = res.locals.shopify.session.id;
     let productData: any = [];
     let products: any = req.body.products;
-    console.log('products', products);    
-    let query: string = "INSERT INTO product_settings (session_id, product_id, product_title, product_image,product_color) VALUES ?";
+    console.log('products', products);
+    let query: string = "INSERT INTO products (session_id, product_id, title, image, product_color) VALUES ?";
     products.forEach((item: any, itemKey: any) => {
         productData[itemKey] = [
             session_id,
@@ -481,7 +480,7 @@ app.post("/api/add-product", (req: Request, res: Response) => {
 // Get product list
 app.get("/api/get-product-list", (req: Request, res: Response) => {
     let session_id: string = res.locals.shopify.session.id;
-    mysqlConnection.query('select * from product_settings WHERE ?', {
+    mysqlConnection.query('select * from products WHERE ?', {
         session_id: session_id
     }, function (err: any, result: any) {
         if (err) throw err
@@ -495,159 +494,335 @@ app.get("/api/get-product-list", (req: Request, res: Response) => {
 
 // Get product by id
 app.get("/api/get-product/:id", (req: Request, res: Response) => {
-    // let session_id: string = res.locals.shopify.session.id;
-    let query: string = `SELECT * FROM product_settings WHERE ? LIMIT 1`;
-    mysqlConnection.query(query, {
-        id: req.params.id,
-    }, function (err: any, result: any) {
+    let query_1: string = `SELECT * FROM products WHERE id=${req.params.id} LIMIT 1`;
+    var data: any = [];
+    mysqlConnection.query(query_1, function (err: any, result_1: any) {
         if (err) throw err;
-        if (result.length > 0) {
-            res.status(200).send({
-                "status": true,
-                "message": "Data fetched",
-                "data": result[0]
+        if (result_1.length > 0) {
+            let query_2: string = `SELECT * FROM product_mappings WHERE product_id=${req.params.id}`;
+            data.push(result_1[0]);
+            mysqlConnection.query(query_2, function (err: any, result_2: any) {
+                if (err) throw err;
+                if (result_2.length > 0) {
+                    data[0].product_map = result_2;
+                }
+                res.status(200).send({
+                    "status": true,
+                    "message": "Data fetchedss",
+                    "data": data
+                });
             });
         } else {
             res.status(404).send({
                 "status": true,
-                "message": `Invalid art product setting id: ${req.params.id}`,
+                "message": `Invalid product id ${req.params.id}`,
                 "data": [],
             });
         }
     });
 });
 
-// Mapped product from front side
-app.post("/api/map-product-front-side/:id", (req: Request, res: Response) => {
-    let session_id: string = res.locals.shopify.session.id;
-    let is_mapped: number = 1;
-    let front_image_left: string = req.body.front_image_left;
-    let front_image_top: string = req.body.front_image_top;
-    let front_crop_width: string = req.body.front_crop_width;
-    let front_crop_height: string = req.body.front_crop_height;
-    let front_image_width: string = req.body.front_image_width;
-    let front_image_height: string = req.body.front_image_height;
-    let front_scale_x: string = req.body.front_scale_x;
-    let front_scale_y: string = req.body.front_scale_y;
-    mysqlConnection.query('INSERT INTO product_settings SET ?', {
-        session_id: res.locals.shopify.session.id,
-        is_mapped: 1,
-        front_image_left: front_image_left,
-        front_image_top: front_image_top,
-        front_crop_width: front_crop_width,
-        front_crop_height: front_crop_height,
-        front_image_width: front_image_width,
-        front_image_height: front_image_height,
-        front_scale_x: front_scale_x,
-        front_scale_y: front_scale_y,
-    }, function (error: any, results: any, fields: any) {
+// Delete map-product by id
+app.delete("/api/delete-map-product/:id", async (req: Request, res: Response) => {
+    let query: string = `DELETE FROM product_mappings WHERE id=${req.params.id}`;
+    console.log('query',query)
+    mysqlConnection.query(query, function (error: any, results: any) {
         if (error) throw error;
-        res.status(201).send({
-            "status": true,
-            "message": "Saved front side product map!",
-            "data": results
-        });
+        if (results.affectedRows > 0) {
+            res.status(200).send({
+                "status": true,
+                "message": "Deleted success!",
+                "data": results
+            });
+        } else {
+            res.status(404).send({
+                "status": true,
+                "message": `Invalid product map id ${req.params.id}`,
+                "data": [],
+            });
+        }
     });
+});
+
+// Mapped product
+app.post("/api/map-product/:id", upload.single('image'), async (req: Request, res: Response) => {
+    try {
+        let image: any = await req.file;
+        let uploadedFilePath: string = image.path;
+        let session_id: string = res.locals.shopify.session.id;
+        let is_mapped: number = 1;
+        let look_name: string = req.body.look_name;
+        // let image: string = uploadedFilePath;
+        let crop: string = req.body.crop;
+        let query_1: string = `SELECT * FROM products WHERE id=${req.params.id}`;
+
+        mysqlConnection.query(query_1, function (error: any, result_1: any, fields: any) {
+            if (error) throw error;
+            if (result_1.length > 0) {
+                let query_2: string = `UPDATE products SET 
+                is_mapped = ? WHERE id='${req.params.id}'`;
+                let updatedProdSettingData = [
+                    is_mapped,
+                ];
+                mysqlConnection.query(query_2, updatedProdSettingData, function (error, result_2, fields) {
+                    if (error) throw error;
+                    mysqlConnection.query('INSERT INTO product_mappings SET ?', {
+                        session_id: session_id,
+                        product_id: req.params.id,
+                        look_name: look_name,
+                        image: uploadedFilePath,
+                        crop: crop,
+                    }, function (error: any, result_3: any, fields: any) {
+                        if (error) throw error;
+                        res.status(201).send({
+                            "status": true,
+                            "message": "Saved product map!",
+                            "data": result_3,
+                            "uploaded_file_path": uploadedFilePath
+                        });
+                    });
+                });
+            } else {
+                res.status(404).send({
+                    "status": true,
+                    "message": `Invalid product id ${req.params.id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (e: any) {
+        res.status(404).send({
+            "status": true,
+            "message": e.message,
+            "data": []
+        });
+    }
+});
+
+
+// Mapped product from front side
+app.post("/api/map-product-front-side/:id", upload.single('image'), async (req: Request, res: Response) => {
+    let image: any = await req.file;
+    let uploadedFilePath: string = image.path;
+    try {
+        let is_mapped: number = 1;
+        let front_look_name: string = req.body.front_look_name;
+        let front_image: string = uploadedFilePath;
+        let front_crop_width: string = req.body.front_crop_width;
+        let front_crop_height: string = req.body.front_crop_height;
+        let front_scale_x: string = req.body.front_scale_x;
+        let front_scale_y: string = req.body.front_scale_y;
+        let query_1: string = `SELECT * FROM products WHERE id=${req.params.id}`;
+
+        mysqlConnection.query(query_1, function (error: any, result_1: any, fields: any) {
+            if (error) throw error;
+            if (result_1.length > 0) {
+                let query_2: string = `UPDATE products SET 
+                is_mapped = ?, front_look_name = ?, front_image = ?, front_crop_width = ?, 
+                front_crop_height = ?, front_scale_x = ?, front_scale_y = ?
+                WHERE id='${req.params.id}'`;
+                let updatedData = [
+                    is_mapped,
+                    front_look_name,
+                    front_image,
+                    front_crop_width,
+                    front_crop_height,
+                    front_scale_x,
+                    front_scale_y,
+                ];
+                mysqlConnection.query(query_2, updatedData, function (error, result_2, fields) {
+                    if (error) throw error;
+                    res.status(201).send({
+                        "status": true,
+                        "message": "Saved front side product map!",
+                        "data": result_2,
+                        "uploaded_file_path": uploadedFilePath
+                    });
+                });
+            } else {
+                res.status(404).send({
+                    "status": true,
+                    "message": `Invalid product id ${req.params.id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (e: any) {
+        res.status(404).send({
+            "status": true,
+            "message": e.message,
+            "data": []
+        });
+    }
 });
 
 // Mapped product from back side
-app.post("/api/map-product-back-side/:id", (req: Request, res: Response) => {
-    let session_id: string = res.locals.shopify.session.id;
-    let is_mapped: number = 1;
-    let back_image_left: string = req.body.back_image_left;
-    let back_image_top: string = req.body.back_image_top;
-    let back_crop_width: string = req.body.back_crop_width;
-    let back_crop_height: string = req.body.back_crop_height;
-    let back_image_width: string = req.body.back_image_width;
-    let back_image_height: string = req.body.back_image_height;
-    let back_scale_x: string = req.body.back_scale_x;
-    let back_scale_y: string = req.body.back_scale_y;
-    mysqlConnection.query('INSERT INTO product_settings SET ?', {
-        session_id: res.locals.shopify.session.id,
-        is_mapped: 1,
-        back_image_left: back_image_left,
-        back_image_top: back_image_top,
-        back_crop_width: back_crop_width,
-        back_crop_height: back_crop_height,
-        back_image_width: back_image_width,
-        back_image_height: back_image_height,
-        back_scale_x: back_scale_x,
-        back_scale_y: back_scale_y,
-    }, function (error: any, result: any, fields: any) {
-        if (error) throw error;
-        res.status(201).send({
-            "status": true,
-            "message": "Saved back side product map!",
-            "data": result
+app.post("/api/map-product-back-side/:id", upload.single('image'), async (req: Request, res: Response) => {
+    let image: any = await req.file;
+    let uploadedFilePath: string = image.path;
+    try {
+        let is_mapped: number = 1;
+        let back_look_name: string = req.body.back_look_name;
+        let back_image: string = uploadedFilePath;
+        let back_crop_width: string = req.body.back_crop_width;
+        let back_crop_height: string = req.body.back_crop_height;
+        let back_scale_x: string = req.body.back_scale_x;
+        let back_scale_y: string = req.body.back_scale_y;
+        let query_1: string = `SELECT * FROM products WHERE id=${req.params.id}`;
+
+        mysqlConnection.query(query_1, function (error: any, result_1: any, fields: any) {
+            if (error) throw error;
+            if (result_1.length > 0) {
+                let query_2: string = `UPDATE products SET 
+                is_mapped = ?, back_look_name = ?, back_image = ?, back_crop_width = ?, 
+                back_crop_height = ?, back_scale_x = ?, back_scale_y = ?
+                WHERE id='${req.params.id}'`;
+                let updatedData = [
+                    is_mapped,
+                    back_look_name,
+                    back_image,
+                    back_crop_width,
+                    back_crop_height,
+                    back_scale_x,
+                    back_scale_y,
+                ];
+                mysqlConnection.query(query_2, updatedData, function (error, result_2, fields) {
+                    if (error) throw error;
+                    res.status(201).send({
+                        "status": true,
+                        "message": "Saved back side product map!",
+                        "data": result_2,
+                        "uploaded_file_path": uploadedFilePath
+                    });
+                });
+            } else {
+                res.status(404).send({
+                    "status": true,
+                    "message": `Invalid product id ${req.params.id}`,
+                    "data": [],
+                });
+            }
         });
-    });
+    } catch (e: any) {
+        res.status(404).send({
+            "status": true,
+            "message": e.message,
+            "data": []
+        });
+    }
 });
 
 // Mapped product from left side
-app.post("/api/map-product-left-side/:id", (req: Request, res: Response) => {
-    let session_id: string = res.locals.shopify.session.id;
-    let is_mapped: number = 1;
-    let left_image_left: string = req.body.left_image_left;
-    let left_image_top: string = req.body.left_image_top;
-    let left_crop_width: string = req.body.left_crop_width;
-    let left_crop_height: string = req.body.left_crop_height;
-    let left_image_width: string = req.body.left_image_width;
-    let left_image_height: string = req.body.left_image_height;
-    let left_scale_x: string = req.body.left_scale_x;
-    let left_scale_y: string = req.body.left_scale_y;
-    mysqlConnection.query('INSERT INTO product_settings SET ?', {
-        session_id: res.locals.shopify.session.id,
-        is_mapped: 1,
-        left_image_left: left_image_left,
-        left_image_top: left_image_top,
-        left_crop_width: left_crop_width,
-        left_crop_height: left_crop_height,
-        left_image_width: left_image_width,
-        left_image_height: left_image_height,
-        left_scale_x: left_scale_x,
-        left_scale_y: left_scale_y,
-    }, function (error: any, result: any, fields: any) {
-        if (error) throw error;
-        res.status(201).send({
-            "status": true,
-            "message": "Saved left side product map!",
-            "data": result
+app.post("/api/map-product-left-side/:id", upload.single('image'), async (req: Request, res: Response) => {
+    let image: any = await req.file;
+    let uploadedFilePath: string = image.path;
+    try {
+        let is_mapped: number = 1;
+        let left_look_name: string = req.body.left_look_name;
+        let left_image: string = uploadedFilePath;
+        let left_crop_width: string = req.body.left_crop_width;
+        let left_crop_height: string = req.body.left_crop_height;
+        let left_scale_x: string = req.body.left_scale_x;
+        let left_scale_y: string = req.body.left_scale_y;
+        let query_1: string = `SELECT * FROM products WHERE id=${req.params.id}`;
+
+        mysqlConnection.query(query_1, function (error: any, result_1: any, fields: any) {
+            if (error) throw error;
+            if (result_1.length > 0) {
+                let query_2: string = `UPDATE products SET 
+                is_mapped = ?, left_look_name = ?, left_image = ?, left_crop_width = ?, 
+                left_crop_height = ?, left_scale_x = ?, left_scale_y = ?
+                WHERE id='${req.params.id}'`;
+                let updatedData = [
+                    is_mapped,
+                    left_look_name,
+                    left_image,
+                    left_crop_width,
+                    left_crop_height,
+                    left_scale_x,
+                    left_scale_y,
+                ];
+                mysqlConnection.query(query_2, updatedData, function (error, result_2, fields) {
+                    if (error) throw error;
+                    res.status(201).send({
+                        "status": true,
+                        "message": "Saved left side product map!",
+                        "data": result_2,
+                        "uploaded_file_path": uploadedFilePath
+                    });
+                });
+            } else {
+                res.status(404).send({
+                    "status": true,
+                    "message": `Invalid product id ${req.params.id}`,
+                    "data": [],
+                });
+            }
         });
-    });
+    } catch (e: any) {
+        res.status(404).send({
+            "status": true,
+            "message": e.message,
+            "data": []
+        });
+    }
 });
 
 // Mapped product from right side
-app.post("/api/map-product-right-side/:id", (req: Request, res: Response) => {
-    let session_id: string = res.locals.shopify.session.id;
-    let is_mapped: number = 1;
-    let right_image_left: string = req.body.right_image_left;
-    let right_image_top: string = req.body.right_image_top;
-    let right_crop_width: string = req.body.right_crop_width;
-    let right_crop_height: string = req.body.right_crop_height;
-    let right_image_width: string = req.body.right_image_width;
-    let right_image_height: string = req.body.right_image_height;
-    let right_scale_x: string = req.body.right_scale_x;
-    let right_scale_y: string = req.body.right_scale_y;
-    mysqlConnection.query('INSERT INTO product_settings SET ?', {
-        session_id: res.locals.shopify.session.id,
-        is_mapped: 1,
-        right_image_left: right_image_left,
-        right_image_top: right_image_top,
-        right_crop_width: right_crop_width,
-        right_crop_height: right_crop_height,
-        right_image_width: right_image_width,
-        right_image_height: right_image_height,
-        right_scale_x: right_scale_x,
-        right_scale_y: right_scale_y,
-    }, function (error: any, result: any, fields: any) {
-        if (error) throw error;
-        res.status(201).send({
-            "status": true,
-            "message": "Saved right side product map!",
-            "data": result
+app.post("/api/map-product-right-side/:id", upload.single('image'), async (req: Request, res: Response) => {
+    let image: any = await req.file;
+    let uploadedFilePath: string = image.path;
+    try {
+        let is_mapped: number = 1;
+        let right_look_name: string = req.body.right_look_name;
+        let right_image: string = uploadedFilePath;
+        let right_crop_width: string = req.body.right_crop_width;
+        let right_crop_height: string = req.body.right_crop_height;
+        let right_scale_x: string = req.body.right_scale_x;
+        let right_scale_y: string = req.body.right_scale_y;
+        let query_1: string = `SELECT * FROM products WHERE id=${req.params.id}`;
+
+        mysqlConnection.query(query_1, function (error: any, result_1: any, fields: any) {
+            if (error) throw error;
+            if (result_1.length > 0) {
+                let query_2: string = `UPDATE products SET 
+                is_mapped = ?, right_look_name = ?, right_image = ?, right_crop_width = ?, 
+                right_crop_height = ?, right_scale_x = ?, right_scale_y = ?
+                WHERE id='${req.params.id}'`;
+                let updatedData = [
+                    is_mapped,
+                    right_look_name,
+                    right_image,
+                    right_crop_width,
+                    right_crop_height,
+                    right_scale_x,
+                    right_scale_y,
+                ];
+                mysqlConnection.query(query_2, updatedData, function (error, result_2, fields) {
+                    if (error) throw error;
+                    res.status(201).send({
+                        "status": true,
+                        "message": "Saved right side product map!",
+                        "data": result_2,
+                        "uploaded_file_path": uploadedFilePath
+                    });
+                });
+            } else {
+                res.status(404).send({
+                    "status": true,
+                    "message": `Invalid product id ${req.params.id}`,
+                    "data": [],
+                });
+            }
         });
-    })
-})
+    } catch (e: any) {
+        res.status(404).send({
+            "status": true,
+            "message": e.message,
+            "data": []
+        });
+    }
+});
 
 // Delete setting by id
 app.delete("/api/delete-product/:id", (req: Request, res: Response) => {
@@ -760,3 +935,4 @@ app.listen(PORT);
 // const PORT = process.env.BACKEND_PORT || process.env.PORT; = const PORT = 3000;
 // `${process.cwd()}/frontend/dist` = `${process.cwd()}/web/frontend/dist`
 // `${process.cwd()}/frontend/` = `${process.cwd()}/web/frontend/`
+// "data": destination + fileName = "http://customizer.sketchthemes.com:8080/customizer-shopify-app/web/public/uploads/" + fileName

@@ -1,10 +1,11 @@
-import { Page, Layout, LegacyCard, DataTable, Thumbnail, Button, Toast, Spinner, Frame } from "@shopify/polaris";
+import { Page, Heading, Layout, LegacyCard, DataTable, Thumbnail, Button, Toast, Spinner, Frame, Icon } from "@shopify/polaris";
 import createApp, { Provider, ResourcePicker, TitleBar } from "@shopify/app-bridge-react";
 import ReactPaginate from "react-paginate";
 import { useEffect, useState } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import dummyImage from "../assets/images/dummy-image.jpg";
 import { Link, useNavigate } from "react-router-dom";
+import { CircleTickMinor, MobileAcceptMajor, CancelMajor } from '@shopify/polaris-icons';
 
 export default function Products(props) {
   const API_URL = props.API_URL;
@@ -25,6 +26,7 @@ export default function Products(props) {
   const [pageNumber, setPageNumber] = useState(0);
   const usersPerPage = 10;
   const pagesVisited = pageNumber * usersPerPage;
+
   useEffect(async () => {
     const response = await fetch(`${API_URL}/get-product-list`);
     const productList = await response.json();
@@ -41,12 +43,20 @@ export default function Products(props) {
     checkSelectedProdIds.push(product.product_id)
     return (
       [<Thumbnail
-        source={product.product_image}
-        alt={product.product_title}
+        source={product.image}
+        alt={product.title}
       />,
-      `${product.product_title}`,
-      <Link to={`/ProductMap?id=${product.id}`}><Button primary>Edit</Button></Link>
-      // <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={product.id} onClick={() => navigate(`/ProductMap/${product.id}`)}>Mark Region </Button></a>
+      `${product.title}`,
+      (product.is_mapped === 1) ?
+        <Icon
+          source={MobileAcceptMajor}
+          color="base"
+        /> : <Icon
+          source={CancelMajor}
+          color="base"
+        />,
+      <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={product.id} onClick={() => navigate(`/ProductMap/?id=${product.id}`)}>Mark Region </Button></a>
+        // <Link to={`/ProductMap?id=${product.id}`}><Button primary>Mark Region</Button></Link>
       ]
     )
   }).reverse();
@@ -68,7 +78,7 @@ export default function Products(props) {
     var data = {
       'products': []
     };
-    console.log('checkSelectedProdIds',checkSelectedProdIds)
+    console.log('checkSelectedProdIds', checkSelectedProdIds)
     let prodIndex = 0;
     prodData.forEach((product, key) => {
       var prd_image = "";
@@ -83,7 +93,7 @@ export default function Products(props) {
         }
       }
       let prodId = Number(product.id.replace("gid://shopify/Product/", ""));
-      console.log('checkSelectedProdIds.length > 0', checkSelectedProdIds.length > 0,'checkSelectedProdIds.includes(prodId) == false',checkSelectedProdIds.includes(prodId) == false)
+      console.log('checkSelectedProdIds.length > 0', checkSelectedProdIds.length > 0, 'checkSelectedProdIds.includes(prodId) == false', checkSelectedProdIds.includes(prodId) == false)
       if (checkSelectedProdIds.length > 0) {
         if (checkSelectedProdIds.includes(prodId) == false) {
           console.log('if')
@@ -114,7 +124,7 @@ export default function Products(props) {
         body: JSON.stringify(data)
       });
       const resultData = await response.json();
-  
+
       if (resultData.status === true) {
         setToastContent(resultData.message);
         setToastMsg(true);
@@ -150,17 +160,20 @@ export default function Products(props) {
             </div>
           </div>
         }
-        <TitleBar
-          title="Products"
-          primaryAction={{
-            content: "Add Product",
-            onAction: showResourcePicker
-            // onAction: () => { setOpenResourcePicker(true) }
-          }}
-        />
+        <div className="header">
+          <div className="header_title">
+            <Heading>List of products</Heading>
+          </div>
+          <div className="header_btns">
+            <a href={void 0} onClick={showResourcePicker} style={{ marginLeft: "8px" }}>
+              <Button primary>
+                Add Product
+              </Button>
+            </a>
+          </div>
+        </div>
         <Layout>
           <Layout.Section>
-            {/* <h1>Hello</h1> */}
             <ResourcePicker
               resourceType="Product"
               open={openResourcePicker}
@@ -178,11 +191,13 @@ export default function Products(props) {
               columnContentTypes={[
                 'text',
                 'text',
+                'text',
                 'numeric',
               ]}
               headings={[
                 'Image',
                 'Title',
+                'Is Mark',
                 'Action'
               ]}
               rows={allProductTableData}

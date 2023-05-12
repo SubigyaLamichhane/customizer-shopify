@@ -172,3 +172,37 @@ li.paginationActive a:focus {
   border: 1px dashed #fff;
   /* box-shadow: 0 0 0 9999em rgba(0,0,0,.5) */
 }
+
+/* .Polaris-Icon--colorBase svg {
+  margin-left: -60px;
+} */
+
+.Polaris-Modal-CloseButton:hover {
+  /* background: var(--p-surface-hovered); */
+}
+
+.header {
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  margin:0px 0px 20px 0px;
+  align-items: center;
+  margin-top:0px;
+  border-bottom: 0.0625rem solid var(--p-border-subdued);
+  padding-bottom: 20px;
+}
+.header_title h2.Polaris-Heading {
+  font-size: 22px;
+}
+.header_btns>a{
+  text-decoration: none;
+}
+.header_link a span.link_text {
+  margin-left: 6px;
+}
+.header_link a {
+  display: flex;
+  text-decoration: none;
+  color: #000;
+  font-size: 18px;
+}
