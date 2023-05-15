@@ -70,29 +70,37 @@ app.use(cors());
 
 // Convert pdf/ai/eps/jpg/jpeg/psd file into png formate
 app.post("/api/convert-file", upload.single('image'), async (req: Request, res: Response) => {
-    let image: any = await req.file;
-    let fileExtension: string = image.filename.split('.').pop();
-    let fileName: string = image.filename.replace(fileExtension, "png");
-    let destination: string = image.destination;
-    if (fileExtension == "pdf" || fileExtension == "PDF"
-        || fileExtension == "ai" || fileExtension == "AI"
-        || fileExtension == "eps" || fileExtension == "EPS"
-        || fileExtension == "jpg" || fileExtension == "JPG"
-        || fileExtension == "jpeg" || fileExtension == "JPEG"
-        || fileExtension == "psd" || fileExtension == "PSD"
-        || fileExtension == "png" || fileExtension == "PNG") {
-        gm(image.path).in("-colorspace").in("srgb").write(destination + fileName, function (err: any) {
-            if (err) throw err
-            res.status(200).send({
-                "status": true,
-                "message": "File converted from " + fileExtension + " to png formate successfully!",
-                "data": destination + fileName
+    try {
+        let image: any = await req.file;
+        let fileExtension: string = image.filename.split('.').pop();
+        let fileName: string = image.filename.replace(fileExtension, "png");
+        let destination: string = image.destination;
+        if (fileExtension == "pdf" || fileExtension == "PDF"
+            || fileExtension == "ai" || fileExtension == "AI"
+            || fileExtension == "eps" || fileExtension == "EPS"
+            || fileExtension == "jpg" || fileExtension == "JPG"
+            || fileExtension == "jpeg" || fileExtension == "JPEG"
+            || fileExtension == "psd" || fileExtension == "PSD"
+            || fileExtension == "png" || fileExtension == "PNG") {
+            gm(image.path).in("-colorspace").in("srgb").write(destination + fileName, function (err: any) {
+                if (err) throw err
+                res.status(200).send({
+                    "status": true,
+                    "message": "File converted from " + fileExtension + " to png formate successfully!",
+                    "data": destination + fileName
+                });
             });
-        });
-    } else {
-        res.status(200).send({
-            "status": false,
-            "message": "Invalid file formate!",
+        } else {
+            res.status(200).send({
+                "status": false,
+                "message": "Invalid file formate!",
+                "data": []
+            });
+        }
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
             "data": []
         });
     }
@@ -140,208 +148,280 @@ app.get("/api/products/create", async (_req: Request, res: Response) => {
 
 // Get art category list
 app.get("/api/get-art-category-list", (req: Request, res: Response) => {
-    let query: string = `SELECT * FROM art_category WHERE session_id='${res.locals.shopify.session.id}'`;
-    mysqlConnection.query(query, function (err: any, result: any) {
-        if (err) throw err
-        res.status(201).send({
-            "status": true,
-            "message": "Data fetched!",
-            "data": result
+    try {
+        let query: string = `SELECT * FROM art_category WHERE session_id='${res.locals.shopify.session.id}'`;
+        mysqlConnection.query(query, function (err: any, result: any) {
+            if (err) throw err
+            res.status(201).send({
+                "status": true,
+                "message": "Data fetched!",
+                "data": result
+            });
         });
-    });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
 });
 
 // Create art category
 app.post("/api/create-art-category", async (req: Request, res: Response) => {
-    let session_id: string = res.locals.shopify.session.id;
-    let name: string = req.body.name;
-    let background_image: string = req.body.background_image;
-    mysqlConnection.query('INSERT INTO art_category SET ?', {
-        session_id: session_id,
-        name: name,
-        background_image: background_image
-    }, function (error: any, results: any, fields: any) {
-        if (error) throw error;
-        let artCategoryId: number = results.insertId;
-        res.status(201).send({
-            "status": true,
-            "message": "Created art category!",
-            "data": results
+    try {
+        let session_id: string = res.locals.shopify.session.id;
+        let name: string = req.body.name;
+        let background_image: string = req.body.background_image;
+        mysqlConnection.query('INSERT INTO art_category SET ?', {
+            session_id: session_id,
+            name: name,
+            background_image: background_image
+        }, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            let artCategoryId: number = results.insertId;
+            res.status(201).send({
+                "status": true,
+                "message": "Created art category!",
+                "data": results
+            });
         });
-    });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
 });
 
 // Create art sub category
 app.post("/api/create-art-sub-category/:art_category_id", (req: Request, res: Response) => {
-    let art_category_id: any = req.params.art_category_id;
-    let name: string = req.body.name;
-    let query: string = `SELECT * FROM art_category WHERE id=${art_category_id}`;
-    mysqlConnection.query(query, function (error: any, results_1: any, fields: any) {
-        if (error) throw error;
-        if (results_1.length > 0) {
-            mysqlConnection.query('INSERT INTO art_sub_category SET ?', {
-                art_category_id: art_category_id,
-                name: req.body.name,
-            }, function (error: any, results: any, fields: any) {
-                if (error) throw error;
-                res.status(201).send({
-                    "status": true,
-                    "message": "Created art sub category!",
-                    "data": results
+    try {
+        let art_category_id: any = req.params.art_category_id;
+        let name: string = req.body.name;
+        let query: string = `SELECT * FROM art_category WHERE id=${art_category_id}`;
+        mysqlConnection.query(query, function (error: any, results_1: any, fields: any) {
+            if (error) throw error;
+            if (results_1.length > 0) {
+                mysqlConnection.query('INSERT INTO art_sub_category SET ?', {
+                    art_category_id: art_category_id,
+                    name: req.body.name,
+                }, function (error: any, results: any, fields: any) {
+                    if (error) throw error;
+                    res.status(201).send({
+                        "status": true,
+                        "message": "Created art sub category!",
+                        "data": results
+                    });
                 });
-            });
-        } else {
-            res.status(404).send({
-                "status": true,
-                "message": `Invalid art category id ${req.params.art_category_id}`,
-                "data": [],
-            });
-        }
-    });
+            } else {
+                res.status(404).send({
+                    "status": true,
+                    "message": `Invalid art category id ${req.params.art_category_id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
 });
 
 // Create art sub category list
 app.post("/api/create-art-sub-category-list/:art_sub_category_id", (req: Request, res: Response) => {
-    let art_sub_category_id: number = req.body.art_sub_category_id;
-    let name: string = req.body.name;
-    let image_src: string = req.body.image_src;
-    let query: string = `SELECT * FROM art_sub_category WHERE id=${req.params.art_sub_category_id}`;
-    mysqlConnection.query(query, function (error: any, results_1: any, fields: any) {
-        if (error) throw error;
-        if (results_1.length > 0) {
-            mysqlConnection.query('INSERT INTO art_sub_category_list SET ?', {
-                art_sub_category_id: art_sub_category_id,
-                name: name,
-                image_src: image_src
-            }, function (error: any, results: any, fields: any) {
-                if (error) throw error;
-                res.status(201).send({
-                    "status": true,
-                    "message": "Created art category list!",
-                    "data": results
+    try {
+        let art_sub_category_id: number = req.body.art_sub_category_id;
+        let name: string = req.body.name;
+        let image_src: string = req.body.image_src;
+        let query: string = `SELECT * FROM art_sub_category WHERE id=${req.params.art_sub_category_id}`;
+        mysqlConnection.query(query, function (error: any, results_1: any, fields: any) {
+            if (error) throw error;
+            if (results_1.length > 0) {
+                mysqlConnection.query('INSERT INTO art_sub_category_list SET ?', {
+                    art_sub_category_id: art_sub_category_id,
+                    name: name,
+                    image_src: image_src
+                }, function (error: any, results: any, fields: any) {
+                    if (error) throw error;
+                    res.status(201).send({
+                        "status": true,
+                        "message": "Created art category list!",
+                        "data": results
+                    });
                 });
-            });
-        } else {
-            res.status(404).send({
-                "status": true,
-                "message": `Invalid art sub category id ${req.params.art_sub_category_id}`,
-                "data": [],
-            });
-        }
-    });
+            } else {
+                res.status(404).send({
+                    "status": true,
+                    "message": `Invalid art sub category id ${req.params.art_sub_category_id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
 });
 
 // Create art sub category list sub
 app.post("/api/create-art-sub-category-sub-list/:art_sub_category_list_id", (req: Request, res: Response) => {
-    let art_sub_category_list_id: number = req.body.art_sub_category_list_id;
-    let image_src: string = req.body.image_src;
-    let query: string = `SELECT * FROM art_sub_category_list WHERE id=${req.params.art_sub_category_list_id}`;
-    mysqlConnection.query(query, function (error, results_1, fields) {
-        if (error) throw error;
-        if (results_1.length > 0) {
-            mysqlConnection.query('INSERT INTO art_sub_category_sub_list SET ?', {
-                art_sub_category_list_id: art_sub_category_list_id,
-                image_src: image_src
-            }, function (error: any, results: any, fields: any) {
-                if (error) throw error;
-                res.status(201).send({
-                    "status": true,
-                    "message": "Created art sub category list!",
-                    "data": results
+    try {
+        let art_sub_category_list_id: number = req.body.art_sub_category_list_id;
+        let image_src: string = req.body.image_src;
+        let query: string = `SELECT * FROM art_sub_category_list WHERE id=${req.params.art_sub_category_list_id}`;
+        mysqlConnection.query(query, function (error, results_1, fields) {
+            if (error) throw error;
+            if (results_1.length > 0) {
+                mysqlConnection.query('INSERT INTO art_sub_category_sub_list SET ?', {
+                    art_sub_category_list_id: art_sub_category_list_id,
+                    image_src: image_src
+                }, function (error: any, results: any, fields: any) {
+                    if (error) throw error;
+                    res.status(201).send({
+                        "status": true,
+                        "message": "Created art sub category list!",
+                        "data": results
+                    });
                 });
-            });
-        } else {
-            res.status(404).send({
-                "status": true,
-                "message": `Invalid art sub category list id! ${req.params.art_sub_category_list_id}`,
-                "data": [],
-            });
-        }
-    });
+            } else {
+                res.status(404).send({
+                    "status": true,
+                    "message": `Invalid art sub category list id! ${req.params.art_sub_category_list_id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
 });
 
 // Delete art category by id
 app.delete("/api/delete-art-category/:id", (req: Request, res: Response) => {
-    let query: string = `DELETE FROM art_category WHERE id=${req.params.id}`;
-    mysqlConnection.query(query, function (error: any, results: any, fields: any) {
-        if (error) throw error;
-        if (results.affectedRows > 0) {
-            res.status(200).send({
-                "status": true,
-                "message": "Deleted success!",
-                "data": results
-            });
-        } else {
-            res.status(404).send({
-                "status": true,
-                "message": `Invalid art category id ${req.params.id}`,
-                "data": [],
-            });
-        }
-    });
+    try {
+        let query: string = `DELETE FROM art_category WHERE id=${req.params.id}`;
+        mysqlConnection.query(query, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            if (results.affectedRows > 0) {
+                res.status(200).send({
+                    "status": true,
+                    "message": "Deleted success!",
+                    "data": results
+                });
+            } else {
+                res.status(404).send({
+                    "status": true,
+                    "message": `Invalid art category id ${req.params.id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
 });
 
 // Delete art sub category by id
 app.delete("/api/delete-art-sub-category/:id", (req: Request, res: Response) => {
-    let query: string = `DELETE FROM art_sub_category WHERE id=${req.params.id}`;
-    mysqlConnection.query(query, function (error: any, results: any, fields: any) {
-        if (error) throw error;
-        if (results.affectedRows > 0) {
-            res.status(200).send({
-                "status": true,
-                "message": "Deleted success!",
-                "data": results
-            });
-        } else {
-            res.status(404).send({
-                "status": true,
-                "message": `Invalid art sub category id ${req.params.id}`,
-                "data": [],
-            });
-        }
-    });
+    try {
+        let query: string = `DELETE FROM art_sub_category WHERE id=${req.params.id}`;
+        mysqlConnection.query(query, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            if (results.affectedRows > 0) {
+                res.status(200).send({
+                    "status": true,
+                    "message": "Deleted success!",
+                    "data": results
+                });
+            } else {
+                res.status(404).send({
+                    "status": true,
+                    "message": `Invalid art sub category id ${req.params.id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
 });
 
 // Delete art sub category list by id
 app.delete("/api/delete-art-sub-category-list/:id", (req: Request, res: Response) => {
-    let query: string = `DELETE FROM art_sub_category_list WHERE id=${req.params.id}`;
-    mysqlConnection.query(query, function (error: any, results: any, fields: any) {
-        if (error) throw error;
-        if (results.affectedRows > 0) {
-            res.status(200).send({
-                "status": true,
-                "message": "Deleted success!",
-                "data": results
-            });
-        } else {
-            res.status(404).send({
-                "status": true,
-                "message": `Invalid art sub category list id ${req.params.id}`,
-                "data": [],
-            });
-        }
-    })
+    try {
+        let query: string = `DELETE FROM art_sub_category_list WHERE id=${req.params.id}`;
+        mysqlConnection.query(query, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            if (results.affectedRows > 0) {
+                res.status(200).send({
+                    "status": true,
+                    "message": "Deleted success!",
+                    "data": results
+                });
+            } else {
+                res.status(404).send({
+                    "status": true,
+                    "message": `Invalid art sub category list id ${req.params.id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
 });
 
 // Delete art sub category sub list by id
 app.delete("/api/delete-art-sub-category-sub-list/:id", (req: Request, res: Response) => {
-    let query: string = `DELETE FROM art_sub_category_sub_list WHERE id=${req.params.id}`;
-    mysqlConnection.query(query, function (error: any, results: any, fields: any) {
-        if (error) throw error;
-        if (results.affectedRows > 0) {
-            res.status(200).send({
-                "status": true,
-                "message": "Deleted success!",
-                "data": results
-            });
-        } else {
-            res.status(404).send({
-                "status": true,
-                "message": `Invalid art sub category sub list id ${req.params.id}`,
-                "data": [],
-            });
-        }
-    })
+    try {
+        let query: string = `DELETE FROM art_sub_category_sub_list WHERE id=${req.params.id}`;
+        mysqlConnection.query(query, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            if (results.affectedRows > 0) {
+                res.status(200).send({
+                    "status": true,
+                    "message": "Deleted success!",
+                    "data": results
+                });
+            } else {
+                res.status(404).send({
+                    "status": true,
+                    "message": `Invalid art sub category sub list id ${req.params.id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
 });
 
 // Get setting
@@ -364,10 +444,10 @@ app.get("/api/get-setting", (req: Request, res: Response) => {
                 });
             }
         });
-    } catch (e: any) {
+    } catch (error: any) {
         res.status(404).send({
-            "status": false,
-            "message": e.message,
+            "status": true,
+            "message": "Something went wrong!",
             "data": []
         });
     }
@@ -413,10 +493,10 @@ app.post("/api/save-setting", (req: Request, res: Response) => {
                 });
             }
         });
-    } catch (e: any) {
+    } catch (error: any) {
         res.status(404).send({
             "status": true,
-            "message": e.message,
+            "message": "Something went wrong!",
             "data": []
         });
     }
@@ -424,124 +504,164 @@ app.post("/api/save-setting", (req: Request, res: Response) => {
 
 // Delete setting by id
 app.delete("/api/delete-setting/:id", (req: Request, res: Response) => {
-    let query: string = `DELETE FROM settings WHERE id=${req.params.id}`;
-    mysqlConnection.query(query, function (error: any, results: any, fields: any) {
-        if (error) throw error;
-        if (results.affectedRows > 0) {
-            res.status(201).send({
-                "status": true,
-                "message": "Deleted success!",
-                "data": results
-            });
-        } else {
-            res.status(404).send({
-                "status": true,
-                "message": `Invalid art sub category sub list id ${req.params.id}`,
-                "data": [],
-            });
-        }
-    })
+    try {
+        let query: string = `DELETE FROM settings WHERE id=${req.params.id}`;
+        mysqlConnection.query(query, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            if (results.affectedRows > 0) {
+                res.status(201).send({
+                    "status": true,
+                    "message": "Deleted success!",
+                    "data": results
+                });
+            } else {
+                res.status(404).send({
+                    "status": true,
+                    "message": `Invalid art sub category sub list id ${req.params.id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
 });
 
 // Add product
 app.post("/api/add-product", (req: Request, res: Response) => {
-    let session_id: string = res.locals.shopify.session.id;
-    let productData: any = [];
-    let products: any = req.body.products;
-    console.log('products', products);
-    let query: string = "INSERT INTO products (session_id, product_id, title, image, product_color) VALUES ?";
-    products.forEach((item: any, itemKey: any) => {
-        productData[itemKey] = [
-            session_id,
-            item.product_id,
-            item.product_title,
-            item.product_image,
-            JSON.stringify(item.product_color)
-        ];
-    });
-    mysqlConnection.query(query, [productData], function (error: any, result: any, fields: any) {
-        if (error) throw error;
-        if (result.affectedRows > 0) {
-            res.status(201).send({
-                "status": true,
-                "message": "Product Added!",
-                "data": result
-            });
-        } else {
-            res.status(500).send({
-                "status": true,
-                "message": 'Something went wrong!',
-                "data": [],
-            });
-        }
-    });
+    try {
+        let session_id: string = res.locals.shopify.session.id;
+        let productData: any = [];
+        let products: any = req.body.products;
+        console.log('products', products);
+        let query: string = "INSERT INTO products (session_id, product_id, title, image, product_color) VALUES ?";
+        products.forEach((item: any, itemKey: any) => {
+            productData[itemKey] = [
+                session_id,
+                item.product_id,
+                item.product_title,
+                item.product_image,
+                JSON.stringify(item.product_color)
+            ];
+        });
+        mysqlConnection.query(query, [productData], function (error: any, result: any, fields: any) {
+            if (error) throw error;
+            if (result.affectedRows > 0) {
+                res.status(201).send({
+                    "status": true,
+                    "message": "Product Added!",
+                    "data": result
+                });
+            } else {
+                res.status(500).send({
+                    "status": true,
+                    "message": 'Something went wrong!',
+                    "data": [],
+                });
+            }
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
 });
 
 // Get product list
 app.get("/api/get-product-list", (req: Request, res: Response) => {
-    let session_id: string = res.locals.shopify.session.id;
-    mysqlConnection.query('select * from products WHERE ?', {
-        session_id: session_id
-    }, function (err: any, result: any) {
-        if (err) throw err
-        res.status(200).send({
-            "status": true,
-            "message": "Data fetched!",
-            "data": result
+    try {
+        let session_id: string = res.locals.shopify.session.id;
+        mysqlConnection.query('select * from products WHERE ?', {
+            session_id: session_id
+        }, function (err: any, result: any) {
+            if (err) throw err
+            res.status(200).send({
+                "status": true,
+                "message": "Data fetched!",
+                "data": result
+            });
         });
-    });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
 });
 
 // Get product by id
 app.get("/api/get-product/:id", (req: Request, res: Response) => {
-    let query_1: string = `SELECT * FROM products WHERE id=${req.params.id} LIMIT 1`;
-    var data: any = [];
-    mysqlConnection.query(query_1, function (err: any, result_1: any) {
-        if (err) throw err;
-        if (result_1.length > 0) {
-            let query_2: string = `SELECT * FROM product_mappings WHERE product_id=${req.params.id}`;
-            data.push(result_1[0]);
-            mysqlConnection.query(query_2, function (err: any, result_2: any) {
-                if (err) throw err;
-                if (result_2.length > 0) {
-                    data[0].product_map = result_2;
-                }
-                res.status(200).send({
-                    "status": true,
-                    "message": "Data fetchedss",
-                    "data": data
+    try {
+        let query_1: string = `SELECT * FROM products WHERE id=${req.params.id} LIMIT 1`;
+        var data: any = [];
+        mysqlConnection.query(query_1, function (err: any, result_1: any) {
+            if (err) throw err;
+            if (result_1.length > 0) {
+                let query_2: string = `SELECT * FROM product_mappings WHERE product_id=${req.params.id}`;
+                data.push(result_1[0]);
+                mysqlConnection.query(query_2, function (err: any, result_2: any) {
+                    if (err) throw err;
+                    if (result_2.length > 0) {
+                        data[0].product_map = result_2;
+                    }
+                    res.status(200).send({
+                        "status": true,
+                        "message": "Data fetchedss",
+                        "data": data
+                    });
                 });
-            });
-        } else {
-            res.status(404).send({
-                "status": true,
-                "message": `Invalid product id ${req.params.id}`,
-                "data": [],
-            });
-        }
-    });
+            } else {
+                res.status(404).send({
+                    "status": true,
+                    "message": `Invalid product id ${req.params.id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
 });
 
 // Delete map-product by id
 app.delete("/api/delete-map-product/:id", async (req: Request, res: Response) => {
-    let query: string = `DELETE FROM product_mappings WHERE id=${req.params.id}`;
-    console.log('query',query)
-    mysqlConnection.query(query, function (error: any, results: any) {
-        if (error) throw error;
-        if (results.affectedRows > 0) {
-            res.status(200).send({
-                "status": true,
-                "message": "Deleted success!",
-                "data": results
-            });
-        } else {
-            res.status(404).send({
-                "status": true,
-                "message": `Invalid product map id ${req.params.id}`,
-                "data": [],
-            });
-        }
-    });
+    try {
+        let query: string = `DELETE FROM product_mappings WHERE id=${req.params.id}`;
+        console.log('query', query)
+        mysqlConnection.query(query, function (error: any, results: any) {
+            if (error) throw error;
+            if (results.affectedRows > 0) {
+                res.status(200).send({
+                    "status": true,
+                    "message": "Deleted success!",
+                    "data": results
+                });
+            } else {
+                res.status(404).send({
+                    "status": true,
+                    "message": `Invalid product map id ${req.params.id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
 });
 
 // Mapped product
@@ -590,10 +710,10 @@ app.post("/api/map-product/:id", upload.single('image'), async (req: Request, re
                 });
             }
         });
-    } catch (e: any) {
+    } catch (error: any) {
         res.status(404).send({
             "status": true,
-            "message": e.message,
+            "message": "Something went wrong!",
             "data": []
         });
     }
@@ -602,9 +722,9 @@ app.post("/api/map-product/:id", upload.single('image'), async (req: Request, re
 
 // Mapped product from front side
 app.post("/api/map-product-front-side/:id", upload.single('image'), async (req: Request, res: Response) => {
-    let image: any = await req.file;
-    let uploadedFilePath: string = image.path;
     try {
+        let image: any = await req.file;
+        let uploadedFilePath: string = image.path;
         let is_mapped: number = 1;
         let front_look_name: string = req.body.front_look_name;
         let front_image: string = uploadedFilePath;
@@ -647,10 +767,10 @@ app.post("/api/map-product-front-side/:id", upload.single('image'), async (req: 
                 });
             }
         });
-    } catch (e: any) {
+    } catch (error: any) {
         res.status(404).send({
             "status": true,
-            "message": e.message,
+            "message": "Something went wrong!",
             "data": []
         });
     }
@@ -658,9 +778,9 @@ app.post("/api/map-product-front-side/:id", upload.single('image'), async (req: 
 
 // Mapped product from back side
 app.post("/api/map-product-back-side/:id", upload.single('image'), async (req: Request, res: Response) => {
-    let image: any = await req.file;
-    let uploadedFilePath: string = image.path;
     try {
+        let image: any = await req.file;
+        let uploadedFilePath: string = image.path;
         let is_mapped: number = 1;
         let back_look_name: string = req.body.back_look_name;
         let back_image: string = uploadedFilePath;
@@ -703,10 +823,10 @@ app.post("/api/map-product-back-side/:id", upload.single('image'), async (req: R
                 });
             }
         });
-    } catch (e: any) {
+    } catch (error: any) {
         res.status(404).send({
             "status": true,
-            "message": e.message,
+            "message": "Something went wrong!",
             "data": []
         });
     }
@@ -714,9 +834,9 @@ app.post("/api/map-product-back-side/:id", upload.single('image'), async (req: R
 
 // Mapped product from left side
 app.post("/api/map-product-left-side/:id", upload.single('image'), async (req: Request, res: Response) => {
-    let image: any = await req.file;
-    let uploadedFilePath: string = image.path;
     try {
+        let image: any = await req.file;
+        let uploadedFilePath: string = image.path;
         let is_mapped: number = 1;
         let left_look_name: string = req.body.left_look_name;
         let left_image: string = uploadedFilePath;
@@ -759,10 +879,10 @@ app.post("/api/map-product-left-side/:id", upload.single('image'), async (req: R
                 });
             }
         });
-    } catch (e: any) {
+    } catch (error: any) {
         res.status(404).send({
             "status": true,
-            "message": e.message,
+            "message": "Something went wrong!",
             "data": []
         });
     }
@@ -770,9 +890,9 @@ app.post("/api/map-product-left-side/:id", upload.single('image'), async (req: R
 
 // Mapped product from right side
 app.post("/api/map-product-right-side/:id", upload.single('image'), async (req: Request, res: Response) => {
-    let image: any = await req.file;
-    let uploadedFilePath: string = image.path;
     try {
+        let image: any = await req.file;
+        let uploadedFilePath: string = image.path;
         let is_mapped: number = 1;
         let right_look_name: string = req.body.right_look_name;
         let right_image: string = uploadedFilePath;
@@ -815,10 +935,10 @@ app.post("/api/map-product-right-side/:id", upload.single('image'), async (req: 
                 });
             }
         });
-    } catch (e: any) {
+    } catch (error: any) {
         res.status(404).send({
             "status": true,
-            "message": e.message,
+            "message": "Something went wrong!",
             "data": []
         });
     }
@@ -826,23 +946,31 @@ app.post("/api/map-product-right-side/:id", upload.single('image'), async (req: 
 
 // Delete setting by id
 app.delete("/api/delete-product/:id", (req: Request, res: Response) => {
-    let query: string = `DELETE FROM products WHERE id=${req.params.id}`;
-    mysqlConnection.query(query, function (error: any, results: any, fields: any) {
-        if (error) throw error;
-        if (results.affectedRows > 0) {
-            res.status(200).send({
-                "status": true,
-                "message": "Deleted success!",
-                "data": results
-            });
-        } else {
-            res.status(404).send({
-                "status": true,
-                "message": `Invalid product id ${req.params.id}`,
-                "data": [],
-            });
-        }
-    });
+    try {
+        let query: string = `DELETE FROM products WHERE id=${req.params.id}`;
+        mysqlConnection.query(query, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            if (results.affectedRows > 0) {
+                res.status(200).send({
+                    "status": true,
+                    "message": "Deleted success!",
+                    "data": results
+                });
+            } else {
+                res.status(404).send({
+                    "status": true,
+                    "message": `Invalid product id ${req.params.id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
 });
 
 // Create Text Setting
@@ -865,10 +993,10 @@ app.post("/api/create-text-setting", (req: Request, res: Response) => {
                 "data": results
             });
         });
-    } catch (e: any) {
-        res.status(500).send({
-            "status": false,
-            "message": e.message,
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
             "data": []
         });
     }
@@ -886,10 +1014,10 @@ app.get("/api/get-text-setting", (req: Request, res: Response) => {
                 "data": results
             });
         });
-    } catch (e: any) {
+    } catch (error: any) {
         res.status(404).send({
-            "status": false,
-            "message": e.message,
+            "status": true,
+            "message": "Something went wrong!",
             "data": []
         });
     }
@@ -897,23 +1025,32 @@ app.get("/api/get-text-setting", (req: Request, res: Response) => {
 
 // Delete Text Setting by id
 app.delete("/api/delete-text-setting/:id", (req: Request, res: Response) => {
-    let query: string = `DELETE FROM text_settings WHERE id=${req.params.id}`;
-    mysqlConnection.query(query, function (error: any, results: any, fields: any) {
-        if (error) throw error;
-        if (results.affectedRows > 0) {
-            res.status(200).send({
-                "status": true,
-                "message": "Deleted success!",
-                "data": results
-            });
-        } else {
-            res.status(404).send({
-                "status": true,
-                "message": `Invalid text setting id ${req.params.id}`,
-                "data": [],
-            });
-        }
-    });
+    try {
+        let query: string = `DELETE FROM text_settings WHERE id=${req.params.id}`;
+        mysqlConnection.query(query, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            if (results.affectedRows > 0) {
+                res.status(200).send({
+                    "status": true,
+                    "message": "Deleted success!",
+                    "data": results
+                });
+            } else {
+                res.status(404).send({
+                    "status": true,
+                    "message": `Invalid text setting id ${req.params.id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": true,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
+
 });
 
 // ...................................
