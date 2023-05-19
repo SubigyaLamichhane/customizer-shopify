@@ -488,9 +488,25 @@ function changeProductVariant(val){
 
 
 
-// Outline thickness slider
+
 
 document.addEventListener("DOMContentLoaded", function () {
+
+	// Text Rotation slider
+	window.textRotationSlider = document.getElementById('rotatTextRangeSlide');
+      noUiSlider.create(window.textRotationSlider, {
+        range: {
+          min: -180,
+          max: 180
+        },
+        start: [0],
+        step: 1,
+      });
+      window.textRotationSlider.noUiSlider.on('change', function (values, handle) {
+	    changeInputValue(parseInt(values[0]))
+	  });
+
+	// text Outline thickness slider
       window.clickPipsSlider = document.getElementById('textOutlineSlideThickness');
       noUiSlider.create(window.clickPipsSlider, {
         range: {
@@ -516,5 +532,36 @@ document.addEventListener("DOMContentLoaded", function () {
 	    $("#textOutlineThickness").val(parseInt(values[0]));
 	    var selected_color = $(".color_box>input[name='text_outline_input']:checked").attr('data-color-code');
 	    changeTextOutlineThick();
+	  });
+
+
+
+	  // Art Rotation slider
+	window.artRotationSlider = document.getElementById('rotatArtRangeSlide');
+      noUiSlider.create(window.artRotationSlider, {
+        range: {
+          min: -180,
+          max: 180
+        },
+        start: [0],
+        step: 1,
+      });
+      window.artRotationSlider.noUiSlider.on('change', function (values, handle) {
+	    changeArtInputValue(parseInt(values[0]))
+	  });
+
+	  // Image Rotation slider
+	window.imageRotationSlider = document.getElementById('rotatImageRangeSlide');
+      noUiSlider.create(window.imageRotationSlider, {
+        range: {
+          min: -180,
+          max: 180
+        },
+        start: [0],
+        step: 1,
+      });
+     
+      window.imageRotationSlider.noUiSlider.on('change', function (values, handle) {
+	    changeImageInputValue(parseInt(values[0]))
 	  });
 });

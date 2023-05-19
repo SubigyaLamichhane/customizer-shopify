@@ -1,3 +1,5 @@
+var API_URL = 'http://staging.whattocookai.com:8080';
+var zoomOption = false;
 var front_canvas = new fabric.Canvas('front-canvas', {
     fireRightClick: true,
     stopContextMenu: true,
@@ -56,7 +58,7 @@ var canvas_padding = 20; // canvas padding like 50 = 25 for left + 25 for right(
         height: frontbgHeight,
         fill: 'transparent',
         stroke: '#cacaca',
-        strokeWidth: 1
+        strokeWidth: 0
     });
 
     var backbgRect = new fabric.Rect({
@@ -66,7 +68,7 @@ var canvas_padding = 20; // canvas padding like 50 = 25 for left + 25 for right(
         height: backbgHeight,
         fill: 'transparent',
         stroke: '#cacaca',
-        strokeWidth: 1
+        strokeWidth: 0
     });
 
     var leftbgRect = new fabric.Rect({
@@ -76,7 +78,7 @@ var canvas_padding = 20; // canvas padding like 50 = 25 for left + 25 for right(
         height: leftSlvbgHeight,
         fill: 'transparent',
         stroke: '#cacaca',
-        strokeWidth: 1
+        strokeWidth: 0
     });
 
     var rightbgRect = new fabric.Rect({
@@ -86,7 +88,7 @@ var canvas_padding = 20; // canvas padding like 50 = 25 for left + 25 for right(
         height: rightSlvbgHeight,
         fill: 'transparent',
         stroke: '#cacaca',
-        strokeWidth: 1
+        strokeWidth: 0
     });
     
 // Add the background rectangle to the canvas
@@ -109,20 +111,31 @@ CANVAS_HEIGHT = maxY;
 
 window.addEventListener('resize', resizeCanvas, false);
 function resizeCanvas() {
-    console.log("function called");
+    // console.log("function called");
     var imgWidth = $('#customiserImage').width();
     var imgHeight = $('#customiserImage').height();
-    var canvasWidth = imgWidth*55/100;
-    var canvasHeight = imgHeight*70/100;
-    console.log(" canvas width : ",canvasWidth, " | height : ",canvasHeight );
 
-    var bgWidth = canvasWidth-(canvasWidth*canvas_padding)/100;
-    var bgHeight = canvasHeight-(canvasHeight*canvas_padding)/100;
+    let canvas_view_type = $('.canvas_view_input[name="canvas_view_type"]:checked').attr('view_type');
+    if(canvas_view_type == 'left' || canvas_view_type == 'right'){
+      var canvasWidth = imgWidth*30/100;
+      var canvasHeight = imgHeight*35/100;
+    }else{
+      var canvasWidth = imgWidth*55/100;
+      var canvasHeight = imgHeight*70/100;
+    }
+
+    
+    // console.log(" canvas width : ",canvasWidth, " | height : ",canvasHeight );
+    var width_outer_space = (canvasWidth*canvas_padding)/100;
+    var height_outer_space = (canvasHeight*canvas_padding)/100;
+
+    var bgWidth = canvasWidth-width_outer_space;
+    var bgHeight = canvasHeight-height_outer_space;
 
     // let bgLeft = canvas_padding / 2;
     // let bgTop = canvas_padding / 2;
-    bgLeft = ((canvasWidth*canvas_padding)/100) / 2;
-    bgTop = ((canvasHeight*canvas_padding)/100) / 2;
+    bgLeft = width_outer_space / 2;
+    bgTop = height_outer_space / 2;
 
     minX = bgLeft;
     maxX = bgLeft+bgWidth;
@@ -130,6 +143,8 @@ function resizeCanvas() {
     maxY = bgTop+bgHeight;
     CANVAS_WIDTH = maxX;
     CANVAS_HEIGHT = maxY;
+
+    // console.log("bgLeft : ", bgLeft, " | bgTOP :", bgTop,  " | minx : ",minX, " | maxX :", maxX, " | minY : ", minY, " | maxY : ", maxY, " | canvas-width :", CANVAS_WIDTH, " | canvas-height : ", CANVAS_HEIGHT);
 
     canvas.setHeight(canvasHeight);
     canvas.setWidth(canvasWidth);
@@ -139,17 +154,20 @@ function resizeCanvas() {
         left:bgLeft,
         top:bgTop
     });
+    // fireEvents();
+    setAllObjects();
     canvas.renderAll();
 }
 
 
 // Change canvas type like :- [front, back, right, left]
 function changeCanvasType(type) {
-    console.log("canvas type => ", type);
+    // console.log("canvas type => ", type);
     var variant_val = $('.prd_color_box input[name="product_color"]:checked').attr('data-variant-name');
     var selected_variant_img = $('.product_variant[data-variant="'+variant_val+'"][data-style="'+type+'"]').attr('data-src');
     $('#customiserImage').attr('src', selected_variant_img);
     $('.custom_canvas').css('display','none');
+    $('.drawing-area').css({"top":"45%","left":"50%"});
     if(type == 'back'){
         $('#backCanvasWrap').css('display','block');
         minX = backbgRect.left;
@@ -160,9 +178,10 @@ function changeCanvasType(type) {
         CANVAS_HEIGHT = maxY;
         canvas = back_canvas;
         fireEvents();
-        // resizeCanvas();
+        resizeCanvas();
         // canvas.calcOffset();
     }else if(type == 'right'){
+      $('#rightCanvasWrap').parent('.drawing-area').css({"top":"48%","left":"46%"});
         $('#rightCanvasWrap').css('display','block');
         minX = rightbgRect.left;
         maxX = rightbgRect.left+rightbgRect.width;
@@ -171,9 +190,10 @@ function changeCanvasType(type) {
         CANVAS_WIDTH = maxX;
         CANVAS_HEIGHT = maxY;
         canvas = right_canvas;
-        fireEvents();
-        // resizeCanvas();
+        fireEvents(); 
+        resizeCanvas();
     }else if(type =='left'){
+        $('#leftCanvasWrap').parent('.drawing-area').css({"top":"48%","left":"54%"});
         $('#leftCanvasWrap').css('display','block');
         minX = leftbgRect.left;
         maxX = leftbgRect.left+leftbgRect.width;
@@ -183,7 +203,7 @@ function changeCanvasType(type) {
         CANVAS_HEIGHT = maxY;
         canvas = left_canvas;
         fireEvents();
-        // resizeCanvas();
+        resizeCanvas();
     }else{
         $('#frontCanvasWrap').css('display','block');
         minX = frontbgRect.left;
@@ -194,10 +214,15 @@ function changeCanvasType(type) {
         CANVAS_HEIGHT = maxY;
         canvas = front_canvas;
         fireEvents();
-        // resizeCanvas();
+        resizeCanvas();
     }
     ChooseSettingtab('', 'defaultSettings');
     canvas.discardActiveObject();
+
+    // if(zoomOption == true){
+    //   zoomIn();
+    // }
+
     canvas.renderAll();
 }
 
@@ -264,7 +289,7 @@ var redoRight = [];
         myCustomProperties.push("scaleToHeight");
         myCustomProperties.push("scaleToWidth");
         var myCustomJson = canvas.toJSON(myCustomProperties);
-        console.log(JSON.stringify(myCustomJson))
+        // console.log(JSON.stringify(myCustomJson))
         state = JSON.stringify(myCustomJson);
 
           if(canvas_view_type == 'back'){
@@ -284,9 +309,9 @@ var redoRight = [];
             undoFront = undo;
             redoFront = redo;
           }
-          // console.log("Undo val => ", undo);
-          // console.log("Redo val => ", redo);
-          console.log("canvas val => ", state);
+          // // console.log("Undo val => ", undo);
+          // // console.log("Redo val => ", redo);
+          // console.log("canvas val => ", state);
       
 
     }
@@ -302,9 +327,9 @@ var redoRight = [];
         state = frontState;
       }
 
-      // console.log("On click Undo val => ", playStack);
-      // console.log("On click Redo val => ", saveStack);
-      // console.log("On click canvas val => ", state);
+      // // console.log("On click Undo val => ", playStack);
+      // // console.log("On click Redo val => ", saveStack);
+      // // console.log("On click canvas val => ", state);
 
       saveStack.push(state);
       state = playStack.pop();
@@ -314,7 +339,7 @@ var redoRight = [];
       on.prop('disabled', true);
       off.prop('disabled', true);
       canvas.clear();
-      console.log("json state val => ", state);
+      // console.log("json state val => ", state);
       canvas.loadFromJSON(state, function() {
         canvas.renderAll();
         // now turn the buttons back on if applicable
@@ -334,13 +359,13 @@ var redoRight = [];
         frontState = state;
       }
 
-      // console.log("After click Undo val => ", playStack);
-      // console.log("After click Redo val => ", saveStack);
-      // console.log("After click canvas val => ", state);
+      // // console.log("After click Undo val => ", playStack);
+      // // console.log("After click Redo val => ", saveStack);
+      // // console.log("After click canvas val => ", state);
     }
     // undo and redo buttons
     $('#undo').click(function() {
-        console.log("click undo");
+        // console.log("click undo");
 
       let canvas_view_type = $('.canvas_view_input[name="canvas_view_type"]:checked').attr('view_type');
       if(canvas_view_type == 'back'){
@@ -364,7 +389,7 @@ var redoRight = [];
         replay(undo, redo, '#redo', this);
     });
     $('#redo').click(function() {
-        console.log("click redo");
+        // console.log("click redo");
         let canvas_view_type = $('.canvas_view_input[name="canvas_view_type"]:checked').attr('view_type');
           if(canvas_view_type == 'back'){
             state = backState;
@@ -467,7 +492,8 @@ fabric.Textbox.prototype.controls.br = new fabric.Control({
 function deleteObject(eventData, transform){
   var target = transform.target;
   var canvas = target.canvas;
-  canvas.remove(target);
+  // canvas.remove(target);
+  Delete();
   canvas.requestRenderAll();
   $('.top_layer').css("display","block");
   $('.child_layer').css("display","none");
@@ -486,9 +512,43 @@ function renderIcon(icon) {
 
 // delete object code END
 
+
+function setAllObjects(){
+
+  var objArr = canvas.getObjects();
+  for(var a=0; a<objArr.length;a++){
+
+    objArr[a].setCoords(); 
+
+    if(objArr[a].getBoundingRect().top < minY || objArr[a].getBoundingRect().left < minX){
+        objArr[a].top = Math.max(objArr[a].top, objArr[a].top-objArr[a].getBoundingRect().top+minY);
+        objArr[a].left = Math.max(objArr[a].left, objArr[a].left-objArr[a].getBoundingRect().left+minX);
+        if(objArr[a].top < minY){
+            objArr[a].top = minY;
+        }
+        if(objArr[a].left < minX){
+            objArr[a].left = minX;
+        }
+    }
+
+    if(objArr[a].getBoundingRect().top+objArr[a].getBoundingRect().height  > CANVAS_HEIGHT || objArr[a].getBoundingRect().left+objArr[a].getBoundingRect().width  > CANVAS_WIDTH){
+        objArr[a].top = Math.min(objArr[a].top, CANVAS_HEIGHT-objArr[a].getBoundingRect().height+objArr[a].top-objArr[a].getBoundingRect().top);
+        objArr[a].left = Math.min(objArr[a].left, CANVAS_WIDTH-objArr[a].getBoundingRect().width+objArr[a].left-objArr[a].getBoundingRect().left);
+    }
+
+    // if(objArr[a].top < minY){
+    //   objArr[a].top = minY;
+    // }
+    // if(objArr[a].left < minX){
+    //   objArr[a].left = minX;
+    // }
+  }
+}
+
+
 // function for text resize when object width is greater than canvas
 function fitToObject(event) {
-    console.log("Call fit to object function")
+    // console.log("Call fit to object function")
    var obj = event;
 
     if(obj.object_type == 'text'){
@@ -500,18 +560,18 @@ function fitToObject(event) {
         // }else{
         //     canvas_space_width = 0;
         // }
-        console.log("canvas space => ", canvas_space_width);
-        console.log("canvas => scale to width : ",  obj.scaleToWidth , " | width " , (CANVAS_WIDTH-minX) , " | height : ", obj.scaleToHeight, " | ", parseInt(obj.scaleToWidth) > parseInt(CANVAS_WIDTH-minX) )
+        // console.log("canvas space => ", canvas_space_width);
+        // console.log("canvas => scale to width : ",  obj.scaleToWidth , " | width " , (CANVAS_WIDTH-minX) , " | height : ", obj.scaleToHeight, " | ", parseInt(obj.scaleToWidth) > parseInt(CANVAS_WIDTH-minX) )
         if(parseFloat(obj.scaleToWidth) > parseFloat(CANVAS_WIDTH-minX)){
             var font_size = obj.text_font_size;
             var text_val = obj.text;
             var font_family = obj.text_font_family;
             // var tempData = $.measureText(text_val, {fontFamily:font_family, fontSize:parseFloat(font_size)});
-            // console.log("canvas => temp to width : ",  tempData.width , " | width " , parseFloat(CANVAS_WIDTH-minX-canvas_space_width), " | font_size ", font_size );
+            // // console.log("canvas => temp to width : ",  tempData.width , " | width " , parseFloat(CANVAS_WIDTH-minX-canvas_space_width), " | font_size ", font_size );
             // if(tempData.width > parseFloat(CANVAS_WIDTH-minX-canvas_space_width)){
             //         var text_width = tempData.width;
             //         while(text_width > (CANVAS_WIDTH-minX-canvas_space_width)){
-            //             console.log('text width : ', text_width , " | canvas width : ", (CANVAS_WIDTH-minX-canvas_space_width), " | font size : ", font_size);
+            //             // console.log('text width : ', text_width , " | canvas width : ", (CANVAS_WIDTH-minX-canvas_space_width), " | font size : ", font_size);
             //             font_size = font_size-0.1;
             //             var updateData = $.measureText(text_val, {fontFamily: font_family, fontSize:font_size});
             //             text_width = updateData.width;
@@ -519,9 +579,9 @@ function fitToObject(event) {
             // }
 
             $.ajax({
-              url: "http://customizer.sketchthemes.com:8080/testing.php?text="+obj.text+"&effect="+obj.text_effect+"&font_color="+obj.text_color.replace("#","")+"&font_size="+obj.text_font_size+"&font_width="+parseFloat(obj.scaleToWidth).toFixed(2)+","+parseFloat(newWidth).toFixed(2)+"&font_height="+parseFloat(obj.scaleToHeight).toFixed(2)+","+parseFloat(newHeight).toFixed(2)+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+obj.text_font_family+"&outline_color="+obj.outline_color.replace("#","")+"&outline_width="+obj.outline_width,
+              url: API_URL+"/textGenerate.php?text="+obj.text+"&effect="+obj.text_effect+"&font_color="+obj.text_color.replace("#","")+"&font_size="+obj.text_font_size+"&font_width="+parseFloat(obj.scaleToWidth).toFixed(2)+","+parseFloat(newWidth).toFixed(2)+"&font_height="+parseFloat(obj.scaleToHeight).toFixed(2)+","+parseFloat(newHeight).toFixed(2)+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+obj.text_font_family+"&outline_color="+obj.outline_color.replace("#","")+"&outline_width="+obj.outline_width,
 
-              // url: "http://customizer.sketchthemes.com:8080/testing.php?text="+text_val+"&effect="+obj.text_effect+"&font_color="+obj.text_color.replace("#","")+"&font_size="+font_size+"&fontName="+obj.text_font_family+"&outline_color="+obj.outline_color.replace("#","")+"&outline_width="+obj.outline_width,
+              // url: API_URL+"/textGenerate.php?text="+text_val+"&effect="+obj.text_effect+"&font_color="+obj.text_color.replace("#","")+"&font_size="+font_size+"&fontName="+obj.text_font_family+"&outline_color="+obj.outline_color.replace("#","")+"&outline_width="+obj.outline_width,
               xhrFields: {
                 responseType: 'blob'
               },
@@ -549,7 +609,7 @@ function fitToObject(event) {
                 }, 200)
               },
               error: function (jqXhr, textStatus, errorMessage) {
-                console.log("Error => ",errorMessage);
+                // console.log("Error => ",errorMessage);
                 $('.customiseLoader').css("display","none");
               }
             })    
@@ -561,7 +621,7 @@ function fitToObject(event) {
             $('.customiseLoader').css("display","none"); 
         }
    }
-   console.log("End fit to object Function!");
+   // console.log("End fit to object Function!");
 }
 
 // function for object can not go outside of canvas mark
@@ -599,9 +659,9 @@ function objectMouseDown(obj_target){
     if (obj_target.object_type == 'text') {
 
         let tempData = $.measureText(obj_target.text, {fontFamily:obj_target.text_font_family, fontSize:parseFloat(obj_target.text_font_size)});
-        console.log('Text => ', obj_target.text, " | font family ", obj_target.text_font_family, " | font size ", obj_target.text_font_size);
-        console.log('Temporary data => ', tempData);
-        console.log('Text object was clicked! ', obj_target);
+        // console.log('Text => ', obj_target.text, " | font family ", obj_target.text_font_family, " | font size ", obj_target.text_font_size);
+        // console.log('Temporary data => ', tempData);
+        // console.log('Text object was clicked! ', obj_target);
 
         // editTextFunction(options.target);
         $('.ct_content_tab').removeClass("active_tab");
@@ -645,7 +705,8 @@ function objectMouseDown(obj_target){
 
         // $('.selected_outline_name').text(obj_target.outline_color_name);
 
-        $('#rotatTextRangeSlide').val(obj_target.angle);
+        // $('#rotatTextRangeSlide').val(obj_target.angle);
+        window.textRotationSlider.noUiSlider.set(obj_target.angle);
         $('#rotatTextNumber').val(obj_target.angle);
 
         $('#textFontSize').val(parseFloat(obj_target.text_font_size).toFixed(1));
@@ -660,12 +721,13 @@ function objectMouseDown(obj_target){
     }
 
     if (obj_target.object_type == 'art') {
-        console.log('Art object was clicked! ', obj_target);
-        console.log(" Width => ", obj_target.scaleToWidth);
-        console.log(" height => ", obj_target.scaleToHeight);
+        // console.log('Art object was clicked! ', obj_target);
+        // console.log(" Width => ", obj_target.scaleToWidth);
+        // console.log(" height => ", obj_target.scaleToHeight);
         $("#artWidth").val(parseFloat(obj_target.scaleToWidth).toFixed(2));
         $("#artHeight").val(parseFloat(obj_target.scaleToHeight).toFixed(2));
-        document.getElementById("rotatArtRangeSlide").value = obj_target.angle;
+        // document.getElementById("rotatArtRangeSlide").value = obj_target.angle;
+        window.artRotationSlider.noUiSlider.set(obj_target.angle);
         document.getElementById("rotatArtNumber").value = obj_target.angle;
 
         // editTextFunction(options.target);
@@ -682,12 +744,13 @@ function objectMouseDown(obj_target){
     }
 
     if(obj_target.object_type == 'image') {
-        console.log('Image object was clicked! ', obj_target);
-        console.log(" Width => ", obj_target.scaleToWidth);
-        console.log(" height => ", obj_target.scaleToHeight);
+        // console.log('Image object was clicked! ', obj_target);
+        // console.log(" Width => ", obj_target.scaleToWidth);
+        // console.log(" height => ", obj_target.scaleToHeight);
          $("#imageWidth").val(parseFloat(obj_target.scaleToWidth).toFixed(2));
         $("#imageHeight").val(parseFloat(obj_target.scaleToHeight).toFixed(2));
-        document.getElementById("rotatImageRangeSlide").value = obj_target.angle;
+        // document.getElementById("rotatImageRangeSlide").value = obj_target.angle;
+        window.imageRotationSlider.noUiSlider.set(obj_target.angle);
         document.getElementById("rotatImageNumber").value = obj_target.angle;
         // editTextFunction(options.target);
         $('.ct_content_tab').removeClass("active_tab");
@@ -714,6 +777,31 @@ function objectMouseDown(obj_target){
   }
 }
 
+
+ // all object selection function
+
+ function selectAllObject(){
+  if(canvas.getObjects().length > 0){
+     var selection = new fabric.ActiveSelection(canvas.getObjects(), {
+      canvas: canvas });
+    canvas.setActiveObject(selection).renderAll();
+    if(canvas.getActiveObject()!=null && canvas.getActiveObjects().length > 1){
+          canvas.getActiveObject().setControlsVisibility({
+              tl: false,
+              bl: false,
+              tr: false,
+              br: true,
+              ml: false,
+              mb: false,
+              mr: false,
+              mt: false,
+              mtr: false
+          });
+          canvas.renderAll();
+      }
+    }
+ } 
+
 //function fire event start this function will call whenever we change canvas type(front, back)
 function fireEvents(){
 
@@ -734,30 +822,65 @@ canvas.on('mouse:down', function(options) {
   
   //  Show context menu when click on right button of mouse
   if(options.e.button === 2) {
-        var top_pos = options.e.layerY + 10;
-        var left_pos = options.e.layerX + 10;
+    // console.log("object target => ", options.e);
+        var top_pos = options.e.offsetY + 10;
+        var left_pos = options.e.offsetX + 10;
         $('.context_menu_wrap').css({"display":"block", "top": top_pos, "left": left_pos});
     }else{
         $('.context_menu_wrap').css("display","none");
+        if(canvas.getActiveObject()!=null && canvas.getActiveObjects().length > 1){
+          canvas.getActiveObject().setControlsVisibility({
+              tl: false,
+              bl: false,
+              tr: false,
+              br: true,
+              ml: false,
+              mb: false,
+              mr: false,
+              mt: false,
+              mtr: false
+          });
+          canvas.renderAll();
+        }
     }
+});
+canvas.on('selection:created', function(options) {
+    if(canvas.getActiveObject()!=null && canvas.getActiveObjects().length > 1){
+          canvas.getActiveObject().setControlsVisibility({
+              tl: false,
+              bl: false,
+              tr: false,
+              br: true,
+              ml: false,
+              mb: false,
+              mr: false,
+              mt: false,
+              mtr: false
+          });
+          canvas.renderAll();
+        }
 });
 
 // function work when object move
 canvas.on('object:moving', function(e) {
+    canvas.backgroundImage.set({
+      strokeWidth:1
+    })
     var obj = e.target;
-
     if(obj.object_type == 'image'){
+      
         if(obj.scaleToHeight > CANVAS_HEIGHT || obj.scaleToWidth > CANVAS_WIDTH){
             return;
         }
     }else{
+      console.log(obj.height, CANVAS_HEIGHT, CANVAS_WIDTH)
         if(obj.height > CANVAS_HEIGHT || obj.width > CANVAS_WIDTH){
             return;
         }
     }
 
     
-
+// console.log(obj.getBoundingRect())
     obj.setCoords();   
     if(obj.getBoundingRect().top < minY || obj.getBoundingRect().left < minX){
         obj.top = Math.max(obj.top, obj.top-obj.getBoundingRect().top+minY);
@@ -785,8 +908,10 @@ var height1 = 0 ;
 
 // function work on object scaling
 canvas.on('object:scaling', function (e){
-
-    console.log("scaling => ", e.target.type);
+    canvas.backgroundImage.set({
+      strokeWidth:1
+    })
+    // console.log("scaling => ", e.target.type);
     // setObjectInside(e.target);
     // fitToObject(e.target);
     var obj = e.target;
@@ -887,16 +1012,18 @@ canvas.on('object:scaling', function (e){
 
 
 canvas.on('object:modified', function(event) {
-    console.log("modified");
+    // console.log("modified");
     if (event.target.object_type == 'text') {
         console.log(" data => ", event.target);
         var newWidth = (event.target.width * event.target.scaleX);
         var newHeight = (event.target.height * event.target.scaleY);
+        console.log("width => ", newWidth);
+        console.log("height => ", newHeight);
 
         // if(event.target.text_effect == 'curve'){
             if(parseFloat(event.target.scaleToWidth) !== parseFloat(newWidth)){
             $.ajax({
-              url: "http://customizer.sketchthemes.com:8080/testing.php?text="+event.target.text+"&effect="+event.target.text_effect+"&font_color="+event.target.text_color.replace("#","")+"&font_size="+event.target.text_font_size+"&font_width="+parseFloat(event.target.scaleToWidth).toFixed(2)+","+parseFloat(newWidth).toFixed(2)+"&font_height="+parseFloat(event.target.scaleToHeight).toFixed(2)+","+parseFloat(newHeight).toFixed(2)+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+event.target.text_font_family+"&outline_color="+event.target.outline_color.replace("#","")+"&outline_width="+event.target.outline_width,
+              url: API_URL+"/textGenerate.php?text="+event.target.text+"&effect="+event.target.text_effect+"&font_color="+event.target.text_color.replace("#","")+"&font_size="+event.target.text_font_size+"&font_width="+parseFloat(event.target.scaleToWidth).toFixed(2)+","+parseFloat(newWidth).toFixed(2)+"&font_height="+parseFloat(event.target.scaleToHeight).toFixed(2)+","+parseFloat(newHeight).toFixed(2)+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+event.target.text_font_family+"&outline_color="+event.target.outline_color.replace("#","")+"&outline_width="+event.target.outline_width,
               xhrFields: {
                 responseType: 'blob'
               },
@@ -904,8 +1031,8 @@ canvas.on('object:modified', function(event) {
                 $('.customiseLoader').css("display","flex");
               },
               success: function (img, status, xhr) {
-                console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
-                console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
+                // console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
+                // console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
                 $('#textFontSize').val(parseFloat(xhr.getResponseHeader('x-font-size')).toFixed(1));
                 event.target.set({
                         scaleToWidth:xhr.getResponseHeader('x-img-width'),
@@ -926,12 +1053,12 @@ canvas.on('object:modified', function(event) {
                     setObjectInside(event.target);
                     canvas.renderAll(); 
                     saveState()  // call this function for save object in undo redo
-                    console.log("called save state function !")
+                    // console.log("called save state function !")
                     $('.customiseLoader').css("display","none");
                 }, 200)
               },
               error: function (jqXhr, textStatus, errorMessage) {
-                console.log("Error => ",errorMessage);
+                // console.log("Error => ",errorMessage);
                 $('.customiseLoader').css("display","none");
               }
             }) 
@@ -942,10 +1069,11 @@ canvas.on('object:modified', function(event) {
     }else if (event.target.object_type == 'art') {
         var newWidth = (event.target.width * event.target.scaleX);
         var newHeight = (event.target.height * event.target.scaleY);
-        console.log("Image width :", newWidth , " | height : ", newHeight);
+        // console.log("Image width :", newWidth , " | height : ", newHeight);
         $("#artWidth").val(parseFloat(newWidth).toFixed(2));
         $("#artHeight").val(parseFloat(newHeight).toFixed(2));
-        document.getElementById("rotatArtRangeSlide").value = event.target.angle;
+        // document.getElementById("rotatArtRangeSlide").value = event.target.angle;
+        window.artRotationSlider.noUiSlider.set(event.target.angle);
         document.getElementById("rotatArtNumber").value = event.target.angle;
 
         event.target.set({
@@ -960,10 +1088,11 @@ canvas.on('object:modified', function(event) {
     }else if(event.target.object_type == 'image'){
         var newWidth = (event.target.width * event.target.scaleX);
         var newHeight = (event.target.height * event.target.scaleY);
-        console.log("Image width :", newWidth , " | height : ", newHeight);
+        // console.log("Image width :", newWidth , " | height : ", newHeight);
         $("#imageWidth").val(parseFloat(newWidth).toFixed(2));
         $("#imageHeight").val(parseFloat(newHeight).toFixed(2));
-        document.getElementById("rotatImageRangeSlide").value = event.target.angle;
+        // document.getElementById("rotatImageRangeSlide").value = event.target.angle;
+        window.imageRotationSlider.noUiSlider.set(event.target.angle);
         document.getElementById("rotatImageNumber").value = event.target.angle;
 
         event.target.set({
@@ -976,6 +1105,9 @@ canvas.on('object:modified', function(event) {
         })
         saveState()  // call this function for save object in undo redo
     }
+    canvas.backgroundImage.set({
+      strokeWidth:0
+    })
     
 });
 
@@ -1011,13 +1143,13 @@ $("#addTextContent").click(function(){
         var textWidth = tempData.width;
         var textHeight = tempData.height;
 
-        console.log(tempData)
+        // console.log(tempData)
         if(tempData.width > (CANVAS_WIDTH-minX-5)){
-            console.log("condition 1")
+            // console.log("condition 1")
             var text_width = tempData.width;
             var text_height = tempData.height;
             while (text_width > (CANVAS_WIDTH-minX-5)) {
-                console.log('text width : ', text_width , " | canvas width : ", (CANVAS_WIDTH-minX-5), " | font size : ", font_size);
+                // console.log('text width : ', text_width , " | canvas width : ", (CANVAS_WIDTH-minX-5), " | font size : ", font_size);
               font_size = font_size-1;
               var updateData = $.measureText(text_val, {fontFamily: "Abel", fontSize:font_size});
               text_width = updateData.width;
@@ -1028,7 +1160,7 @@ $("#addTextContent").click(function(){
         }
 
         $.ajax({
-          url: "http://customizer.sketchthemes.com:8080/testing.php?text="+text_val+"&effect=normal&font_color=000000&font_size="+font_size+"&fontName=Abel&outline_color=00000000&outline_width=2",
+          url: API_URL+"/textGenerate.php?text="+text_val+"&effect=normal&font_color=000000&font_size="+font_size+"&fontName=Abel&outline_color=00000000&outline_width=2",
           xhrFields: {
             responseType: 'blob'
           },
@@ -1036,8 +1168,11 @@ $("#addTextContent").click(function(){
             $('.customiseLoader').css("display","flex");
           },
           success: function (img, status, xhr) {
-            $('#textFontSize').val(parseFloat(font_size).toFixed(1));
+            $('#textFontSize').val(parseFloat(xhr.getResponseHeader('x-font-size')).toFixed(1));
                 fabric.Image.fromURL(window.URL.createObjectURL(img), function(img) {
+                  console.log("minx : ", minX, " | min Y : ", minY);
+                  // img.scaleToWidth(xhr.getResponseHeader('x-img-width'));
+                  // img.scaleToHeight(xhr.getResponseHeader('x-img-height'));
                     img.set({
                         scaleToWidth:xhr.getResponseHeader('x-img-width'),
                         scaleToHeight:xhr.getResponseHeader('x-img-height'),
@@ -1048,7 +1183,7 @@ $("#addTextContent").click(function(){
                         "text_effect":"normal",
                         "text_color": "#000000",
                         "text_color_name": "black",
-                        "text_font_size": font_size,
+                        "text_font_size": xhr.getResponseHeader('x-font-size'),
                         "text_font_family": "Abel",
                         "outline_color": "#00000000",
                         "outline_color_name": "None",
@@ -1079,7 +1214,7 @@ $("#addTextContent").click(function(){
                     });
                             
                     setTimeout(async function(){
-                        // console.log("Active obejct omg => ", img);
+                        console.log("Active obejct omg => ", img);
                         setObjectInside(img);
                         canvas.setActiveObject(img);
                         canvas.renderAll(); 
@@ -1089,7 +1224,7 @@ $("#addTextContent").click(function(){
                 });
               },
               error: function (jqXhr, textStatus, errorMessage) {
-                console.log("Error => ",errorMessage);
+                // console.log("Error => ",errorMessage);
                 $('.customiseLoader').css("display","none");
               }
 
@@ -1115,7 +1250,8 @@ $("#addTextContent").click(function(){
         window.clickPipsSlider.noUiSlider.set(2);
         // $('.selected_outline_name').text('None');
 
-        $('#rotatTextRangeSlide').val(0);
+        // $('#rotatTextRangeSlide').val(0);
+        window.textRotationSlider.noUiSlider.set(0);
         $('#rotatTextNumber').val(0);
 
 	    $("#textContent").val("");
@@ -1133,7 +1269,7 @@ $("#addTextContent").click(function(){
 $("#editTextContent").change(function(){
     let text_val = $(this).val().trim();
     text_val = text_val.replace(/\s+/g, " ");
-    console.log("value is => ", text_val);
+    // console.log("value is => ", text_val);
 
     let selectedObject = canvas.getActiveObject(); 
     var canvas_space_width = 0;
@@ -1149,7 +1285,7 @@ $("#editTextContent").change(function(){
             text_val = 'No Text';
             // var text_static_val = 'No Text';
             //     var noTextData = $.measureText(text_static_val, {fontFamily: selectedObject.fontFamily, fontSize:selectedObject.fontSize});
-            //     console.log('text width : ', noTextData.width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", selectedObject.fontSize);
+            //     // console.log('text width : ', noTextData.width , " | canvas width : ", CANVAS_WIDTH, " | font size : ", selectedObject.fontSize);
                
         }
         var font_size = parseFloat(selectedObject.text_font_size);
@@ -1157,7 +1293,7 @@ $("#editTextContent").change(function(){
         // if(selectedObject.text_effect == 'curve'){
 
             $.ajax({
-              url: "http://customizer.sketchthemes.com:8080/testing.php?text="+text_val+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+              url: API_URL+"/textGenerate.php?text="+text_val+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
               xhrFields: {
                 responseType: 'blob'
               },
@@ -1165,8 +1301,8 @@ $("#editTextContent").change(function(){
                 $('.customiseLoader').css("display","flex");
               },
               success: function (img, status, xhr) {
-                console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
-                console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
+                // console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
+                // console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
                 $('#textFontSize').val(parseFloat(xhr.getResponseHeader('x-font-size')).toFixed(1));
                 selectedObject.set({
                     scaleToWidth:xhr.getResponseHeader('x-img-width'),
@@ -1187,7 +1323,7 @@ $("#editTextContent").change(function(){
                 }, 200)
               },
               error: function (jqXhr, textStatus, errorMessage) {
-                console.log("Error => ",errorMessage);
+                // console.log("Error => ",errorMessage);
                 $('.customiseLoader').css("display","none");
               }
             }) 
@@ -1198,10 +1334,10 @@ $("#editTextContent").change(function(){
 
         // // selectedObject.set('text', text_val);  
         
-        // console.log('text width : ', tempData.width , " | canvas width : ", CANVAS_WIDTH-minX-canvas_space_width, " | font size : ", font_size);
+        // // console.log('text width : ', tempData.width , " | canvas width : ", CANVAS_WIDTH-minX-canvas_space_width, " | font size : ", font_size);
 
         // if(tempData.width > (CANVAS_WIDTH-minX-canvas_space_width)){
-        //     console.log("Width is greater than canvas width1")
+        //     // console.log("Width is greater than canvas width1")
         //     var text_width = tempData.width;
         //     while (text_width > (CANVAS_WIDTH-minX-canvas_space_width)){
                 
@@ -1213,7 +1349,7 @@ $("#editTextContent").change(function(){
 
 
         //     $.ajax({
-        //       url: "http://customizer.sketchthemes.com:8080/testing.php?text="+text_val+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+        //       url: API_URL+"/textGenerate.php?text="+text_val+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
         //       xhrFields: {
         //         responseType: 'blob'
         //       },
@@ -1240,7 +1376,7 @@ $("#editTextContent").change(function(){
         //         }, 200)
         //       },
         //       error: function (jqXhr, textStatus, errorMessage) {
-        //         console.log("Error => ",errorMessage);
+        //         // console.log("Error => ",errorMessage);
         //         $('.customiseLoader').css("display","none");
         //       }
         //     })         
@@ -1259,7 +1395,7 @@ const changeTextFont = async(font) => {
     // if(selectedObject.text_effect == 'curve'){
 
             $.ajax({
-              url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+font+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+              url: API_URL+"/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+font+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
               xhrFields: {
                 responseType: 'blob'
               },
@@ -1267,8 +1403,8 @@ const changeTextFont = async(font) => {
                 $('.customiseLoader').css("display","flex");
               },
               success: function (img, status, xhr) {
-                console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
-                console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
+                // console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
+                // console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
                 $('#textFontSize').val(parseFloat(xhr.getResponseHeader('x-font-size')).toFixed(1));
                 selectedObject.set({
                     scaleToWidth:xhr.getResponseHeader('x-img-width'),
@@ -1291,7 +1427,7 @@ const changeTextFont = async(font) => {
                 }, 200)
               },
               error: function (jqXhr, textStatus, errorMessage) {
-                console.log("Error => ",errorMessage);
+                // console.log("Error => ",errorMessage);
                 $('.customiseLoader').css("display","none");
               }
             }) 
@@ -1299,7 +1435,7 @@ const changeTextFont = async(font) => {
 //         }else{
 
 //     $.ajax({
-//       url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+font+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+//       url: API_URL+"/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+font+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
 //       xhrFields: {
 //         responseType: 'blob'
 //       },
@@ -1325,7 +1461,7 @@ const changeTextFont = async(font) => {
 //         }, 200)
 //       },
 //       error: function (jqXhr, textStatus, errorMessage) {
-//         console.log("Error => ",errorMessage);
+//         // console.log("Error => ",errorMessage);
 //         $('.customiseLoader').css("display","none");
 //       }
 //     })
@@ -1343,7 +1479,7 @@ const changeTextFont = async(font) => {
 function changeTextColor(color, name){
     var selectedObject = canvas.getActiveObject();
     $.ajax({
-      url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+      url: API_URL+"/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
       xhrFields: {
         responseType: 'blob'
       },
@@ -1363,7 +1499,7 @@ function changeTextColor(color, name){
         }, 200)
       },
       error: function (jqXhr, textStatus, errorMessage) {
-        console.log("Error => ",errorMessage);
+        // console.log("Error => ",errorMessage);
         $('.customiseLoader').css("display","none");
       }
     })
@@ -1380,7 +1516,8 @@ function changeRangeValue(val){
     }else if(angleValue<-181){
         angleValue = -180;
     }
-    document.getElementById("rotatTextRangeSlide").value = angleValue;
+    // document.getElementById("rotatTextRangeSlide").value = angleValue;
+     window.textRotationSlider.noUiSlider.set(angleValue);
     document.getElementById("rotatTextNumber").value = angleValue
     var selectedObject = canvas.getActiveObject();
     // selectedObject.set('angle', parseFloat(val));
@@ -1407,7 +1544,7 @@ function changeTxtOutlineColor(color, name){
     // if(selectedObject.text_effect == 'curve'){
         if(selectedObject != undefined){
             $.ajax({
-              url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+parseFloat(selectedObject.text_font_size)+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+color.replace("#","")+"&outline_width="+thickness_val,
+              url: API_URL+"/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+parseFloat(selectedObject.text_font_size)+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+color.replace("#","")+"&outline_width="+thickness_val,
               xhrFields: {
                 responseType: 'blob'
               },
@@ -1415,8 +1552,8 @@ function changeTxtOutlineColor(color, name){
                 $('.customiseLoader').css("display","flex");
               },
               success: function (img, status, xhr) {
-                console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
-                console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
+                // console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
+                // console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
                  // $('.selected_outline_name').text(name);
                 
 
@@ -1444,7 +1581,7 @@ function changeTxtOutlineColor(color, name){
                 }, 200)
               },
               error: function (jqXhr, textStatus, errorMessage) {
-                console.log("Error => ",errorMessage);
+                // console.log("Error => ",errorMessage);
                 $('.customiseLoader').css("display","none");
               }
             }) 
@@ -1454,7 +1591,7 @@ function changeTxtOutlineColor(color, name){
 
 
 //     $.ajax({
-//       url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+color.replace("#","")+"&outline_width="+thickness_val,
+//       url: API_URL+"/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color="+color.replace("#","")+"&outline_width="+thickness_val,
 //       xhrFields: {
 //         responseType: 'blob'
 //       },
@@ -1482,7 +1619,7 @@ function changeTxtOutlineColor(color, name){
 //         }, 200)
 //       },
 //       error: function (jqXhr, textStatus, errorMessage) {
-//         console.log("Error => ",errorMessage);
+//         // console.log("Error => ",errorMessage);
 //         $('.customiseLoader').css("display","none");
 //       }
 //     })      
@@ -1501,7 +1638,7 @@ function removeTxtOutline(){
     var selectedObject = canvas.getActiveObject();
 
     $.ajax({
-      url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color=00000000&outline_width="+1,
+      url: API_URL+"/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&fontName="+selectedObject.text_font_family+"&outline_color=00000000&outline_width="+1,
       xhrFields: {
         responseType: 'blob'
       },
@@ -1537,7 +1674,7 @@ function removeTxtOutline(){
         }, 200)
       },
       error: function (jqXhr, textStatus, errorMessage) {
-        console.log("Error => ",errorMessage);
+        // console.log("Error => ",errorMessage);
         $('.customiseLoader').css("display","none");
       }
     })
@@ -1553,13 +1690,13 @@ function removeTxtOutline(){
 
 function changeTextEffect(effect){
     $('.txt_shape_container').removeClass('active_shape');
-    console.log('type => ', effect)
+    // console.log('type => ', effect)
     var selectedObject = canvas.getActiveObject();
     var selected_shap = $('.selected_shape_name').text();
-    console.log('selected_shap => ', selected_shap)
+    // console.log('selected_shap => ', selected_shap)
     
     $.ajax({
-      url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+      url: API_URL+"/textGenerate.php?text="+selectedObject.text+"&effect="+effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+selectedObject.text_font_size+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
       xhrFields: {
         responseType: 'blob'
       },
@@ -1596,7 +1733,7 @@ function changeTextEffect(effect){
         }, 200)
       },
       error: function (jqXhr, textStatus, errorMessage) {
-        console.log("Error => ",errorMessage);
+        // console.log("Error => ",errorMessage);
         $('.customiseLoader').css("display","none");
       }
     })
@@ -1620,12 +1757,12 @@ function removeTxtShape(){
 function changeTxtFontSize(value){
     var selectedObject = canvas.getActiveObject();
     // var newData = $.measureText(selectedObject.text, {fontFamily: selectedObject.fontFamily, fontSize:Number(value)});
-    // console.log("MY DATA START--------");
-    // console.log(selectedObject.text)
-    // console.log(selectedObject.fontFamily)
-    // console.log(value)
-    // console.log(newData)
-    // console.log("MY DATA END--------");
+    // // console.log("MY DATA START--------");
+    // // console.log(selectedObject.text)
+    // // console.log(selectedObject.fontFamily)
+    // // console.log(value)
+    // // console.log(newData)
+    // // console.log("MY DATA END--------");
     // return true;
     if(value < 5){
         value = 5; 
@@ -1634,7 +1771,7 @@ function changeTxtFontSize(value){
     // if(selectedObject.text_effect == 'curve'){
 
             $.ajax({
-              url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+parseFloat(value)+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+              url: API_URL+"/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+parseFloat(value)+"&canvas_width="+parseFloat(CANVAS_WIDTH-minX).toFixed(2)+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
               xhrFields: {
                 responseType: 'blob'
               },
@@ -1642,8 +1779,8 @@ function changeTxtFontSize(value){
                 $('.customiseLoader').css("display","flex");
               },
               success: function (img, status, xhr) {
-                console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
-                console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
+                // console.log("XHR header response Width=> ", xhr.getResponseHeader('x-img-width'));
+                // console.log("XHR header response => Height", xhr.getResponseHeader('x-img-height'));
                 $('#textFontSize').val(parseFloat(xhr.getResponseHeader('x-font-size')).toFixed(1));
                 selectedObject.set({
                     scaleToWidth:xhr.getResponseHeader('x-img-width'),
@@ -1664,7 +1801,7 @@ function changeTxtFontSize(value){
                 }, 200)
               },
               error: function (jqXhr, textStatus, errorMessage) {
-                console.log("Error => ",errorMessage);
+                // console.log("Error => ",errorMessage);
                 $('.customiseLoader').css("display","none");
               }
             }) 
@@ -1672,7 +1809,7 @@ function changeTxtFontSize(value){
     //     }else{
 
     //     $.ajax({
-    //       url: "http://customizer.sketchthemes.com:8080/testing.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+value+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
+    //       url: API_URL+"/textGenerate.php?text="+selectedObject.text+"&effect="+selectedObject.text_effect+"&font_color="+selectedObject.text_color.replace("#","")+"&font_size="+value+"&fontName="+selectedObject.text_font_family+"&outline_color="+selectedObject.outline_color.replace("#","")+"&outline_width="+selectedObject.outline_width,
     //       xhrFields: {
     //         responseType: 'blob'
     //       },
@@ -1699,7 +1836,7 @@ function changeTxtFontSize(value){
     //         }, 200)
     //       },
     //       error: function (jqXhr, textStatus, errorMessage) {
-    //         console.log("Error => ",errorMessage);
+    //         // console.log("Error => ",errorMessage);
     //         $('.customiseLoader').css("display","none");
     //       }
     //     })   
@@ -1712,80 +1849,263 @@ function changeTxtFontSize(value){
 }
 
 // text horizontal center
-function centerTextObject(){
-    var selectedObject = canvas.getActiveObject();
-    // selectedObject.centerV();
-    selectedObject.centerH();
-}
+// function centerTextObject(){
+//     var selectedObject = canvas.getActiveObject();
+//     // selectedObject.centerV();
+//     selectedObject.centerH();
+// }
 
 
 
 
-
+var globalPropsToSet = {}, activeSelectedObjs = [];
 function Cut() {
     // clone what are you copying since you
     // may want copy and paste on different moment.
     // and you do not want the changes happened
     // later to reflect on the copy.
-    canvas.getActiveObject().clone(function(cloned) {
-        _clipboard = cloned;
-    });
-    canvas.remove(canvas.getActiveObject())
+    Copy();
+    setTimeout(function name(params) {
+        Delete();
+    },200)
 }
 function Delete() {
-    canvas.remove(canvas.getActiveObject())
+    // canvas.remove(canvas.getActiveObject())
+
+    var selectedObjects = canvas.getActiveObjects();
+
+    if (selectedObjects && selectedObjects.length > 0) {
+      selectedObjects.forEach(function(object) {
+          canvas.remove(object);
+      });
+    }
+    canvas.discardActiveObject();
+    canvas.renderAll();
+
 }
 
+
+
+/* COPY PASTE FUNCTION FOR SINGLE OBJECT START */
 
 function Copy() {
-    // clone what are you copying since you
-    // may want copy and paste on different moment.
-    // and you do not want the changes happened
-    // later to reflect on the copy.
-    canvas.getActiveObject().clone(function(cloned) {
-        _clipboard = cloned;
+  globalPropsToSet = {}, activeSelectedObjs = [];
+  if(canvas.getActiveObjects().length > 0){
+  var activeObjects = canvas.getActiveObjects();
+  canvas.getActiveObject().clone(function(cloned) {
+    var clonedNewProps = {}
+    canvas.getActiveObjects().forEach(function (object) {
+      clonedNewProps = {}
+      var customProperties = Object.getOwnPropertyNames(object);
+      var myCustomProperties = [];
+      myCustomProperties = customProperties.filter(function(prop) {
+        return !fabric.Object.prototype.hasOwnProperty(prop);
+      });
+      forDeletion = ["canvas","_element","_originalElement","_cacheCanvas","_cacheContext"];
+      myCustomProperties = myCustomProperties.filter(item => !forDeletion.includes(item));
+      myCustomProperties.push("scaleToHeight");
+      myCustomProperties.push("scaleToWidth");
+      for(var v=0;v<myCustomProperties.length;v++){
+        clonedNewProps[myCustomProperties[v]] = object[myCustomProperties[v]];
+      }
+      var clonedObj = fabric.util.object.clone(object);
+
+      activeSelectedObjs.push({"el":object, "props":clonedNewProps})
     });
+    if(activeObjects.length==1){
+      // console.log("ok")
+      globalPropsToSet = clonedNewProps;
+    }
+    _clipboard = cloned;
+  }); 
+ }
 }
+document.addEventListener("keydown", function(e) {
+    var keyCode = e.keyCode;
+    if((event.ctrlKey || event.metaKey) && keyCode == 67 && canvas.getActiveObjects().length>0){
+      Copy();
+    }
+    else if((event.ctrlKey || event.metaKey) && keyCode == 86){
+      Paste();
+    }
+    else if((event.ctrlKey || event.metaKey) && keyCode == 88 && canvas.getActiveObjects().length>0){
+      Cut();
+    }
+}, false);
+
+
 function Paste() {
-    // clone again, so you can do multiple copies.
+try{
+
+  if(_clipboard){
     _clipboard.clone(function(clonedObj) {
-        canvas.discardActiveObject();
-        clonedObj.set({
-            left: clonedObj.left + 15,
-            top: clonedObj.top + 15,
-            evented: true,
-            editable: false,
-            lockUniScaling: true,
-            fixedWidth:200
+      canvas.discardActiveObject();
+      
+      if (clonedObj.type === 'activeSelection') {
+        // console.log("ok")
+        clonedObj.canvas = canvas;
+        clonedObj.forEachObject(function(obj, index) {
+          // console.log("loop object")
+          // console.log(obj)
+          // console.log("our object")
+          // console.log(activeSelectedObjs[index]["el"])
+          // console.log(index)
+          globalPropsToSet = activeSelectedObjs[index]["props"];
+          globalPropsToSet["left"] = obj.left + 10
+          globalPropsToSet["top"] = obj.top + 10
+          globalPropsToSet["evented"] = true
+          // console.log(globalPropsToSet)
+          obj.set(globalPropsToSet);
+
+          // console.log("ok")
+          canvas.add(obj);
         });
-        clonedObj.setControlsVisibility({
-            tl: false,
-            bl: false,
-            tr: false,
-            br: true,
-            ml: false,
-            mb: false,
-            mr: false,
-            mt: false,
-            mtr: false
-        });
-        if (clonedObj.type === 'activeSelection') {
-            // active selection needs a reference to the canvas.
-            clonedObj.canvas = canvas;
-            clonedObj.forEachObject(function(obj) {
-                canvas.add(obj);
-            });
-            // this should solve the unselectability
-            clonedObj.setCoords();
-        } else {
-            canvas.add(clonedObj);
-        }
-        _clipboard.top += 10;
-        _clipboard.left += 10;
-        canvas.setActiveObject(clonedObj);
-        canvas.requestRenderAll();
+        clonedObj.setCoords();
+      } else {
+
+         globalPropsToSet["left"] = clonedObj.left + 10
+         globalPropsToSet["top"] = clonedObj.top + 10
+          // globalPropsToSet["evented"] = true
+          clonedObj.set(globalPropsToSet);
+        canvas.add(clonedObj);
+      }
+      _clipboard.top += 10;
+      _clipboard.left += 10;
+      canvas.setActiveObject(clonedObj);
+      setObjectInside(clonedObj);
+      canvas.requestRenderAll();
+      var mouseEvent = new MouseEvent('mousedown', {
+        clientX: 100, // X coordinate of the mouse
+        clientY: 100, // Y coordinate of the mouse
+        button: 1, // 0 for the left mouse button, 1 for the middle mouse button, 2 for the right mouse button
+      });
+      canvas.upperCanvasEl.dispatchEvent(mouseEvent);
+      canvas.upperCanvasEl.dispatchEvent(mouseEvent);
+      canvas.upperCanvasEl.dispatchEvent(mouseEvent);
+      canvas.upperCanvasEl.dispatchEvent(mouseEvent);
+      canvas.upperCanvasEl.dispatchEvent(mouseEvent);
+      canvas.upperCanvasEl.dispatchEvent(mouseEvent);
+      var objects = canvas.getObjects();
+      if (objects.length > 0) {
+        canvas.setActiveObject(objects[objects.length-1]);
+      }
     });
+  }else{
+    console.log(" => clipboard is not available!")
+  }
+}catch{
+  
 }
+
+// for(var v=0;v<activeSelectedObjs.length;v++){
+//   // canvas.discardActiveObject();
+//   // cloned = activeSelectedObjs[v]["el"];
+
+//   var clonedObj = fabric.util.object.clone(activeSelectedObjs[v]["el"]);
+
+
+
+
+//   globalPropsToSet = activeSelectedObjs[v]["props"];
+//   globalPropsToSet["left"] = clonedObj.left + 10
+//       globalPropsToSet["top"] = clonedObj.top + 10
+//       // globalPropsToSet["evented"] = true
+//       clonedObj.set(globalPropsToSet);
+//       // if (clonedObj.type === 'activeSelection') {
+//       //   clonedObj.canvas = canvas;
+//       //   clonedObj.forEachObject(function(obj) {
+//       //     canvas.add(obj);
+//       //   });
+//       //   clonedObj.setCoords();
+//       // } else {
+//       console.log(clonedObj)
+//         canvas.add(clonedObj);
+//       // }
+//         // canvas.setActiveObject(clonedObj);
+//         // setObjectInside(clonedObj);
+
+//         canvas.requestRenderAll();
+//       }
+//       canvas.requestRenderAll();
+//       canvas.renderAll();
+}
+/* COPY PASTE FUNCTION FOR SINGLE OBJECT END */
+
+
+//   var activeObjects = canvas.getActiveObjects(); // Use getActiveObjects() instead of getActiveObject()
+//   var clonedObjects = []; // Array to store cloned objects
+
+// function Copy() {
+
+//   activeObjects.forEach(function (object) {
+//     object.clone(function (cloned) {
+//       var clonedNewProps = {};
+//       var customProperties = Object.getOwnPropertyNames(object);
+//       var myCustomProperties = customProperties.filter(function (prop) {
+//         return !fabric.Object.prototype.hasOwnProperty(prop);
+//       });
+//       for (var v = 0; v < myCustomProperties.length; v++) {
+//         clonedNewProps[myCustomProperties[v]] = object[myCustomProperties[v]];
+//       }
+//       var forDeletion = ["canvas", "_element", "_originalElement", "_cacheCanvas", "_cacheContext"];
+//       myCustomProperties = myCustomProperties.filter(function (item) {
+//         return !forDeletion.includes(item);
+//       });
+//       myCustomProperties.push("scaleToHeight");
+//       myCustomProperties.push("scaleToWidth");
+
+//       cloned.set(clonedNewProps); // Set custom properties for the cloned object
+//       clonedObjects.push(cloned); // Add cloned object to the array
+//     });
+//   });
+
+//   globalPropsToSet = clonedObjects; // Assign the array of cloned objects to globalPropsToSet
+// }
+
+// function Paste() {
+//   if (globalPropsToSet.length > 0) { // Check if there are objects to paste
+//     var clonedObjects = [];
+
+//     globalPropsToSet.forEach(function (clonedObj) {
+//       clonedObj.clone(function (cloned) {
+//         cloned.set({
+//           left: clonedObj.left + 10,
+//           top: clonedObj.top + 10,
+//           evented: true
+//         });
+
+//         clonedObjects.push(cloned); // Add cloned object to the array
+//       });
+//     });
+
+//     canvas.discardActiveObject();
+//     if (clonedObjects.length > 1) { // Check if there are multiple objects to paste
+//       var group = new fabric.Group(clonedObjects); // Create a group with the cloned objects
+//       canvas.add(group);
+//       canvas.setActiveObject(group);
+//       setObjectInside(group);
+//       group.setCoords();
+//     } else {
+//       canvas.add(clonedObjects[0]); // Add the single cloned object
+//       canvas.setActiveObject(clonedObjects[0]);
+//       setObjectInside(clonedObjects[0]);
+//     }
+
+//     clonedObjects.forEach(function (obj) {
+//       obj.top += 10;
+//       obj.left += 10;
+//     });
+
+//     canvas.requestRenderAll();
+//   } else {
+//     console.log("Clipboard is not available!");
+//   }
+// }
+
+
+
+
+
 
 function updateTshirtImage(imageURL){
     fabric.Image.fromURL(imageURL, function(img) {                   
@@ -1810,12 +2130,13 @@ function updateTshirtImage(imageURL){
         });
         canvas.add(img);
 
-        console.log(" before : width => ", img.width ," | height => ", img.height );
+        // console.log(" before : width => ", img.width ," | height => ", img.height );
         var newWidth = (img.width * img.scaleX);
         var newHeight = (img.height * img.scaleY);
         $("#artWidth").val(parseFloat(newWidth).toFixed(2));
         $("#artHeight").val(parseFloat(newHeight).toFixed(2));
-        document.getElementById("rotatArtRangeSlide").value = 0;
+        // document.getElementById("rotatArtRangeSlide").value = 0;
+        // window.artRotationSlider.noUiSlider.set(0);
         document.getElementById("rotatArtNumber").value = 0;
         img.set({
             // width: newWidth,
@@ -1825,7 +2146,7 @@ function updateTshirtImage(imageURL){
             scaleToWidth:newWidth,
             scaleToHeight:newHeight
         });
-        console.log("After Image width :", newWidth , " | height : ", newHeight);
+        // console.log("After Image width :", newWidth , " | height : ", newHeight);
         canvas.setActiveObject(img);
         canvas.renderAll();
         saveState()  // call this function for save object in undo redo
@@ -1834,7 +2155,7 @@ function updateTshirtImage(imageURL){
 
 function addArtDesign(path) {
     if(edit_art == true){
-       console.log("Update Art !")
+       // console.log("Update Art !")
        let selectedObject = canvas.getActiveObject();
         
        selectedObject.setSrc(path);
@@ -1879,10 +2200,10 @@ function _scaleToDimensions(object, height, width, absolute){
 }
 
 function changeArtSize(value, dimension){
-    console.log("value is => ", value, " | value type => ", dimension);
+    // console.log("value is => ", value, " | value type => ", dimension);
     const activeObject = canvas.getActiveObject();
       if (activeObject) {
-        console.log("canvas width => ", CANVAS_WIDTH-minX)
+        // console.log("canvas width => ", CANVAS_WIDTH-minX)
 
         let newHeight, newWidth;
         if (dimension === "height") {
@@ -1919,18 +2240,21 @@ function changeArtSize(value, dimension){
 }
 
 
-// Art center js
-function centerArtObject(){
+// object center js
+function centerObject(){
     var selectedObject = canvas.getActiveObject();
+    // console.log(selectedObject);
     // canvas.centerObject(selectedObject);
-    selectedObject.centerH();
-    canvas.renderAll();
-    saveState()  // call this function for save object in undo redo
+    if(selectedObject != undefined){
+      selectedObject.centerH();
+      canvas.renderAll();
+      saveState()  // call this function for save object in undo redo
+    }
 }
 // Art flip x js
 function flipXArt(){
     var selectedObject = canvas.getActiveObject();
-    console.log("Flip Horizontal");
+    // console.log("Flip Horizontal");
     selectedObject.toggle('flipX')
     // selectedObject.set('flipX', true);
     selectedObject.setCoords();
@@ -1942,7 +2266,7 @@ function flipXArt(){
 // Art flip y js
 function flipYArt(){
     var selectedObject = canvas.getActiveObject();
-    console.log("Flip Verticle");
+    // console.log("Flip Verticle");
     // selectedObject.set('flipY', true);
     selectedObject.toggle('flipY')
     selectedObject.setCoords();
@@ -1961,7 +2285,8 @@ function changeArtRangeValue(val){
     }else if(angleValue<-181){
         angleValue = -180;
     }
-    document.getElementById("rotatArtRangeSlide").value = angleValue;
+    // document.getElementById("rotatArtRangeSlide").value = angleValue;
+    window.artRotationSlider.noUiSlider.set(angleValue);
     document.getElementById("rotatArtNumber").value = angleValue
     var selectedObject = canvas.getActiveObject();
     selectedObject.rotate(parseFloat(angleValue));
@@ -1999,8 +2324,8 @@ function changeArtInputValue(val){
 // When the user clicks on upload a custom picture
 document.getElementById('uploadFile').addEventListener("change", function(e){
 
-    console.log("Image data => ", e);
-    console.log("data type : ", e.target.files[0]);
+    // console.log("Image data => ", e);
+    // console.log("data type : ", e.target.files[0]);
 
     var fd = new FormData();
     var files = e.target.files[0];
@@ -2016,11 +2341,12 @@ document.getElementById('uploadFile').addEventListener("change", function(e){
 
 
     $.ajax({
-          url: "https://customizer.sketchthemes.com/api/convert-file",
+          url: API_URL+"api/convert-file",
           type: 'post',
           data: fd,
           contentType: false,
           processData: false,
+          header: { "Access-Control-Allow-Origin": "*" },
           // xhrFields: {
           //   responseType: 'blob'
           // },
@@ -2028,7 +2354,7 @@ document.getElementById('uploadFile').addEventListener("change", function(e){
             $('.customiseLoader').css("display","flex");
           },
           success: function (response, status) {
-            console.log("Uploaded image successfull : ", response);
+            // console.log("Uploaded image successfull : ", response);
 
             if(response.status == true){
                 fabric.Image.fromURL(response.data, function(img) {                   
@@ -2053,12 +2379,13 @@ document.getElementById('uploadFile').addEventListener("change", function(e){
                     });
                     canvas.add(img);
 
-                    console.log(" before : width => ", img.width ," | height => ", img.height );
+                    // console.log(" before : width => ", img.width ," | height => ", img.height );
                     var newWidth = (img.width * img.scaleX);
                     var newHeight = (img.height * img.scaleY);
                     $("#imageWidth").val(parseFloat(newWidth).toFixed(2));
                     $("#imageHeight").val(parseFloat(newHeight).toFixed(2));
-                    document.getElementById("rotatImageRangeSlide").value = 0;
+                    // document.getElementById("rotatImageRangeSlide").value = 0;
+                    window.imageRotationSlider.noUiSlider.set(0);
                     document.getElementById("rotatImageNumber").value = 0;
                     img.set({
                         // width: newWidth,
@@ -2068,7 +2395,7 @@ document.getElementById('uploadFile').addEventListener("change", function(e){
                         scaleToWidth:newWidth,
                         scaleToHeight:newHeight
                     });
-                    console.log(" After Image width : ", newWidth , " | height : ", newHeight);
+                    // console.log(" After Image width : ", newWidth , " | height : ", newHeight);
                     setObjectInside(img);
                     canvas.setActiveObject(img);
                     canvas.renderAll();
@@ -2087,9 +2414,9 @@ document.getElementById('uploadFile').addEventListener("change", function(e){
             }
           },
           error: function (jqXhr, textStatus, errorMessage) {
-            console.log("1. Error => ",jqXhr);
-            console.log("2. Error => ",textStatus);
-            console.log("3. Error => ",errorMessage);
+            // console.log("1. Error => ",jqXhr);
+            // console.log("2. Error => ",textStatus);
+            // console.log("3. Error => ",errorMessage);
             $("#uploadFile").val(null);  // set input file field value null
             $('.error_file_modal').css("display","none");
             $('#fileNotSupportError').css("display","block");
@@ -2109,7 +2436,8 @@ function changeImageRangeValue(val){
     }else if(angleValue<-181){
         angleValue = -180;
     }
-    document.getElementById("rotatImageRangeSlide").value = angleValue;
+    // document.getElementById("rotatImageRangeSlide").value = angleValue;
+    window.imageRotationSlider.noUiSlider.set(angleValue);
     document.getElementById("rotatImageNumber").value = angleValue
     var selectedObject = canvas.getActiveObject();
     selectedObject.rotate(parseFloat(angleValue));
@@ -2173,10 +2501,16 @@ document.addEventListener("keydown", function(e) {
     // console.log("key code => ", keyCode);
 
     if(keyCode == 46){
-        console.log("Removing selected element on Fabric.js on DELETE key !");
-        canvas.remove(canvas.getActiveObject());
+
+      if(document.activeElement.id == 'editTextContent'){
+
+      }else{
+        // console.log("Removing selected element on Fabric.js on DELETE key !");
+        // canvas.remove(canvas.getActiveObject());
+        Delete();
         $('#editTextTab').css("display","none");
         $('#addTextTab').css("display","block");
+      }
     }
 }, false);
 
@@ -2186,7 +2520,7 @@ document.addEventListener("keydown", function(e) {
 
 // After loading all content
 document.addEventListener("DOMContentLoaded", function () {
-    console.log("Loaded all content!")
+    // console.log("Loaded all content!")
    resizeCanvas();
 });
 
@@ -2200,33 +2534,145 @@ function closeCustomModal(){
     $('.custom_modal').css("display","none");
 }
 
-var SCALE_FACTOR = 1.8;
+var SCALE_FACTOR = 1.6;
 var zoomMax = 23;
 var canvasScale = 1;
 
 // Zoom In
 function zoomIn() {
+  zoomOption = true;
     if(canvas.getZoom().toFixed(5) > zoomMax){
-        console.log("zoomIn: Error: cannot zoom-in anymore");
+        // console.log("zoomIn: Error: cannot zoom-in anymore");
         return;
     }
+    
 
-    canvas.setZoom(canvas.getZoom()*SCALE_FACTOR);
-    canvas.setHeight(canvas.getHeight() * SCALE_FACTOR);
-    canvas.setWidth(canvas.getWidth() * SCALE_FACTOR);
+    var zoomInWidth = canvas.getWidth() * SCALE_FACTOR;
+    var zoomInHeight = canvas.getHeight() * SCALE_FACTOR;
+
+    var width_outer_space = (zoomInWidth*canvas_padding)/100;
+    var height_outer_space = (zoomInHeight*canvas_padding)/100;
+
+    var bgWidth = zoomInWidth-width_outer_space;
+    var bgHeight = zoomInHeight-height_outer_space;
+
+    bgLeft = width_outer_space / 2;
+    bgTop = height_outer_space / 2;
+
+    minX = bgLeft;
+    maxX = bgLeft+bgWidth;
+    minY = bgTop;
+    maxY = bgTop+bgHeight;
+    CANVAS_WIDTH = maxX;
+    CANVAS_HEIGHT = maxY;
+
+    
+    // canvas.setZoom(canvas.getZoom()*SCALE_FACTOR);
+    canvas.setHeight(zoomInHeight);
+    canvas.setWidth(zoomInWidth);
+    canvas.backgroundImage.set({
+      left: bgLeft,
+      top: bgTop,
+      width: bgWidth,
+      height: bgHeight,
+      zoomX:1,
+      zoomY:1,
+      cacheWidth: bgWidth,
+      cacheHeight: bgHeight,
+    })
+    console.log("zoom in bg rect => ", canvas.backgroundImage);
+
+    var objects = canvas.getObjects();
+    for (var i in objects) {
+        var scaleX = objects[i].scaleX;
+        var scaleY = objects[i].scaleY;
+        var left = objects[i].left;
+        var top = objects[i].top;
+        
+        var tempScaleX = scaleX * SCALE_FACTOR;
+        var tempScaleY = scaleY * SCALE_FACTOR;
+        var tempLeft = left * SCALE_FACTOR;
+        var tempTop = top * SCALE_FACTOR;
+        
+        objects[i].scaleX = tempScaleX;
+        objects[i].scaleY = tempScaleY;
+        objects[i].left = tempLeft;
+        objects[i].top = tempTop;
+
+
+        // CANVAS_WIDTH = 800;
+        // CANVAS_HEIGHT = 800;
+        
+        objects[i].setCoords();
+    }
+
     canvas.renderAll();
 }
 
 // Zoom Out
 function zoomOut() {
-    if( canvas.getZoom().toFixed(5) <=1 ){
+  zoomOption = false;
+    if( canvas.getZoom().toFixed(5) < 1 ){
         console.log("zoomOut: Error: cannot zoom-out anymore");
         return;
     }
 
-    canvas.setZoom(canvas.getZoom()/SCALE_FACTOR);
-    canvas.setHeight(canvas.getHeight() / SCALE_FACTOR);
-    canvas.setWidth(canvas.getWidth() / SCALE_FACTOR);
+    // canvas.setZoom(canvas.getZoom()/SCALE_FACTOR);
+    // canvas.setHeight(canvas.getHeight() / SCALE_FACTOR);
+    // canvas.setWidth(canvas.getWidth() / SCALE_FACTOR);
+
+    var zoomOutWidth = canvas.getWidth() / SCALE_FACTOR;
+    var zoomOutHeight = canvas.getHeight() / SCALE_FACTOR;
+
+    var width_outer_space = (zoomOutWidth*canvas_padding)/100;
+    var height_outer_space = (zoomOutHeight*canvas_padding)/100;
+
+    var bgWidth = zoomOutWidth-width_outer_space;
+    var bgHeight = zoomOutHeight-height_outer_space;
+
+    bgLeft = width_outer_space / 2;
+    bgTop = height_outer_space / 2;
+
+    minX = bgLeft;
+    maxX = bgLeft+bgWidth;
+    minY = bgTop;
+    maxY = bgTop+bgHeight;
+    CANVAS_WIDTH = maxX;
+    CANVAS_HEIGHT = maxY;
+    
+    canvas.setHeight(zoomOutHeight);
+    canvas.setWidth(zoomOutWidth);
+    canvas.backgroundImage.set({
+      left: bgLeft,
+      top: bgTop,
+      width: bgWidth,
+      height: bgHeight,
+      zoomX:1,
+      zoomY:1,
+      cacheWidth: bgWidth,
+      cacheHeight: bgHeight,
+    })
+
+    console.log("zoom out bg rect => ", canvas.backgroundImage);
+    var objects = canvas.getObjects();
+    for (var i in objects) {
+        var scaleX = objects[i].scaleX;
+        var scaleY = objects[i].scaleY;
+        var left = objects[i].left;
+        var top = objects[i].top;
+    
+        var tempScaleX = scaleX * (1 / SCALE_FACTOR);
+        var tempScaleY = scaleY * (1 / SCALE_FACTOR);
+        var tempLeft = left * (1 / SCALE_FACTOR);
+        var tempTop = top * (1 / SCALE_FACTOR);
+
+        objects[i].scaleX = tempScaleX;
+        objects[i].scaleY = tempScaleY;
+        objects[i].left = tempLeft;
+        objects[i].top = tempTop;
+
+        objects[i].setCoords();
+    }
     canvas.renderAll();
 }
 
@@ -2234,11 +2680,13 @@ function zoomOut() {
 function changeZoomStatus(option){
     $('.zoom_icon').css("display","none");
     if(option == 'plus'){
-        $('img#customiserImage').css('object-fit','contain');
+        // $('img#customiserImage').css('object-fit','contain');
+        $('img#customiserImage').css('transform','scale(1)');
         zoomOut();
         $('.zoom_plus_option').css("display","block");
     }else{
-        $('img#customiserImage').css('object-fit','cover');
+        // $('img#customiserImage').css('object-fit','cover');
+      $('img#customiserImage').css('transform','scale(1.6)');
         zoomIn();
         $('.zoom_minus_option').css("display","block");
     }   

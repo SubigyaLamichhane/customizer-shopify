@@ -1,6 +1,6 @@
 // @ts-check
 import { join } from "path";
-import { readFileSync, writeFile } from "fs";
+import { readFileSync, writeFile, readFile } from "fs";
 import express, { Request, Response, NextFunction, Express } from "express";
 import serveStatic from "serve-static";
 
@@ -24,6 +24,7 @@ const gmSubClass = gm.subClass({ imageMagick: true });
 import multer from "multer";
 import path from "path";
 import { encode } from "punycode";
+import { error } from "console";
 const __dirname = path.resolve();
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -52,6 +53,18 @@ app.get(shopify.config.auth.path, shopify.auth.begin());
 app.get(
     shopify.config.auth.callbackPath,
     shopify.auth.callback(),
+    // async (req: Request, res: Response) => {
+    //     const page = new shopify.api.rest.Page({
+    //         session: res.locals.shopify.session,
+    //     });
+    //     page.title = "Customizer";
+    //     page.body_html = "<h2>Customizer</h2>\n<p><strong>customize you product!</strong>.</p>";
+    //     const response = await page.save({
+    //         update: true,
+    //     });
+    //     console.log('callbackPath',response)
+    //     // return true;
+    // },
     shopify.redirectToShopifyOrAppRoot()
 );
 app.post(
@@ -145,6 +158,28 @@ app.get("/api/products/create", async (_req: Request, res: Response) => {
 });
 
 // ...................................
+
+// Create page on shopify and add default entry for customization setting
+app.get("/api/page/create", async (req: Request, res: Response) => {
+    const page = new shopify.api.rest.Page({
+        session: res.locals.shopify.session,
+    });
+    page.title = "Customizer";
+    page.body_html = readFileSync('./store-frontend/customizer.html', 'utf-8');
+    const response = await page.save({
+        update: true,
+    });
+    let query: string = `UPDATE shopify_sessions SET is_pages_created = '1', page_id = ${page.id} WHERE id='${res.locals.shopify.session.id}'`;
+    mysqlConnection.query(query, function (error, result) {
+        if (error) throw error;
+        res.status(201).send({
+            "status": true,
+            "message": "Setting updated!",
+            "data": result,
+            "page": page
+        });
+    });
+});
 
 // Get art category list
 app.get("/api/get-art-category-list", (req: Request, res: Response) => {

@@ -14,7 +14,7 @@ export default function App() {
   // See documentation for <Routes /> for more info
   const pages = import.meta.globEager("./pages/**/!(*.test.[jt]sx)*.([jt]sx)");
 
-  const API_URL = "https://759f-103-21-55-66.ngrok-free.app/api";
+  const API_URL = "https://e2b5-125-99-173-2.ngrok-free.app/api";
   
   return (
     <PolarisProvider>
