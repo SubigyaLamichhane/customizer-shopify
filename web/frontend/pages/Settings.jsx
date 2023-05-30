@@ -2,7 +2,7 @@ import { Frame, Page, Button, LegacyCard, Toast, Spinner, Icon } from '@shopify/
 import {
     ChevronLeftMinor, CircleTickMinor, MobileAcceptMajor, CancelMajor,
     NoteMinor, AlertMinor
-  } from '@shopify/polaris-icons';
+} from '@shopify/polaris-icons';
 import { TitleBar } from "@shopify/app-bridge-react";
 import React, { useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
@@ -34,10 +34,8 @@ export default function Settings(props) {
                 visible_add_name: settingsVal.visible_add_name,
                 visible_add_notes: settingsVal.visible_add_notes
             });
-        } else {
-            setToastContent("Something went wrong!");
-            setToastErrStatus(true)
         }
+
         setLoadingStatus(false);
     }, [])
 
@@ -92,11 +90,6 @@ export default function Settings(props) {
                         </Link>
                     </div>
                     <div className="header_btns">
-                        {/* <a href={void 0} onClick={changePreviewHandle} style={{ marginLeft: "8px" }}>
-                            <Button>
-                                Instruction
-                            </Button>
-                        </a> */}
                         <a href={void 0} onClick={saveSettings} style={{ marginLeft: "8px" }}>
                             <Button primary>
                                 Update
@@ -104,7 +97,6 @@ export default function Settings(props) {
                         </a>
                     </div>
                 </div>
-                {/* <TitleBar title="Settings Page" primaryAction={null} /> */}
                 <LegacyCard title="Settings" sectioned>
                     <div className="form_field">
                         <label> visible add art section </label>

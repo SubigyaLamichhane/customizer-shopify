@@ -180,7 +180,7 @@ export default function ProductMap(props) {
     }
     else {
       setToastContent("Something went wrong!");
-      setToastErrStatus(true)
+      setToastErrStatus(true);
     }
   }
 

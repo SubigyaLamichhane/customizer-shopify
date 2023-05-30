@@ -1,10 +1,22 @@
-import { Page, Heading, Layout, LegacyCard, DataTable, Thumbnail, Button, Toast, Spinner, Frame, Icon } from "@shopify/polaris";
+import {
+  Frame,
+  Page,
+  Layout,
+  LegacyCard,
+  Filters,
+  DataTable,
+  Thumbnail,
+  Button,
+  Toast,
+  Spinner,
+  Icon
+} from "@shopify/polaris";
 import createApp, { Provider, ResourcePicker, TitleBar } from "@shopify/app-bridge-react";
 import ReactPaginate from "react-paginate";
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import dummyImage from "../assets/images/dummy-image.jpg";
-import { Link, useNavigate } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { CircleTickMinor, MobileAcceptMajor, CancelMajor } from '@shopify/polaris-icons';
 
 export default function Products(props) {
@@ -24,6 +36,8 @@ export default function Products(props) {
   const [rows, setRows] = useState([]);
   const [rowUpdate, setRowUpdate] = useState(false);
   const [pageNumber, setPageNumber] = useState(0);
+  const [dataCount, setDataCount] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
   const usersPerPage = 10;
   const pagesVisited = pageNumber * usersPerPage;
 
@@ -36,7 +50,13 @@ export default function Products(props) {
 
   var selectedPrdIds = [];
   var checkSelectedProdIds = [];
-  var allProductData = rows?.map(product => {
+  var allProductData = rows?.filter((product) => {
+    if (searchTerm == "") {
+      return product;
+    } else if (product.title?.toLowerCase().includes(searchTerm?.toLowerCase())) {
+      return product;
+    }
+  }).map(product => {
     selectedPrdIds.push({
       id: `gid://shopify/Product/${product.product_id}`,
     });
@@ -48,15 +68,20 @@ export default function Products(props) {
       />,
       `${product.title}`,
       (product.is_mapped === 1) ?
-        <Icon
-          source={MobileAcceptMajor}
-          color="base"
-        /> : <Icon
-          source={CancelMajor}
-          color="base"
-        />,
+        <p style={{ marginLeft: "-145px" }}>
+          <Icon
+            source={MobileAcceptMajor}
+            color="success"
+          />
+        </p>
+        :
+        <p style={{ marginLeft: "-145px" }}>
+          <Icon
+            source={CancelMajor}
+            color="critical"
+          />
+        </p>,
       <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={product.id} onClick={() => navigate(`/ProductMap/?id=${product.id}`)}>Mark Region </Button></a>
-        // <Link to={`/ProductMap?id=${product.id}`}><Button primary>Mark Region</Button></Link>
       ]
     )
   }).reverse();
@@ -68,9 +93,35 @@ export default function Products(props) {
     allProductTableData = allProductData.slice(pagesVisited, pagesVisited + usersPerPage);
   }
 
+  // filter code
+  const [queryValue, setQueryValue] = useState("");
+  const handleFiltersQueryChange = useCallback(
+    (value) => {
+      setQueryValue(value);
+      setSearchTerm(value);
+      setPageNumber(0)
+    },
+    [],
+  );
+  const handleQueryValueRemove = useCallback(() => { setQueryValue(""); setSearchTerm(""); }, []);
+  const handleFiltersClearAll = useCallback(() => {
+    handleQueryValueRemove();
+  }, [handleQueryValueRemove]);
+
+  const filters = [];
+  const appliedFilters = [];
   const changePage = ({ selected }) => {
     setPageNumber(selected);
   };
+
+  useEffect(() => {
+    if (pageNumber === 0) {
+      setDataCount(allProductData.length);
+    } else {
+      setDataCount((usersPerPage * pageNumber) + allProductData.length);
+    }
+  }, [rows, pageNumber, searchTerm]);
+  // filter code end
 
   // product selection code function
   const selectedProduct = async (selectPayload) => {
@@ -162,7 +213,7 @@ export default function Products(props) {
         }
         <div className="header">
           <div className="header_title">
-            <Heading>List of products</Heading>
+            <h1 className='Polaris-Heading'>List Of Product</h1>
           </div>
           <div className="header_btns">
             <a href={void 0} onClick={showResourcePicker} style={{ marginLeft: "8px" }}>
@@ -174,47 +225,58 @@ export default function Products(props) {
         </div>
         <Layout>
           <Layout.Section>
-            <ResourcePicker
-              resourceType="Product"
-              open={openResourcePicker}
-              onCancel={hideResourcePicker}
-              initialSelectionIds={selectedPrdIds}
-              allowMultiple={true}
-              actionVerb="select"
-              showVariants={false}
-              onSelection={selectedProduct}
-            // selectMultiple={false}
-            />
-          </Layout.Section>
-          <Layout.Section>
-            <DataTable
-              columnContentTypes={[
-                'text',
-                'text',
-                'text',
-                'numeric',
-              ]}
-              headings={[
-                'Image',
-                'Title',
-                'Is Mark',
-                'Action'
-              ]}
-              rows={allProductTableData}
-            // totals={['', '', '',]}
-            />
-            <ReactPaginate
-              previousLabel={<svg viewBox="0 0 20 20" className="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path d="M12 16a.997.997 0 0 1-.707-.293l-5-5a.999.999 0 0 1 0-1.414l5-5a.999.999 0 1 1 1.414 1.414l-4.293 4.293 4.293 4.293a.999.999 0 0 1-.707 1.707z"></path></svg>}
-              nextLabel={<svg viewBox="0 0 20 20" className="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path d="M8 16a.999.999 0 0 1-.707-1.707l4.293-4.293-4.293-4.293a.999.999 0 1 1 1.414-1.414l5 5a.999.999 0 0 1 0 1.414l-5 5a.997.997 0 0 1-.707.293z"></path></svg>}
-              pageCount={pageCount}
-              onPageChange={changePage}
-              containerClassName={"paginationBttns"}
-              previousLinkClassName={"previousBttn"}
-              nextLinkClassName={"nextBttn"}
-              disabledClassName={"paginationDisabled"}
-              activeClassName={"paginationActive"}
-              forcePage={pageNumber}
-            />
+            <LegacyCard sectioned>
+              <ResourcePicker
+                resourceType="Product"
+                open={openResourcePicker}
+                onCancel={hideResourcePicker}
+                initialSelectionIds={selectedPrdIds}
+                allowMultiple={true}
+                actionVerb="select"
+                showVariants={false}
+                onSelection={selectedProduct}
+              // selectMultiple={false}
+              />
+              <div className="filter_wrapper">
+                <Filters
+                  queryValue={queryValue}
+                  filters={filters}
+                  appliedFilters={appliedFilters}
+                  onQueryChange={handleFiltersQueryChange}
+                  onQueryClear={handleQueryValueRemove}
+                  onClearAll={handleFiltersClearAll}
+                  queryPlaceholder="Search here"
+                />
+              </div>
+              <DataTable
+                columnContentTypes={[
+                  'text',
+                  'text',
+                  'text',
+                  'action',
+                ]}
+                headings={[
+                  <h1 className='Polaris-Heading'>Image</h1>,
+                  <h1 className='Polaris-Heading'>Title</h1>,
+                  <h1 className='Polaris-Heading'>Is Mark</h1>,
+                  <h1 className='Polaris-Heading'>Action</h1>
+                ]}
+                rows={allProductTableData}
+                footerContent={`Showing ${dataCount} of ${allProductData ? allProductData.length : "0"} results`}
+              />
+              <ReactPaginate
+                previousLabel={<svg viewBox="0 0 20 20" className="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path d="M12 16a.997.997 0 0 1-.707-.293l-5-5a.999.999 0 0 1 0-1.414l5-5a.999.999 0 1 1 1.414 1.414l-4.293 4.293 4.293 4.293a.999.999 0 0 1-.707 1.707z"></path></svg>}
+                nextLabel={<svg viewBox="0 0 20 20" className="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path d="M8 16a.999.999 0 0 1-.707-1.707l4.293-4.293-4.293-4.293a.999.999 0 1 1 1.414-1.414l5 5a.999.999 0 0 1 0 1.414l-5 5a.997.997 0 0 1-.707.293z"></path></svg>}
+                pageCount={pageCount}
+                onPageChange={changePage}
+                containerClassName={"paginationBttns"}
+                previousLinkClassName={"previousBttn"}
+                nextLinkClassName={"nextBttn"}
+                disabledClassName={"paginationDisabled"}
+                activeClassName={"paginationActive"}
+                forcePage={pageNumber}
+              />
+            </LegacyCard>
           </Layout.Section>
         </Layout>
       </Page>

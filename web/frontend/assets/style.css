@@ -61,7 +61,7 @@
 
 /*toggle css end*/
 
-/* form_field */
+/* form_field css */
 .form_field {
   display: flex;
   align-items: center;
@@ -85,8 +85,9 @@
 .form_field.select_field .Polaris-Select {
   min-width: 150px;
 }
+/* form_field css end */
 
-/* loader */
+/* loader css */
 .loader_wrapper {
   position: fixed;
   top: 0;
@@ -99,11 +100,9 @@
   justify-content: center;
   align-items: center;
 }
+/* loader css end */
 
-/* add */
-/* .paginationBttns li {
-  display: none;
-} */
+/* pagination css */
 .paginationBttns li.previous, .paginationBttns li.next  {
   display: block;
 }
@@ -148,39 +147,10 @@ li.paginationActive a,
 li.paginationActive a:focus {
   color: var(--white);
 }
-
-.product_img {
-  position: relative;
-}
-.product_img img{
-  width: 100%;
- }
+/* pagination css end */
 
 
-/* element.style {
-  top: 111px;
-  left: 78px;
-  width: 54.4px;
-  height: 69.6px;
-} */
-.ReactCrop__crop-selection {
-  position: absolute;
-  top: 0;
-  left: 0;
-  transform: translate3d(0, 0, 0);
-  cursor: move;
-  border: 1px dashed #fff;
-  /* box-shadow: 0 0 0 9999em rgba(0,0,0,.5) */
-}
-
-/* .Polaris-Icon--colorBase svg {
-  margin-left: -60px;
-} */
-
-.Polaris-Modal-CloseButton:hover {
-  /* background: var(--p-surface-hovered); */
-}
-
+/* header/navbar css */
 .header {
   width: 100%;
   display: flex;
@@ -206,3 +176,70 @@ li.paginationActive a:focus {
   color: #000;
   font-size: 18px;
 }
+/* header/navbar css end */
+
+/* delete modal css */
+.delete_container {
+  text-align: center;
+  display: flex;
+  justify-content: center;
+  flex-direction: column;
+  align-items: center;
+}
+.delete_container p {
+  margin-top: 2px !important;
+}
+.delete_container .Polaris-ButtonGroup {
+  margin-top: 10px;
+}
+/* delete modal css end */
+
+.product_img {
+  position: relative;
+}
+.product_img img{
+  width: 100%;
+}
+
+.ReactCrop__crop-selection {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: translate3d(0, 0, 0);
+  cursor: move;
+  border: 1px dashed #fff;
+}
+
+/* breadcrumb css */
+ul.breadcrumb {
+  padding: 10px 16px;
+  list-style: none;
+  /* background-color: #eee; */
+}
+ul.breadcrumb li {
+  display: inline;
+  font-size: 18px;
+}
+ul.breadcrumb li+li:before {
+  padding: 8px;
+  color: black;
+  content: "/\00a0";
+}
+ul.breadcrumb li a {
+  color: #0275d8;
+  text-decoration: none;
+}
+ul.breadcrumb li a:hover {
+  color: #01447e;
+  text-decoration: underline;
+}
+/* breadcrumb css end */
+
+/* filter css */
+.filter_wrapper {
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 5px;
+  margin-left: auto;
+}
+/* filter css end */
