@@ -85,6 +85,7 @@
 .form_field.select_field .Polaris-Select {
   min-width: 150px;
 }
+
 /* form_field css end */
 
 /* loader css */
@@ -100,10 +101,12 @@
   justify-content: center;
   align-items: center;
 }
+
 /* loader css end */
 
 /* pagination css */
-.paginationBttns li.previous, .paginationBttns li.next  {
+.paginationBttns li.previous,
+.paginationBttns li.next {
   display: block;
 }
 
@@ -126,15 +129,18 @@ ul.paginationBttns li a {
   align-items: center;
   justify-content: center;
 }
+
 li.paginationDisabled a {
   background: #f1f2f3 !important;
   cursor: not-allowed !important;
 }
+
 ul li.paginationActive a {
   background: rgba(0, 128, 96, 1);
   color: #fff !important;
   border: none;
 }
+
 li.paginationDisabled a svg path {
   fill: #d2d5d8;
 }
@@ -143,10 +149,12 @@ li.paginationActive a {
   background: var(--theme_color);
   color: var(--white);
 }
+
 li.paginationActive a,
 li.paginationActive a:focus {
   color: var(--white);
 }
+
 /* pagination css end */
 
 
@@ -155,27 +163,32 @@ li.paginationActive a:focus {
   width: 100%;
   display: flex;
   justify-content: space-between;
-  margin:0px 0px 20px 0px;
+  margin: 0px 0px 20px 0px;
   align-items: center;
-  margin-top:0px;
+  margin-top: 0px;
   border-bottom: 0.0625rem solid var(--p-border-subdued);
   padding-bottom: 20px;
 }
+
 .header_title h2.Polaris-Heading {
   font-size: 22px;
 }
-.header_btns>a{
+
+.header_btns>a {
   text-decoration: none;
 }
+
 .header_link a span.link_text {
   margin-left: 6px;
 }
+
 .header_link a {
   display: flex;
   text-decoration: none;
   color: #000;
   font-size: 18px;
 }
+
 /* header/navbar css end */
 
 /* delete modal css */
@@ -186,18 +199,22 @@ li.paginationActive a:focus {
   flex-direction: column;
   align-items: center;
 }
+
 .delete_container p {
   margin-top: 2px !important;
 }
+
 .delete_container .Polaris-ButtonGroup {
   margin-top: 10px;
 }
+
 /* delete modal css end */
 
 .product_img {
   position: relative;
 }
-.product_img img{
+
+.product_img img {
   width: 100%;
 }
 
@@ -216,23 +233,28 @@ ul.breadcrumb {
   list-style: none;
   /* background-color: #eee; */
 }
+
 ul.breadcrumb li {
   display: inline;
   font-size: 18px;
 }
+
 ul.breadcrumb li+li:before {
   padding: 8px;
   color: black;
   content: "/\00a0";
 }
+
 ul.breadcrumb li a {
   color: #0275d8;
   text-decoration: none;
 }
+
 ul.breadcrumb li a:hover {
   color: #01447e;
   text-decoration: underline;
 }
+
 /* breadcrumb css end */
 
 /* filter css */
@@ -242,4 +264,39 @@ ul.breadcrumb li a:hover {
   margin-bottom: 5px;
   margin-left: auto;
 }
+
 /* filter css end */
+
+.button-right button {
+  position: absolute !important;
+  right: 5% !important;
+  z-index: 99;
+}
+
+.Polaris-MediaCard {
+  justify-content: space-between !important;
+}
+
+.product_img img {
+  width: 500px;
+  object-fit: cover;
+}
+
+.color-box {
+  width: '36px';
+  height: '14px';
+  border-radius: '2px';
+}
+
+/* .color-box-swatch {
+  padding: '5px';
+  /* background: '#fff', */
+  border-radius: '1px';
+  box-shadow: '0 0 0 1px rgba(0,0,0,.1)';
+  display: 'inline-block';
+  cursor: 'pointer';
+} */
+
+/* .sketch-picker  {
+  width: 100% !important;
+} */

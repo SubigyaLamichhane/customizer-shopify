@@ -28,8 +28,8 @@ import { error } from "console";
 const __dirname = path.resolve();
 var storage = multer.diskStorage({
     destination: function (req, file, cb) {
-        cb(null, path.join(__dirname, '/public/uploads/')); // node production
-        // cb(null, path.join(__dirname, '/frontend/assets/public/uploads/')); // node local
+        cb(null, path.join(__dirname, '/frontend/assets/public/uploads/')); // local environment
+        // cb(null, path.join(__dirname, '/web/frontend/dist/assets/')); // production environment
     },
     filename: function (req, file, cb) {
         cb(null, Date.now() + '-' + file.originalname);
@@ -39,7 +39,15 @@ var upload = multer({ storage: storage });
 
 console.log(process.env.BACKEND_PORT, 'hello', process.env.PORT);
 
+// local environment
 const PORT = process.env.BACKEND_PORT || process.env.PORT;
+const APP_URL = "https://2ef6-103-21-55-66.ngrok-free.app/";
+const FILE_PATH = "https://2ef6-103-21-55-66.ngrok-free.app/assets/public/uploads/";
+
+// production environment
+// const PORT = 3000;
+// const APP_URL = "https://staging.whattocookai.com/";
+// const FILE_PATH = "https://staging.whattocookai.com/assets/";
 
 const STATIC_PATH =
     process.env.NODE_ENV === "production"
@@ -100,7 +108,7 @@ app.post("/api/convert-file", upload.single('image'), async (req: Request, res: 
                 res.status(200).send({
                     "status": true,
                     "message": "File converted from " + fileExtension + " to png formate successfully!",
-                    "data": destination + fileName
+                    "data": FILE_PATH + fileName
                 });
             });
         } else {
@@ -112,7 +120,30 @@ app.post("/api/convert-file", upload.single('image'), async (req: Request, res: 
         }
     } catch (error: any) {
         res.status(404).send({
-            "status": true,
+            "status": false,
+            "message": "Something went wrong!" + error,
+            "data": []
+        });
+    }
+});
+
+// Get art category list for front end side
+app.get("/api/front-end/get-art-category-list", (req: Request, res: Response) => {
+    try {
+        let shop_url: any = req.query.shop_url;
+        let query: string = `SELECT * FROM art_category WHERE session_id='${shop_url}'`;
+        console.log('query',query);
+        mysqlConnection.query(query, function (err: any, result: any) {
+            if (err) throw err
+            res.status(201).send({
+                "status": true,
+                "message": "Data fetched!",
+                "data": result
+            });
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": false,
             "message": "Something went wrong!",
             "data": []
         });
@@ -245,15 +276,12 @@ app.post("/api/create-art-category", upload.single('background_image'), async (r
     try {
         let session_id: string = res.locals.shopify.session.id;
         let name: string = req.body.name;
-        // let level: string = req.body.level;
-        // let background_image: string = req.body.background_image;
         let image: any = await req.file;
-        let uploadedFilePath: string = image.path;
+        let uploadedFilePath: any = FILE_PATH + image.filename;
         mysqlConnection.query('INSERT INTO art_category SET ?', {
             session_id: session_id,
             name: name,
-            background_image: uploadedFilePath,
-            // level: level
+            background_image: uploadedFilePath
         }, function (error: any, results: any, fields: any) {
             if (error) throw error;
             let artCategoryId: number = results.insertId;
@@ -429,9 +457,8 @@ app.get("/api/get-art-sub-category-sub-list/:category_id/:sub_category_id/:sub_c
 app.post("/api/create-art-sub-category-list/:art_sub_category_id", upload.single('image'), async (req: Request, res: Response) => {
     try {
         let name: string = req.body.name;
-        // let image: string = req.body.image;
         let image: any = await req.file;
-        let uploadedFilePath: string = image ? image.path : null;
+        let uploadedFilePath: any = image ? FILE_PATH + image.filename : null;
         let query: string = `SELECT * FROM art_sub_category WHERE id=${req.params.art_sub_category_id}`;
         mysqlConnection.query(query, function (error: any, results_1: any, fields: any) {
             if (error) throw error;
@@ -507,7 +534,8 @@ app.get("/api/get-art-sub-category-sub-list/:id", (req: Request, res: Response) 
 app.post("/api/create-art-sub-category-sub-list/:art_sub_category_list_id", upload.single('image'), async (req: Request, res: Response) => {
     try {
         let image: any = await req.file;
-        let uploadedFilePath: string = image ? image.path : null;
+        let fileName: string = image.filename;
+        let uploadedFilePath: any = image ? FILE_PATH + fileName : null;
         let query: string = `SELECT * FROM art_sub_category_list WHERE id=${req.params.art_sub_category_list_id}`;
         mysqlConnection.query(query, function (error, results_1, fields) {
             if (error) throw error;
@@ -901,11 +929,10 @@ app.delete("/api/delete-map-product/:id", async (req: Request, res: Response) =>
 app.post("/api/map-product/:id", upload.single('image'), async (req: Request, res: Response) => {
     try {
         let image: any = await req.file;
-        let uploadedFilePath: string = image.path;
+        let uploadedFilePath: any = image ? FILE_PATH + image.filename : req.body.image;
         let session_id: string = res.locals.shopify.session.id;
         let is_mapped: number = 1;
         let look_name: string = req.body.look_name;
-        // let image: string = uploadedFilePath;
         let crop: string = req.body.crop;
         let query_1: string = `SELECT * FROM products WHERE id=${req.params.id}`;
 
@@ -937,7 +964,7 @@ app.post("/api/map-product/:id", upload.single('image'), async (req: Request, re
                 });
             } else {
                 res.status(404).send({
-                    "status": true,
+                    "status": false,
                     "message": `Invalid product id ${req.params.id}`,
                     "data": [],
                 });
@@ -945,232 +972,8 @@ app.post("/api/map-product/:id", upload.single('image'), async (req: Request, re
         });
     } catch (error: any) {
         res.status(404).send({
-            "status": true,
-            "message": "Something went wrong!",
-            "data": []
-        });
-    }
-});
-
-// Mapped product from front side
-app.post("/api/map-product-front-side/:id", upload.single('image'), async (req: Request, res: Response) => {
-    try {
-        let image: any = await req.file;
-        let uploadedFilePath: string = image.path;
-        let is_mapped: number = 1;
-        let front_look_name: string = req.body.front_look_name;
-        let front_image: string = uploadedFilePath;
-        let front_crop_width: string = req.body.front_crop_width;
-        let front_crop_height: string = req.body.front_crop_height;
-        let front_scale_x: string = req.body.front_scale_x;
-        let front_scale_y: string = req.body.front_scale_y;
-        let query_1: string = `SELECT * FROM products WHERE id=${req.params.id}`;
-
-        mysqlConnection.query(query_1, function (error: any, result_1: any, fields: any) {
-            if (error) throw error;
-            if (result_1.length > 0) {
-                let query_2: string = `UPDATE products SET 
-                is_mapped = ?, front_look_name = ?, front_image = ?, front_crop_width = ?, 
-                front_crop_height = ?, front_scale_x = ?, front_scale_y = ?
-                WHERE id='${req.params.id}'`;
-                let updatedData = [
-                    is_mapped,
-                    front_look_name,
-                    front_image,
-                    front_crop_width,
-                    front_crop_height,
-                    front_scale_x,
-                    front_scale_y,
-                ];
-                mysqlConnection.query(query_2, updatedData, function (error, result_2, fields) {
-                    if (error) throw error;
-                    res.status(201).send({
-                        "status": true,
-                        "message": "Saved front side product map!",
-                        "data": result_2,
-                        "uploaded_file_path": uploadedFilePath
-                    });
-                });
-            } else {
-                res.status(404).send({
-                    "status": true,
-                    "message": `Invalid product id ${req.params.id}`,
-                    "data": [],
-                });
-            }
-        });
-    } catch (error: any) {
-        res.status(404).send({
-            "status": true,
-            "message": "Something went wrong!",
-            "data": []
-        });
-    }
-});
-
-// Mapped product from back side
-app.post("/api/map-product-back-side/:id", upload.single('image'), async (req: Request, res: Response) => {
-    try {
-        let image: any = await req.file;
-        let uploadedFilePath: string = image.path;
-        let is_mapped: number = 1;
-        let back_look_name: string = req.body.back_look_name;
-        let back_image: string = uploadedFilePath;
-        let back_crop_width: string = req.body.back_crop_width;
-        let back_crop_height: string = req.body.back_crop_height;
-        let back_scale_x: string = req.body.back_scale_x;
-        let back_scale_y: string = req.body.back_scale_y;
-        let query_1: string = `SELECT * FROM products WHERE id=${req.params.id}`;
-
-        mysqlConnection.query(query_1, function (error: any, result_1: any, fields: any) {
-            if (error) throw error;
-            if (result_1.length > 0) {
-                let query_2: string = `UPDATE products SET 
-                is_mapped = ?, back_look_name = ?, back_image = ?, back_crop_width = ?, 
-                back_crop_height = ?, back_scale_x = ?, back_scale_y = ?
-                WHERE id='${req.params.id}'`;
-                let updatedData = [
-                    is_mapped,
-                    back_look_name,
-                    back_image,
-                    back_crop_width,
-                    back_crop_height,
-                    back_scale_x,
-                    back_scale_y,
-                ];
-                mysqlConnection.query(query_2, updatedData, function (error, result_2, fields) {
-                    if (error) throw error;
-                    res.status(201).send({
-                        "status": true,
-                        "message": "Saved back side product map!",
-                        "data": result_2,
-                        "uploaded_file_path": uploadedFilePath
-                    });
-                });
-            } else {
-                res.status(404).send({
-                    "status": true,
-                    "message": `Invalid product id ${req.params.id}`,
-                    "data": [],
-                });
-            }
-        });
-    } catch (error: any) {
-        res.status(404).send({
-            "status": true,
-            "message": "Something went wrong!",
-            "data": []
-        });
-    }
-});
-
-// Mapped product from left side
-app.post("/api/map-product-left-side/:id", upload.single('image'), async (req: Request, res: Response) => {
-    try {
-        let image: any = await req.file;
-        let uploadedFilePath: string = image.path;
-        let is_mapped: number = 1;
-        let left_look_name: string = req.body.left_look_name;
-        let left_image: string = uploadedFilePath;
-        let left_crop_width: string = req.body.left_crop_width;
-        let left_crop_height: string = req.body.left_crop_height;
-        let left_scale_x: string = req.body.left_scale_x;
-        let left_scale_y: string = req.body.left_scale_y;
-        let query_1: string = `SELECT * FROM products WHERE id=${req.params.id}`;
-
-        mysqlConnection.query(query_1, function (error: any, result_1: any, fields: any) {
-            if (error) throw error;
-            if (result_1.length > 0) {
-                let query_2: string = `UPDATE products SET 
-                is_mapped = ?, left_look_name = ?, left_image = ?, left_crop_width = ?, 
-                left_crop_height = ?, left_scale_x = ?, left_scale_y = ?
-                WHERE id='${req.params.id}'`;
-                let updatedData = [
-                    is_mapped,
-                    left_look_name,
-                    left_image,
-                    left_crop_width,
-                    left_crop_height,
-                    left_scale_x,
-                    left_scale_y,
-                ];
-                mysqlConnection.query(query_2, updatedData, function (error, result_2, fields) {
-                    if (error) throw error;
-                    res.status(201).send({
-                        "status": true,
-                        "message": "Saved left side product map!",
-                        "data": result_2,
-                        "uploaded_file_path": uploadedFilePath
-                    });
-                });
-            } else {
-                res.status(404).send({
-                    "status": true,
-                    "message": `Invalid product id ${req.params.id}`,
-                    "data": [],
-                });
-            }
-        });
-    } catch (error: any) {
-        res.status(404).send({
-            "status": true,
-            "message": "Something went wrong!",
-            "data": []
-        });
-    }
-});
-
-// Mapped product from right side
-app.post("/api/map-product-right-side/:id", upload.single('image'), async (req: Request, res: Response) => {
-    try {
-        let image: any = await req.file;
-        let uploadedFilePath: string = image.path;
-        let is_mapped: number = 1;
-        let right_look_name: string = req.body.right_look_name;
-        let right_image: string = uploadedFilePath;
-        let right_crop_width: string = req.body.right_crop_width;
-        let right_crop_height: string = req.body.right_crop_height;
-        let right_scale_x: string = req.body.right_scale_x;
-        let right_scale_y: string = req.body.right_scale_y;
-        let query_1: string = `SELECT * FROM products WHERE id=${req.params.id}`;
-
-        mysqlConnection.query(query_1, function (error: any, result_1: any, fields: any) {
-            if (error) throw error;
-            if (result_1.length > 0) {
-                let query_2: string = `UPDATE products SET 
-                is_mapped = ?, right_look_name = ?, right_image = ?, right_crop_width = ?, 
-                right_crop_height = ?, right_scale_x = ?, right_scale_y = ?
-                WHERE id='${req.params.id}'`;
-                let updatedData = [
-                    is_mapped,
-                    right_look_name,
-                    right_image,
-                    right_crop_width,
-                    right_crop_height,
-                    right_scale_x,
-                    right_scale_y,
-                ];
-                mysqlConnection.query(query_2, updatedData, function (error, result_2, fields) {
-                    if (error) throw error;
-                    res.status(201).send({
-                        "status": true,
-                        "message": "Saved right side product map!",
-                        "data": result_2,
-                        "uploaded_file_path": uploadedFilePath
-                    });
-                });
-            } else {
-                res.status(404).send({
-                    "status": true,
-                    "message": `Invalid product id ${req.params.id}`,
-                    "data": [],
-                });
-            }
-        });
-    } catch (error: any) {
-        res.status(404).send({
-            "status": true,
-            "message": "Something went wrong!",
+            "status": false,
+            "message": "Something went wrong!" + error,
             "data": []
         });
     }
@@ -1204,6 +1007,319 @@ app.delete("/api/delete-product/:id", (req: Request, res: Response) => {
         });
     }
 });
+
+// --------------------
+// Create Text Font Color Setting
+app.post("/api/create-text-font-color", (req: Request, res: Response) => {
+    try {
+        let session_id: string = res.locals.shopify.session.id;
+        let name: string = req.body.name;
+        let color: string = req.body.color;
+        mysqlConnection.query('INSERT INTO text_colors SET ?', {
+            session_id: session_id,
+            name: name,
+            color: color
+        }, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            res.status(201).send({
+                "status": true,
+                "message": "Font color Added!",
+                "data": results
+            });
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": false,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
+});
+
+// Get Text Font Color Setting
+app.get("/api/get-text-font-colors", (req: Request, res: Response) => {
+    try {
+        let query: string = `SELECT * FROM text_colors WHERE session_id='${res.locals.shopify.session.id}'`;
+        mysqlConnection.query(query, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            res.status(200).send({
+                "status": true,
+                "message": "Data fetched!",
+                "data": results
+            });
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": false,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
+});
+
+// Delete Text Font Color Setting by id
+app.delete("/api/delete-text-font-color/:id", (req: Request, res: Response) => {
+    try {
+        let query: string = `DELETE FROM text_colors WHERE id=${req.params.id}`;
+        mysqlConnection.query(query, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            if (results.affectedRows > 0) {
+                res.status(200).send({
+                    "status": true,
+                    "message": "Deleted success!",
+                    "data": results
+                });
+            } else {
+                res.status(404).send({
+                    "status": false,
+                    "message": `Invalid text setting id ${req.params.id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": false,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
+});
+
+// Create Text Font Color Setting
+app.post("/api/create-text-outline-color", (req: Request, res: Response) => {
+    try {
+        let session_id: string = res.locals.shopify.session.id;
+        let name: string = req.body.name;
+        let color: string = req.body.color;
+        mysqlConnection.query('INSERT INTO text_outline_colors SET ?', {
+            session_id: session_id,
+            name: name,
+            color: color
+        }, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            res.status(201).send({
+                "status": true,
+                "message": "Outline color Added!",
+                "data": results
+            });
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": false,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
+});
+
+// Get Text Font Outline Color Setting
+app.get("/api/get-text-outline-colors", (req: Request, res: Response) => {
+    try {
+        let query: string = `SELECT * FROM text_outline_colors WHERE session_id='${res.locals.shopify.session.id}'`;
+        mysqlConnection.query(query, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            res.status(200).send({
+                "status": true,
+                "message": "Data fetched!",
+                "data": results
+            });
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": false,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
+});
+
+// Delete Text Font Outline Color Setting by id
+app.delete("/api/delete-text-outline-color/:id", (req: Request, res: Response) => {
+    try {
+        let query: string = `DELETE FROM text_outline_colors WHERE id=${req.params.id}`;
+        mysqlConnection.query(query, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            if (results.affectedRows > 0) {
+                res.status(200).send({
+                    "status": true,
+                    "message": "Deleted success!",
+                    "data": results
+                });
+            } else {
+                res.status(404).send({
+                    "status": false,
+                    "message": `Invalid text outline color id ${req.params.id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": false,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
+});
+
+// Create Text Font
+app.post("/api/create-text-font", (req: Request, res: Response) => {
+    try {
+        let session_id: string = res.locals.shopify.session.id;
+        let name: string = req.body.name;
+        mysqlConnection.query('INSERT INTO text_fonts SET ?', {
+            session_id: session_id,
+            name: name,
+        }, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            res.status(201).send({
+                "status": true,
+                "message": "Text font added!",
+                "data": results
+            });
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": false,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
+});
+
+// Get Text Font
+app.get("/api/get-text-font-list", (req: Request, res: Response) => {
+    try {
+        let query: string = `SELECT * FROM text_fonts WHERE session_id='${res.locals.shopify.session.id}'`;
+        mysqlConnection.query(query, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            res.status(200).send({
+                "status": true,
+                "message": "Data fetched!",
+                "data": results
+            });
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": false,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
+});
+
+// Delete Text Font by id
+app.delete("/api/delete-text-font/:id", (req: Request, res: Response) => {
+    try {
+        let query: string = `DELETE FROM text_fonts WHERE id=${req.params.id}`;
+        mysqlConnection.query(query, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            if (results.affectedRows > 0) {
+                res.status(200).send({
+                    "status": true,
+                    "message": "Deleted success!",
+                    "data": results
+                });
+            } else {
+                res.status(404).send({
+                    "status": false,
+                    "message": `Invalid text font id ${req.params.id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": false,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
+});
+
+// ==
+
+// Create Text Font
+app.post("/api/create-sub-text-font/:font_id", upload.single('file'), async (req: Request, res: Response) => {
+    try {
+        let session_id: string = res.locals.shopify.session.id;
+        let font_id: string = req.params.font_id;
+        let name: string = req.body.name;
+        let file: any = await req.file;
+        let uploadedFilePath: any = file ? FILE_PATH + file.filename : null;
+        mysqlConnection.query('INSERT INTO text_font_list SET ?', {
+            font_id: font_id,
+            name: name,
+            image: uploadedFilePath
+        }, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            res.status(201).send({
+                "status": true,
+                "message": "Text font added!",
+                "data": results
+            });
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": false,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
+});
+
+// Get Sub Text Font List
+app.get("/api/get-text-sub-font-list/:id", (req: Request, res: Response) => {
+    try {
+        let query: string = `SELECT * FROM text_font_list WHERE font_id='${req.params.id}'`;
+        mysqlConnection.query(query, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            res.status(200).send({
+                "status": true,
+                "message": "Data fetched!",
+                "data": results
+            });
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": false,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
+});
+
+// Delete Sub Text Font by id
+app.delete("/api/delete-text-sub-font/:id", (req: Request, res: Response) => {
+    try {
+        let query: string = `DELETE FROM text_font_list WHERE id=${req.params.id}`;
+        mysqlConnection.query(query, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            if (results.affectedRows > 0) {
+                res.status(200).send({
+                    "status": true,
+                    "message": "Deleted success!",
+                    "data": results
+                });
+            } else {
+                res.status(404).send({
+                    "status": false,
+                    "message": `Invalid text font id ${req.params.id}`,
+                    "data": [],
+                });
+            }
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": false,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
+});
+
+// --------------------
 
 // Create Text Setting
 app.post("/api/create-text-setting", (req: Request, res: Response) => {
@@ -1301,6 +1417,7 @@ app.listen(PORT);
 // make changes on server
 // replace some lines 
 // cb(null, path.join(__dirname, '/public/uploads/')); = cb(null, path.join(__dirname, '/web/public/uploads/'));
+// uploadedFilePath: string  = "https://staging.whattocookai.com/assets/" + image.filename;
 // const PORT = process.env.BACKEND_PORT || process.env.PORT; = const PORT = 3000;
 // `${process.cwd()}/frontend/dist` = `${process.cwd()}/web/frontend/dist`
 // `${process.cwd()}/frontend/` = `${process.cwd()}/web/frontend/`

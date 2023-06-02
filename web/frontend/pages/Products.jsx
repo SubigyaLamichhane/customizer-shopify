@@ -230,12 +230,12 @@ export default function Products(props) {
                 resourceType="Product"
                 open={openResourcePicker}
                 onCancel={hideResourcePicker}
-                initialSelectionIds={selectedPrdIds}
                 allowMultiple={true}
                 actionVerb="select"
                 showVariants={false}
                 onSelection={selectedProduct}
-              // selectMultiple={false}
+                // selectMultiple={false}
+                // initialSelectionIds={selectedPrdIds}
               />
               <div className="filter_wrapper">
                 <Filters
@@ -258,7 +258,7 @@ export default function Products(props) {
                 headings={[
                   <h1 className='Polaris-Heading'>Image</h1>,
                   <h1 className='Polaris-Heading'>Title</h1>,
-                  <h1 className='Polaris-Heading'>Is Mark</h1>,
+                  <h1 className='Polaris-Heading'>Is Marked</h1>,
                   <h1 className='Polaris-Heading'>Action</h1>
                 ]}
                 rows={allProductTableData}
