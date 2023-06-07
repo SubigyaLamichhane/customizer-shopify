@@ -242,7 +242,7 @@ export default function ProductMap(props) {
                 <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
                   <h1 className='Polaris-Heading'>{title}</h1><br /><br />
                   <TextField
-                    label="Look name"
+                    label="Look"
                     value={lookName}
                     placeholder='Please enter value'
                     onChange={handleLookName}
@@ -319,7 +319,7 @@ export default function ProductMap(props) {
 
         {
           product.product_map ?
-            <LegacyCard title="Map Product List" sectioned>
+            <LegacyCard title="Maped Product List" sectioned>
               {/* foreach for product mapping */}
               {
                 product.product_map?.map((product, i) => {
@@ -327,7 +327,7 @@ export default function ProductMap(props) {
                     [
                       <MediaCard
                         key={i}
-                        title="Look Name"
+                        title="Look"
                         description={product.look_name}
                       >
                         <div className='button-right'>

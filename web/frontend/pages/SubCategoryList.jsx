@@ -36,7 +36,7 @@ export default function SubCategoryList(props) {
     const [toastErrStatus, setToastErrStatus] = useState(false);
     const [rows, setRows] = useState([]);
     const [subCategory, setSubCategory] = useState([]);
-    const [subCategoryImage, setSubCategoryImage] = useState(true);
+    const [subCategoryImage, setSubCategoryImage] = useState("");
     const [rowUpdate, setRowUpdate] = useState(false);
     const [pageNumber, setPageNumber] = useState(0);
     const [dataCount, setDataCount] = useState(0);
@@ -46,6 +46,7 @@ export default function SubCategoryList(props) {
     const urlParams = new URLSearchParams(window.location.search);
     const categoryId = urlParams.get("id");
     const subCategoryId = urlParams.get("sub_category_id");
+    const [isImage, setIsImage] = useState(0);
 
     const [name, setName] = useState("");
     const [categoryName, setCategoryName] = useState("");
@@ -87,7 +88,7 @@ export default function SubCategoryList(props) {
                     deleteModalHandle();
                 }}>Delete </Button>
                 {(category.image) ? ""
-                    : <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={category.id} onClick={() => navigate(`/SubCategorySubList/?id=${categoryId}&sub_category_id=${subCategoryId}&sub_category_list_id=${category.id}`)}>Add Sub Category List </Button></a>
+                    : <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={category.id} onClick={() => navigate(`/SubCategorySubList/?id=${categoryId}&sub_category_id=${subCategoryId}&sub_category_list_id=${category.id}`)}>Add Art </Button></a>
                 }
             </div>
             ]
@@ -340,12 +341,12 @@ export default function SubCategoryList(props) {
                                     <div className="header_btns">
                                         <a href={void 0} onClick={() => changePreviewHandle("category")} style={{ marginLeft: "8px" }}>
                                             <Button primary>
-                                                Add Sub Category
+                                                Add Art Category
                                             </Button>
                                         </a>
                                         <a href={void 0} onClick={() => changePreviewHandle("list")} style={{ marginLeft: "8px" }}>
                                             <Button primary>
-                                                Add Sub Category List
+                                                Add Art
                                             </Button>
                                         </a>
                                     </div>
@@ -369,8 +370,8 @@ export default function SubCategoryList(props) {
                                         'action',
                                     ]}
                                     headings={[
-                                        <h1 className='Polaris-Heading'>Title</h1>,
-                                        <h1 className='Polaris-Heading'>Action</h1>
+                                        <h1 className='Polaris-Heading'>{subCategoryImage ? "Art Image" : "Title"}</h1>,
+                                        <h1 className='Polaris-Heading'>Actions</h1>
                                     ]}
                                     rows={allCategoryTableData}
                                     footerContent={`Showing ${dataCount} of ${allCategoryData ? allCategoryData.length : "0"} results`}
@@ -397,7 +398,7 @@ export default function SubCategoryList(props) {
                     <Modal
                         open={activePreviewSubModal}
                         onClose={() => changePreviewHandle("category")}
-                        title="Add Sub Category"
+                        title="Add Art Category"
                         primaryAction={{
                             content: 'Save',
                             onAction: saveSubCategory,
@@ -414,7 +415,7 @@ export default function SubCategoryList(props) {
                                         <TextField
                                             value={name}
                                             onChange={handleName}
-                                            label="Caegory Name"
+                                            label="Category"
                                             type="text"
                                             autoComplete="off"
                                             placeholder='Please enter value'
@@ -433,7 +434,7 @@ export default function SubCategoryList(props) {
                     <Modal
                         open={activePreview}
                         onClose={() => changePreviewHandle("list")}
-                        title="Add Category List"
+                        title="Add Art Image"
                         primaryAction={{
                             content: 'Save',
                             onAction: saveSubCategoryList,

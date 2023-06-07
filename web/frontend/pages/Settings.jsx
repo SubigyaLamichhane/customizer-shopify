@@ -16,6 +16,7 @@ export default function Settings(props) {
     const [toastContent, setToastContent] = useState("");
     const [toastErrStatus, setToastErrStatus] = useState(false);
     const [btnSettings, setBtnSettings] = useState({
+        visible_add_text: true,
         visible_add_art: true,
         visible_upload: true,
         visible_add_name: true,
@@ -29,6 +30,7 @@ export default function Settings(props) {
         if (settingDetails.status === true) {
             const settingsVal = settingDetails.data[0];
             setBtnSettings({
+                visible_add_text: settingsVal.visible_add_text,
                 visible_add_art: settingsVal.visible_add_art,
                 visible_upload: settingsVal.visible_upload,
                 visible_add_name: settingsVal.visible_add_name,
@@ -48,6 +50,7 @@ export default function Settings(props) {
     const saveSettings = async () => {
         setLoadingStatus(true);
         const settingData = {
+            "visible_add_text": `${btnSettings.visible_add_text ? "1" : "0"}`,
             "visible_add_art": `${btnSettings.visible_add_art ? "1" : "0"}`,
             "visible_upload": `${btnSettings.visible_upload ? "1" : "0"}`,
             'visible_add_name': `${btnSettings.visible_add_name ? "1" : "0"}`,
@@ -98,8 +101,17 @@ export default function Settings(props) {
                     </div>
                 </div>
                 <LegacyCard title="Settings" sectioned>
+                <div className="form_field">
+                        <label>Visible add text section </label>
+                        <div className="status_switch_wrapper">
+                            <label className="switch">
+                                <input type="checkbox" onChange={(e) => changeBtnSettings("visible_add_text", !btnSettings.visible_add_text)} checked={btnSettings.visible_add_text} />
+                                <span className="slider round"></span>
+                            </label>
+                        </div>
+                    </div>
                     <div className="form_field">
-                        <label> visible add art section </label>
+                        <label> Visible add art section </label>
                         <div className="status_switch_wrapper">
                             <label className="switch">
                                 <input type="checkbox" onChange={(e) => changeBtnSettings("visible_add_art", !btnSettings.visible_add_art)} checked={btnSettings.visible_add_art} />
@@ -108,7 +120,7 @@ export default function Settings(props) {
                         </div>
                     </div>
                     <div className="form_field">
-                        <label>visible upload photo section </label>
+                        <label>Visible upload photo section </label>
                         <div className="status_switch_wrapper">
                             <label className="switch">
                                 <input type="checkbox" onChange={(e) => changeBtnSettings("visible_upload", !btnSettings.visible_upload)} checked={btnSettings.visible_upload} />
@@ -117,7 +129,7 @@ export default function Settings(props) {
                         </div>
                     </div>
                     <div className="form_field">
-                        <label>visible add name section </label>
+                        <label>Visible add names / numbers section </label>
                         <div className="status_switch_wrapper">
                             <label className="switch">
                                 <input type="checkbox" onChange={(e) => changeBtnSettings("visible_add_name", !btnSettings.visible_add_name)} checked={btnSettings.visible_add_name} />
@@ -126,14 +138,14 @@ export default function Settings(props) {
                         </div>
                     </div>
                     <div className="form_field">
-                        <label>visible add notes section </label>
+                        <label>Visible add notes section </label>
                         <div className="status_switch_wrapper">
                             <label className="switch">
                                 <input type="checkbox" onChange={(e) => changeBtnSettings("visible_add_notes", !btnSettings.visible_add_notes)} checked={btnSettings.visible_add_notes} />
                                 <span className="slider round"></span>
                             </label>
                         </div>
-                    </div>
+                    </div>                    
                 </LegacyCard>
             </Page>
         </Frame>

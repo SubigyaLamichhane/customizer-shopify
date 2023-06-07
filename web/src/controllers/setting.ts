@@ -34,17 +34,19 @@ const getSetting = async (req: Request, res: Response) => {
 const saveSetting = async (req: Request, res: Response) => {
     try {
         let session_id: string = res.locals.shopify.session.id;
+        let visible_add_text: number = req.body.visible_add_text;
         let visible_add_art: number = req.body.visible_add_art;
         let visible_upload: number = req.body.visible_upload;
         let visible_add_name: number = req.body.visible_add_name;
         let visible_add_notes: number = req.body.visible_add_notes;
+        console.log('visible_add_text',visible_add_text)
 
         let query_1: string = `SELECT * FROM settings WHERE session_id='${res.locals.shopify.session.id}' LIMIT 1`;
         mysqlConnection.query(query_1, function (error: any, result_1: any, fields: any) {
             if (error) throw error;
             if (result_1.length > 0) {
-                let query_2: string = `UPDATE settings SET visible_add_art = ?, visible_upload = ?, visible_add_name = ?, visible_add_notes = ? WHERE session_id='${res.locals.shopify.session.id}'`;
-                let updatedData = [visible_add_art, visible_upload, visible_add_name, visible_add_notes];
+                let query_2: string = `UPDATE settings SET visible_add_text = ?, visible_add_art = ?, visible_upload = ?, visible_add_name = ?, visible_add_notes = ? WHERE session_id='${res.locals.shopify.session.id}'`;
+                let updatedData = [visible_add_text, visible_add_art, visible_upload, visible_add_name, visible_add_notes];
                 mysqlConnection.query(query_2, updatedData, function (error, result_2, fields) {
                     if (error) throw error;
                     res.status(201).send({
@@ -56,6 +58,7 @@ const saveSetting = async (req: Request, res: Response) => {
             } else {
                 mysqlConnection.query('INSERT INTO settings SET ?', {
                     session_id: session_id,
+                    visible_add_text: visible_add_text,
                     visible_add_art: visible_add_art,
                     visible_upload: visible_upload,
                     visible_add_name: visible_add_name,

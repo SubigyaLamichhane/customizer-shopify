@@ -108,7 +108,7 @@ export default function Products(props) {
                     setDeleteVal({ category_name: `${category.name}`, category_id: `${category.id}` });
                     deleteModalHandle();
                 }}>Delete </Button>
-                <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={category.id} onClick={() => navigate(`/subCategory/?id=${category.id}`)}>Add Sub Category </Button></a>
+                <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={category.id} onClick={() => navigate(`/subCategory/?id=${category.id}`)}>Add Art Category </Button></a>
             </div>
             ]
         )
@@ -269,7 +269,7 @@ export default function Products(props) {
                     <div className="header_btns">
                         <a href={void 0} onClick={changePreviewHandle} style={{ marginLeft: "8px" }}>
                             <Button primary>
-                                Add Category
+                                Add Art Category
                             </Button>
                         </a>
                     </div>
@@ -295,9 +295,9 @@ export default function Products(props) {
                                     'action',
                                 ]}
                                 headings={[
-                                    <h1 className='Polaris-Heading'>Background Image</h1>,
+                                    <h1 className='Polaris-Heading'>Art Category Image</h1>,
                                     <h1 className='Polaris-Heading'>Title</h1>,
-                                    <h1 className='Polaris-Heading'>Action</h1>
+                                    <h1 className='Polaris-Heading'>Actions</h1>
                                 ]}
                                 rows={allCategoryTableData}
                                 footerContent={`Showing ${dataCount} of ${allCategoryData ? allCategoryData.length : "0"} results`}
@@ -322,7 +322,7 @@ export default function Products(props) {
                     <Modal
                         open={activePreview}
                         onClose={changePreviewHandle}
-                        title="Create Category"
+                        title="Create Art Category"
                         primaryAction={{
                             content: 'Save',
                             onAction: saveCategory,
@@ -339,7 +339,7 @@ export default function Products(props) {
                                         <TextField
                                             value={name}
                                             onChange={handleName}
-                                            label="Caegory Name"
+                                            label="Category"
                                             type="text"
                                             autoComplete="off"
                                             placeholder='Please enter value'
