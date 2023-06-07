@@ -240,6 +240,7 @@ const createSubTextFontById = async (req: Request, res: Response) => {
         let file: any = await req.file;
         let uploadedFilePath: any = file ? FILE_PATH + file.filename : null;
         mysqlConnection.query('INSERT INTO text_font_list SET ?', {
+            session_id: session_id,
             font_id: font_id,
             name: name,
             image: uploadedFilePath

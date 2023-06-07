@@ -73,7 +73,7 @@ export default function SubCategory(props) {
                     setDeleteVal({ category_name: `${category.name}`, category_id: `${category.id}` });
                     deleteModalHandle();
                 }}>Delete </Button>
-                <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={category.id} onClick={() => navigate(`/subCategoryList/?id=${categoryId}&sub_category_id=${category.id}`)}>Add Sub Category / List </Button></a>
+                <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={category.id} onClick={() => navigate(`/subCategoryList/?id=${categoryId}&sub_category_id=${category.id}`)}>Add Art Category / Image </Button></a>
             </div>
             ]
         )
@@ -221,19 +221,18 @@ export default function SubCategory(props) {
                                     <div className="header_title">
                                         <ul className="breadcrumb">
                                             <li><span>{categoryName}</span></li>
-                                            {/* <li><span>{ subCategoryName }</span></li> */}
                                         </ul>
                                     </div>
                                     <div className="header_btns">
                                         <a href={void 0} onClick={changePreviewHandle} style={{ marginLeft: "8px" }}>
                                             <Button primary>
-                                                Add Sub Category
+                                                Add Art Category
                                             </Button>
                                         </a>
                                     </div>
                                 </div>
                             </LegacyCard.Section>
-                            <LegacyCard.Section title="Sub Category List">
+                            <LegacyCard.Section title="Sub Art Category List">
                                 <div className="filter_wrapper">
                                     <Filters
                                         queryValue={queryValue}
@@ -252,7 +251,7 @@ export default function SubCategory(props) {
                                     ]}
                                     headings={[
                                         <h1 className='Polaris-Heading'>Title</h1>,
-                                        <h1 className='Polaris-Heading'>Action</h1>
+                                        <h1 className='Polaris-Heading'>Actions</h1>
                                     ]}
                                     rows={allCategoryTableData}
                                     footerContent={`Showing ${dataCount} of ${allCategoryData ? allCategoryData.length : "0"} results`}
@@ -278,7 +277,7 @@ export default function SubCategory(props) {
                     <Modal
                         open={activePreview}
                         onClose={changePreviewHandle}
-                        title="Add Sub Category"
+                        title="Add Art Category"
                         primaryAction={{
                             content: 'Save',
                             onAction: saveSubCategory,
@@ -295,7 +294,7 @@ export default function SubCategory(props) {
                                         <TextField
                                             value={name}
                                             onChange={handleName}
-                                            label="Caegory Name"
+                                            label="Category"
                                             type="text"
                                             autoComplete="off"
                                             placeholder='Please enter value'

@@ -292,13 +292,13 @@ export default function SubCategoryList(props) {
                                     <div className="header_btns">
                                         <a href={void 0} onClick={changePreviewHandle} style={{ marginLeft: "8px" }}>
                                             <Button primary>
-                                                Add Sub Category List
+                                                Add Art
                                             </Button>
                                         </a>
                                     </div>
                                 </div>
                             </LegacyCard.Section>
-                            <LegacyCard.Section title="Sub Category List">
+                            <LegacyCard.Section title="Art List">
                                 <div className="filter_wrapper">
                                     <Filters
                                         queryValue={queryValue}
@@ -316,8 +316,8 @@ export default function SubCategoryList(props) {
                                         'action',
                                     ]}
                                     headings={[
-                                        'Title',
-                                        'Action'
+                                        <h1 className='Polaris-Heading'>Art Image</h1>,
+                                        <h1 className='Polaris-Heading'>Actions</h1>
                                     ]}
                                     rows={allCategoryTableData}
                                     footerContent={`Showing ${dataCount} of ${allCategoryData ? allCategoryData.length : "0"} results`}
@@ -343,7 +343,7 @@ export default function SubCategoryList(props) {
                     <Modal
                         open={activePreview}
                         onClose={changePreviewHandle}
-                        title="Add Category List"
+                        title="Add Art Image"
                         primaryAction={{
                             content: 'Save',
                             onAction: saveSubCategoryList,

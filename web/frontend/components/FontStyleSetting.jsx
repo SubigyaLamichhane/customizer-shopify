@@ -214,7 +214,7 @@ export default function FontStyleSetting(props) {
         ]}
         headings={[
           <h1 className='Polaris-Heading'>Name</h1>,
-          <h1 className='Polaris-Heading'>Action</h1>
+          <h1 className='Polaris-Heading'>Actions</h1>
         ]}
         rows={allTableData}
         footerContent={`Showing ${dataCount} of ${allData ? allData.length : "0"} results`}

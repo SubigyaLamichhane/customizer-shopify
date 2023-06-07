@@ -99,17 +99,12 @@ export default function FontStyleList(props) {
         }
     }).map(item => {
         return (
-            [<Thumbnail
-                source={item.background_image ? item.background_image : dummyImage}
-                alt={item.name}
-            />,
-            `${item.name}`,
+            [`${item.name}`,
             <div style={{ display: "inline-flex" }}>
                 <Button destructive id={item.id} onClick={() => {
                     setDeleteVal({ name: `${item.name}`, id: `${item.id}` });
                     deleteModalHandle();
                 }}>Delete </Button>
-                <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={item.id} onClick={() => navigate(`/subCategory/?id=${item.id}`)}>Add Sub Category </Button></a>
             </div>
             ]
         )
@@ -284,12 +279,10 @@ export default function FontStyleList(props) {
                             <DataTable
                                 columnContentTypes={[
                                     'text',
-                                    'text',
                                     'action',
                                 ]}
                                 headings={[
-                                    <h1 className='Polaris-Heading'>Background Image</h1>,
-                                    <h1 className='Polaris-Heading'>Title</h1>,
+                                    <h1 className='Polaris-Heading'>Name</h1>,
                                     <h1 className='Polaris-Heading'>Action</h1>
                                 ]}
                                 rows={allTableData}
