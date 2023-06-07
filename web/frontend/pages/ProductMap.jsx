@@ -1,5 +1,15 @@
 import {
-  Frame, Page, Heading, Stack, Grid, Button, TextField, LegacyCard, DropZone,
+  Frame,
+  Page,
+  Layout,
+  LegacyCard,
+  Heading,
+  Stack,
+  Grid,
+  Button,
+  ButtonGroup,
+  TextField,
+  DropZone,
   LegacyStack,
   Thumbnail,
   Banner,
@@ -44,9 +54,13 @@ export default function ProductMap(props) {
     height: 100
   });
 
-   // modal functionality
-   const [activePreview, setActivePreview] = useState(false);
-   const changePreviewHandle = useCallback(() => setActivePreview(!activePreview), [activePreview]);
+  // modal functionality
+  const [activePreview, setActivePreview] = useState(false);
+  const changePreviewHandle = useCallback(() => setActivePreview(!activePreview), [activePreview]);
+
+  const [deleteModal, setDeleteModal] = useState(false);
+  const deleteModalHandle = useCallback(() => setDeleteModal(!deleteModal), [deleteModal]);
+  const [deleteVal, setDeleteVal] = useState({ id: "", name: 0 });
 
   // file upload code
   const [file, setFile] = useState();
@@ -127,15 +141,10 @@ export default function ProductMap(props) {
       setLookNameError(true);
       return false;
     }
-    if (!file) {
-      setLoadingStatus(false);
-      setFileError("File is required!");
-      return false;
-    }
-
     let formData = new FormData()
+    let fileData = file ? file : image;
     formData.append('look_name', lookName);
-    formData.append('image', file);
+    formData.append('image', fileData);
     formData.append('crop', JSON.stringify(crop));
     const config = {
       headers: { 'content-type': 'multipart/form-data' }
@@ -163,10 +172,11 @@ export default function ProductMap(props) {
   }
 
   // delete map product
-  const deleteProductMap = async (id) => {
-    console.log('value', id)
+  const deleteProductMap = async () => {
+    deleteModalHandle();
     setLoadingStatus(true);
-    const response = await fetch(`${API_URL}/delete-map-product/${id}`, {
+    const deleteId = deleteVal.id;
+    const response = await fetch(`${API_URL}/delete-map-product/${deleteId}`, {
       method: "DELETE",
       headers: { 'content-type': 'multipart/form-data' }
     });
@@ -220,16 +230,56 @@ export default function ProductMap(props) {
             </a>
             <a href={void 0} onClick={saveProductMapping} style={{ marginLeft: "8px" }}>
               <Button primary>
-                Add More Looks
+                Save Looks
               </Button>
             </a>
           </div>
         </div>
-        <LegacyCard sectioned>
+        <Layout>
+          <Layout.Section>
+            <LegacyCard sectioned>
+              <Grid>
+                <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                  <h1 className='Polaris-Heading'>{title}</h1><br /><br />
+                  <TextField
+                    label="Look name"
+                    value={lookName}
+                    placeholder='Please enter value'
+                    onChange={handleLookName}
+                    autoComplete="off"
+                    error={lookNameError && "Can not be empty!"}
+                  /><br /><br />
+                  <DropZone allowMultiple={false} label="Choose File for image" onDrop={handleDropZoneDrop}>
+                    {uploadedFile}
+                    {fileUpload}
+                    {fileError &&
+                      <div id="PolarisTextField11Error" className="Polaris-InlineError">
+                        <div className="Polaris-InlineError__Icon">
+                          <Icon source={AlertMinor} />
+                        </div>
+                        {fileError}
+                      </div>
+                    }
+                  </DropZone>
+                </Grid.Cell>
+                <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
+                  <LegacyCard sectioned>
+                    <div className="product_img">
+                      <ReactCrop crop={crop} onChange={c => { setCrop(c); console.log('crop', crop) }}>
+                        <img style={{ transform: `scale(1) rotate(0deg)` }} src={file ? window.URL.createObjectURL(file) : image} alt={title} />
+                      </ReactCrop>
+                    </div>
+                  </LegacyCard>
+                </Grid.Cell>
+              </Grid>
+            </LegacyCard>
+          </Layout.Section>
+        </Layout>
+        {/* <LegacyCard sectioned>
           <Grid>
             <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>
               <LegacyCard title={title} sectioned>
-                <LegacyCard title="More Looks" sectioned>
+                <LegacyCard sectioned>
                   <TextField
                     label="Look name"
                     value={lookName}
@@ -265,40 +315,55 @@ export default function ProductMap(props) {
               </LegacyCard>
             </Grid.Cell>
           </Grid>
-        </LegacyCard>
-        <LegacyCard title="Map Product List" sectioned>
-          {/* foreach for product mapping */}
-          {
-            product.product_map?.map((product, i) => {
-              return (
-                [
-                  <MediaCard
-                    key={i}
-                    title="Look Name"
-                    description={product.look_name}
-                    popoverActions={[{ content: 'Delete', onAction: () => { deleteProductMap(product.id) } }]}
-                  >
-                    <div className="product_img">
-                      <ReactCrop crop={JSON.parse(product.crop)}>
-                        <img
-                          alt=""
-                          style={{
-                            transform: 'scale(1) rotate(0deg)',
-                            objectFit: 'cover',
-                            objectPosition: 'center',
-                            cursor: 'not-allowed'
-                          }}
-                          src={product.image}
-                        />
-                      </ReactCrop>
-                    </div>
-                  </MediaCard>
-                ]
-              )
-            }).reverse()
-          }
-        </LegacyCard>
-        {/* end foreach for product mapping */}
+        </LegacyCard> */}
+
+        {
+          product.product_map ?
+            <LegacyCard title="Map Product List" sectioned>
+              {/* foreach for product mapping */}
+              {
+                product.product_map?.map((product, i) => {
+                  return (
+                    [
+                      <MediaCard
+                        key={i}
+                        title="Look Name"
+                        description={product.look_name}
+                      >
+                        <div className='button-right'>
+                          <Button destructive onClick={() => {
+                            setDeleteVal({ id: `${product.id}`, name: `${product.look_name}` });
+                            deleteModalHandle();
+                          }}>Delete</Button>
+                        </div>
+                        <Grid>
+                          <Grid.Cell columnSpan={{ xs: 12, sm: 2, md: 2, lg: 12, xl: 12 }}>
+                            <div className="product_img">
+                              <ReactCrop crop={JSON.parse(product.crop)}>
+                                <img
+                                  alt=""
+                                  style={{
+                                    transform: 'scale(1) rotate(0deg)',
+                                    objectFit: 'cover',
+                                    objectPosition: 'center',
+                                    cursor: 'not-allowed'
+                                  }}
+                                  src={product.image}
+                                />
+                              </ReactCrop>
+                            </div>
+                          </Grid.Cell>
+                        </Grid>
+                      </MediaCard>
+                    ]
+                  )
+                }).reverse()
+              }
+            </LegacyCard>
+            /* end foreach for product mapping */
+            :
+            ""
+        }
 
         {/* modal start */}
         <div >
@@ -314,10 +379,8 @@ export default function ProductMap(props) {
             <Modal.Section>
               <TextContainer>
                 <ol>
-                  <li>Click Drawing and then add a line or shape.</li>
-                  <li>Click where to start drawing.</li>
-                  <li>Click each corner or bend of your line or shape to move the map, click and hold the mouse.</li>
-                  <li>When you're finished drawing, double-click or complete the shape.</li>
+                  <li>By default you can see the front look of the product you have selected or you can click on add more look button to add new look of the product.</li>
+                  <li>In the image you can see a square shape region marker through which you can mark the drawable region in which you want your customer to customize the product. </li>
                   <li>When you're done click save.</li>
                 </ol>
               </TextContainer>
@@ -325,7 +388,31 @@ export default function ProductMap(props) {
           </Modal>
         </div>
         {/* modal end */}
-      </Page>
-    </Frame>
+
+        {/* modal start */}
+        <div>
+          <Modal
+            open={deleteModal}
+            onClose={deleteModalHandle}
+            title=""
+            small
+          >
+            <Modal.Section>
+              <div className="delete_modal_wrapper">
+                <div className="delete_container">
+                  <h1 className="Polaris-Heading">Are you sure!</h1>
+                  <p>You want to delete <b variation="strong">"{deleteVal.name}"</b> product mapping.</p>
+                  <ButtonGroup>
+                    <Button onClick={deleteModalHandle}>Cancel</Button>
+                    <Button destructive onClick={deleteProductMap}>Delete</Button>
+                  </ButtonGroup>
+                </div>
+              </div>
+            </Modal.Section>
+          </Modal>
+        </div>
+        {/* modal end */}
+      </Page >
+    </Frame >
   )
 }

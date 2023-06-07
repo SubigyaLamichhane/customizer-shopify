@@ -24,12 +24,14 @@ import { useEffect, useState, useCallback } from "react";
 import { useAuthenticatedFetch } from "../hooks";
 import dummyImage from "../assets/images/dummy-image.jpg";
 import { useNavigate } from "react-router-dom";
-import { AlertMinor } from '@shopify/polaris-icons';
+import { AlertMinor, NoteMinor } from '@shopify/polaris-icons';
 
-export default function Products(props) {
+export default function FontStyleList(props) {
     const API_URL = props.API_URL;
     const fetch = useAuthenticatedFetch();
     const navigate = useNavigate();
+    const urlParams = new URLSearchParams(window.location.search);
+    const id = urlParams.get("id");
     const [loadingStatus, setLoadingStatus] = useState(true);
     const [toastMsg, setToastMsg] = useState();
     const [toastContent, setToastContent] = useState("");
@@ -41,26 +43,25 @@ export default function Products(props) {
     const [searchTerm, setSearchTerm] = useState("");
     const usersPerPage = 10;
     const pagesVisited = pageNumber * usersPerPage;
-
     const [name, setName] = useState("");
     const [nameError, setNameError] = useState(false);
     const [deleteModal, setDeleteModal] = useState(false);
     const deleteModalHandle = useCallback(() => setDeleteModal(!deleteModal), [deleteModal]);
-    const [deleteVal, setDeleteVal] = useState({ category_name: "", category_id: 0 });
+    const [deleteVal, setDeleteVal] = useState({ name: "", id: 0 });
 
     // delete category
-    const deleteCategory = async () => {
+    const deleteItem = async () => {
         deleteModalHandle();
         setLoadingStatus(true);
-        const deleteId = deleteVal.category_id;
-        const response = await fetch(`${API_URL}/delete-art-category/${deleteId}`, {
+        const deleteId = deleteVal.id;
+        const response = await fetch(`${API_URL}/delete-text-sub-font/${deleteId}`, {
             method: "Delete"
         });
         const res = await response.json();
 
         if (res.status === true) {
             setToastContent(res.message);
-            setDeleteVal({ category_name: "", category_id: "" });
+            setDeleteVal({ name: "", id: "" });
             setToastMsg(true);
             setLoadingStatus(false);
             setRowUpdate(!rowUpdate);
@@ -84,41 +85,41 @@ export default function Products(props) {
 
     // call use effect
     useEffect(async () => {
-        const response = await fetch(`${API_URL}/get-art-category-list`);
+        const response = await fetch(`${API_URL}/get-text-sub-font-list/${id}`);
         const productList = await response.json();
         setRows(productList.data);
         setLoadingStatus(false);
     }, [rowUpdate]);
 
-    var allCategoryData = rows?.filter((category) => {
+    var allData = rows?.filter((item) => {
         if (searchTerm == "") {
-            return category;
-        } else if (category.name?.toLowerCase().includes(searchTerm?.toLowerCase())) {
-            return category;
+            return item;
+        } else if (item.name?.toLowerCase().includes(searchTerm?.toLowerCase())) {
+            return item;
         }
-    }).map(category => {
+    }).map(item => {
         return (
             [<Thumbnail
-                source={category.background_image ? category.background_image : dummyImage}
-                alt={category.name}
+                source={item.background_image ? item.background_image : dummyImage}
+                alt={item.name}
             />,
-            `${category.name}`,
+            `${item.name}`,
             <div style={{ display: "inline-flex" }}>
-                <Button destructive id={category.id} onClick={() => {
-                    setDeleteVal({ category_name: `${category.name}`, category_id: `${category.id}` });
+                <Button destructive id={item.id} onClick={() => {
+                    setDeleteVal({ name: `${item.name}`, id: `${item.id}` });
                     deleteModalHandle();
                 }}>Delete </Button>
-                <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={category.id} onClick={() => navigate(`/subCategory/?id=${category.id}`)}>Add Sub Category </Button></a>
+                <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={item.id} onClick={() => navigate(`/subCategory/?id=${item.id}`)}>Add Sub Category </Button></a>
             </div>
             ]
         )
     }).reverse();
 
     var pageCount = 0;
-    var allCategoryTableData = [];
-    if (allCategoryData) {
-        pageCount = Math.ceil(allCategoryData.length / usersPerPage);
-        allCategoryTableData = allCategoryData.slice(pagesVisited, pagesVisited + usersPerPage);
+    var allTableData = [];
+    if (allData) {
+        pageCount = Math.ceil(allData.length / usersPerPage);
+        allTableData = allData.slice(pagesVisited, pagesVisited + usersPerPage);
     }
 
     // filter code
@@ -144,9 +145,9 @@ export default function Products(props) {
 
     useEffect(() => {
         if (pageNumber === 0) {
-            setDataCount(allCategoryTableData.length);
+            setDataCount(allTableData.length);
         } else {
-            setDataCount((usersPerPage * pageNumber) + allCategoryTableData.length);
+            setDataCount((usersPerPage * pageNumber) + allTableData.length);
         }
     }, [rows, pageNumber, searchTerm]);
     // filter code end
@@ -160,7 +161,8 @@ export default function Products(props) {
     const [fileError, setFileError] = useState("");
     const handleDropZoneDrop = useCallback(
         (_dropFiles, acceptedFiles, _rejectedFiles) => {
-            const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
+            const validImageTypes = ['font/ttf'];
+            console.log(acceptedFiles)
             if (validImageTypes.includes(acceptedFiles[0].type)) {
                 if (acceptedFiles[0].size < 2000000) {
                     setFile((file) => acceptedFiles[0]);
@@ -177,20 +179,11 @@ export default function Products(props) {
         []
     );
 
-    const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
+    const validImageTypes = ['font/ttf'];
     const fileUpload = !file && <DropZone.FileUpload />;
     const uploadedFile = file && (
         <div style={{ padding: '0' }}>
             <LegacyStack alignment="center">
-                <Thumbnail
-                    size="small"
-                    alt={file.name}
-                    source={
-                        validImageTypes.includes(file.type)
-                            ? window.URL.createObjectURL(file)
-                            : NoteMinor
-                    }
-                />
                 <div>
                     {file.name}{' '}
                     <Text variant="bodySm" as="p">
@@ -203,7 +196,7 @@ export default function Products(props) {
     // file upload code end
 
     // save category
-    const saveCategory = async () => {
+    const saveItem = async () => {
         setLoadingStatus(true);
         if (name === "") {
             setLoadingStatus(false);
@@ -218,12 +211,12 @@ export default function Products(props) {
 
         let formData = new FormData()
         formData.append('name', name);
-        formData.append('background_image', file);
+        formData.append('file', file);
         // formData.append('level', level);
         const config = {
             headers: { 'content-type': 'multipart/form-data' }
         }
-        const response = await fetch(`${API_URL}/create-art-category`, {
+        const response = await fetch(`${API_URL}/create-sub-text-font/${id}`, {
             method: 'POST',
             body: formData,
             config
@@ -264,12 +257,12 @@ export default function Products(props) {
                 }
                 <div className="header">
                     <div className="header_title">
-                        <h1 className='Polaris-Heading'>List Of Art Category</h1>
+                        <h1 className='Polaris-Heading'>List Of Fonts</h1>
                     </div>
                     <div className="header_btns">
                         <a href={void 0} onClick={changePreviewHandle} style={{ marginLeft: "8px" }}>
                             <Button primary>
-                                Add Category
+                                Add Font
                             </Button>
                         </a>
                     </div>
@@ -299,8 +292,8 @@ export default function Products(props) {
                                     <h1 className='Polaris-Heading'>Title</h1>,
                                     <h1 className='Polaris-Heading'>Action</h1>
                                 ]}
-                                rows={allCategoryTableData}
-                                footerContent={`Showing ${dataCount} of ${allCategoryData ? allCategoryData.length : "0"} results`}
+                                rows={allTableData}
+                                footerContent={`Showing ${dataCount} of ${allData ? allData.length : "0"} results`}
                             />
                             <ReactPaginate
                                 previousLabel={<svg viewBox="0 0 20 20" className="Polaris-Icon__Svg" focusable="false" aria-hidden="true"><path d="M12 16a.997.997 0 0 1-.707-.293l-5-5a.999.999 0 0 1 0-1.414l5-5a.999.999 0 1 1 1.414 1.414l-4.293 4.293 4.293 4.293a.999.999 0 0 1-.707 1.707z"></path></svg>}
@@ -318,14 +311,14 @@ export default function Products(props) {
                     </Layout.Section>
                 </Layout>
                 {/* modal start */}
-                <div >
+                <div>
                     <Modal
                         open={activePreview}
                         onClose={changePreviewHandle}
-                        title="Create Category"
+                        title="Add Font"
                         primaryAction={{
                             content: 'Save',
-                            onAction: saveCategory,
+                            onAction: saveItem,
                         }}
                         secondaryActions={{
                             content: 'Close',
@@ -339,13 +332,13 @@ export default function Products(props) {
                                         <TextField
                                             value={name}
                                             onChange={handleName}
-                                            label="Caegory Name"
+                                            label="Font Name"
                                             type="text"
                                             autoComplete="off"
                                             placeholder='Please enter value'
                                             error={nameError && "Can not be empty!"}
                                         />
-                                        <DropZone allowMultiple={false} label="Choose File for image" onDrop={handleDropZoneDrop}>
+                                        <DropZone allowMultiple={false} label="Choose File for font, File type must be .ttf." onDrop={handleDropZoneDrop}>
                                             {uploadedFile}
                                             {fileUpload}
                                             {fileError &&
@@ -378,10 +371,10 @@ export default function Products(props) {
                             <div className="delete_modal_wrapper">
                                 <div className="delete_container">
                                     <h1 className="Polaris-Heading">Are you sure!</h1>
-                                    <p>You want to delete <b variation="strong">"{deleteVal.category_name}"</b> category.</p>
+                                    <p>You want to delete <b variation="strong">"{deleteVal.name}"</b> font.</p>
                                     <ButtonGroup>
                                         <Button onClick={deleteModalHandle}>Cancel</Button>
-                                        <Button destructive onClick={deleteCategory}>Delete</Button>
+                                        <Button destructive onClick={deleteItem}>Delete</Button>
                                     </ButtonGroup>
                                 </div>
                             </div>
