@@ -7,9 +7,11 @@ import {
   DataTable,
   Thumbnail,
   Button,
+  ButtonGroup,
   Toast,
   Spinner,
-  Icon
+  Icon,
+  Modal
 } from "@shopify/polaris";
 import createApp, { Provider, ResourcePicker, TitleBar } from "@shopify/app-bridge-react";
 import ReactPaginate from "react-paginate";
@@ -27,12 +29,10 @@ export default function Products(props) {
   const [toastMsg, setToastMsg] = useState();
   const [toastContent, setToastContent] = useState("");
   const [toastErrStatus, setToastErrStatus] = useState(false);
-
   // product selection variables
   const [openResourcePicker, setOpenResourcePicker] = useState(false);
   const hideResourcePicker = () => setOpenResourcePicker(false);
   const showResourcePicker = () => setOpenResourcePicker(true);
-
   const [rows, setRows] = useState([]);
   const [rowUpdate, setRowUpdate] = useState(false);
   const [pageNumber, setPageNumber] = useState(0);
@@ -40,6 +40,9 @@ export default function Products(props) {
   const [searchTerm, setSearchTerm] = useState("");
   const usersPerPage = 10;
   const pagesVisited = pageNumber * usersPerPage;
+  const [deleteModal, setDeleteModal] = useState(false);
+  const deleteModalHandle = useCallback(() => setDeleteModal(!deleteModal), [deleteModal]);
+  const [deleteVal, setDeleteVal] = useState({ id: 0, name: "" });
 
   useEffect(async () => {
     const response = await fetch(`${API_URL}/get-product-list`);
@@ -81,7 +84,13 @@ export default function Products(props) {
             color="critical"
           />
         </p>,
-      <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={product.id} onClick={() => navigate(`/ProductMap/?id=${product.id}`)}>Mark Region </Button></a>
+      <div style={{ display: "inline-flex" }}>
+        <Button style={{ marginLeft: "8px" }} destructive id={product.id} onClick={() => {
+          setDeleteVal({ name: `${product.title}`, id: `${product.id}` });
+          deleteModalHandle();
+        }}>Delete </Button>
+        <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={product.id} onClick={() => navigate(`/ProductMap/?id=${product.id}`)}>Mark Region </Button></a>
+      </div>
       ]
     )
   }).reverse();
@@ -193,7 +202,30 @@ export default function Products(props) {
       setOpenResourcePicker(false);
     }
     // hideResourcePicker();
-  }
+  };
+
+  // delete item
+  const deleteItem = async () => {
+    deleteModalHandle();
+    setLoadingStatus(true);
+    const deleteId = deleteVal.id;
+    const response = await fetch(`${API_URL}/delete-product/${deleteId}`, {
+      method: "Delete"
+    });
+    const res = await response.json();
+
+    if (res.status === true) {
+      setToastContent(res.message);
+      setDeleteVal({ id: "", name: "" });
+      setToastMsg(true);
+      setLoadingStatus(false);
+      setRowUpdate(!rowUpdate);
+    }
+    else {
+      setToastContent(res.message);
+      setToastErrStatus(true)
+    }
+  };
 
   return (
     <Frame>
@@ -234,8 +266,8 @@ export default function Products(props) {
                 actionVerb="select"
                 showVariants={false}
                 onSelection={selectedProduct}
-                // selectMultiple={false}
-                // initialSelectionIds={selectedPrdIds}
+              // selectMultiple={false}
+              // initialSelectionIds={selectedPrdIds}
               />
               <div className="filter_wrapper">
                 <Filters
@@ -279,6 +311,29 @@ export default function Products(props) {
             </LegacyCard>
           </Layout.Section>
         </Layout>
+        {/* delete modal start */}
+        <div>
+          <Modal
+            open={deleteModal}
+            onClose={deleteModalHandle}
+            title=""
+            small
+          >
+            <Modal.Section>
+              <div className="delete_modal_wrapper">
+                <div className="delete_container">
+                  <h1 className="Polaris-Heading">Are you sure!</h1>
+                  <p>You want to delete <b variation="strong">"{deleteVal.name}"</b> font color.</p>
+                  <ButtonGroup>
+                    <Button onClick={deleteModalHandle}>Cancel</Button>
+                    <Button destructive onClick={deleteItem}>Delete</Button>
+                  </ButtonGroup>
+                </div>
+              </div>
+            </Modal.Section>
+          </Modal>
+        </div>
+        {/* delete modal end */}
       </Page>
     </Frame>
   );

@@ -11,6 +11,7 @@ import {
     Modal,
     Form,
     FormLayout,
+    Select,
     TextField,
     Toast,
     Icon,
@@ -40,6 +41,7 @@ export default function SubCategory(props) {
     const pagesVisited = pageNumber * usersPerPage;
     const urlParams = new URLSearchParams(window.location.search);
     const categoryId = urlParams.get("id");
+    const [childList, setChildList] = useState("");
 
     const [name, setName] = useState("");
     const [categoryName, setCategoryName] = useState("");
@@ -47,6 +49,18 @@ export default function SubCategory(props) {
     const [deleteModal, setDeleteModal] = useState(false);
     const deleteModalHandle = useCallback(() => setDeleteModal(!deleteModal), [deleteModal]);
     const [deleteVal, setDeleteVal] = useState({ category_name: "", category_id: 0 });
+
+    // selete option
+    const [selected, setSelected] = useState("art_image");
+    const handleSelectChange = useCallback(
+        (value) => setSelected(value),
+        [],
+    );
+    const options = [
+        { label: 'Art Image', value: 'art_image' },
+        { label: 'Art Category', value: 'art_sub_category' },
+    ];
+
 
     // call use effect
     useEffect(async () => {
@@ -56,6 +70,9 @@ export default function SubCategory(props) {
         setRows(categoryData.data);
         setSubCategory(categoryData.data[0].sub_category);
         setCategoryName(categoryData.data[0].name);
+        if (categoryData.data[0].sub_category) {
+            setChildList(categoryData.data[0].sub_category[0].child_list);
+        }
         setLoadingStatus(false);
     }, [rowUpdate]);
 
@@ -73,7 +90,7 @@ export default function SubCategory(props) {
                     setDeleteVal({ category_name: `${category.name}`, category_id: `${category.id}` });
                     deleteModalHandle();
                 }}>Delete </Button>
-                <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={category.id} onClick={() => navigate(`/subCategoryList/?id=${categoryId}&sub_category_id=${category.id}`)}>Add Art Category / Image </Button></a>
+                <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={category.id} onClick={() => navigate(`/subCategoryList/?id=${categoryId}&sub_category_id=${category.id}`)}>{(category.child_list == "art_sub_category") ? "Add Art Sub Category" : "Art Image"} </Button></a>
             </div>
             ]
         )
@@ -140,7 +157,8 @@ export default function SubCategory(props) {
             return false;
         }
         let data = {
-            name: name
+            name: name,
+            child_list: selected
         };
         const response = await fetch(`${API_URL}/create-art-sub-category/${categoryId}`, {
             method: 'POST',
@@ -154,6 +172,7 @@ export default function SubCategory(props) {
             setToastMsg(true);
             setLoadingStatus(false);
             setRowUpdate(!rowUpdate);
+            setName("");
         }
         else {
             setLoadingStatus(false);
@@ -299,6 +318,12 @@ export default function SubCategory(props) {
                                             autoComplete="off"
                                             placeholder='Please enter value'
                                             error={nameError && "Can not be empty!"}
+                                        />
+                                        <Select
+                                            label="Selete child list"
+                                            options={options}
+                                            onChange={handleSelectChange}
+                                            value={selected}
                                         />
                                     </FormLayout>
                                 </Form>

@@ -18,7 +18,7 @@ import {
     Icon,
     ButtonGroup,
 } from '@shopify/polaris';
-import { ChevronLeftMinor, AlertMinor } from '@shopify/polaris-icons';
+import { ChevronLeftMinor, AlertMinor, NoteMinor } from '@shopify/polaris-icons';
 import ReactPaginate from "react-paginate";
 import React, { useEffect, useState, useCallback } from "react";
 import { useAuthenticatedFetch } from "../hooks";
@@ -135,73 +135,72 @@ export default function SubCategoryList(props) {
     const changePreviewHandle = useCallback(() => setActivePreview(!activePreview), [activePreview]);
 
     // file upload code
-    const [file, setFile] = useState();
+    const [files, setFiles] = useState([]);
     const [fileError, setFileError] = useState("");
     const handleDropZoneDrop = useCallback(
         (_dropFiles, acceptedFiles, _rejectedFiles) => {
             const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
+            console.log('acceptedFiles[0].type', acceptedFiles[0].type);
             if (validImageTypes.includes(acceptedFiles[0].type)) {
                 if (acceptedFiles[0].size < 2000000) {
-                    setFile((file) => acceptedFiles[0]);
-                    setFileError("");
+                    setFiles((files) => [...files, ...acceptedFiles]),
+                        setFileError("");
                 } else {
-                    setFile();
                     setFileError(`“${acceptedFiles[0].name}” is too large. Try a file size less than 2MB.`)
                 }
             } else {
-                setFile();
                 setFileError(`“${acceptedFiles[0].name}” is not supported. File type must be .gif, .jpg, .png or .svg.`)
             }
         },
-        []
+        [],
     );
 
     const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
-    const fileUpload = !file && <DropZone.FileUpload />;
-    const uploadedFile = file && (
+
+    const fileUpload = files ? files.length == 0 && <DropZone.FileUpload /> : "";
+    const uploadedFile = files && (
         <div style={{ padding: '0' }}>
-            <LegacyStack alignment="center">
-                <Thumbnail
+            <LegacyStack vertical>
+                {files.map((file, index) => (
+                    <LegacyStack alignment="center" key={index}>
+                        <Thumbnail
+                            size="small"
+                            alt={file.name}
+                            source={
+                                validImageTypes.includes(file.type)
+                                    ? window.URL.createObjectURL(file)
+                                    : NoteMinor
+                            }
+                        />
+                        <div>
+                            {file.name}{' '}
+                            <Text variant="bodySm" as="p">
+                                {file.size} bytes
+                            </Text>
+                        </div>
+                    </LegacyStack>
+                ))}
+                {/* {files.length == 0 && <Thumbnail
                     size="small"
-                    alt={file.name}
-                    source={
-                        validImageTypes.includes(file.type)
-                            ? window.URL.createObjectURL(file)
-                            : NoteMinor
-                    }
-                />
-                <div>
-                    {file.name}{' '}
-                    <Text variant="bodySm" as="p">
-                        {file.size} bytes
-                    </Text>
-                </div>
+                    source={AlertMinor}
+                />} */}
             </LegacyStack>
         </div>
     );
     // file upload code end
 
-    // handle look name
-    const handleName = useCallback((newValue) => {
-        if (newValue === "") {
-            setNameError(true);
-            setName("");
-        } else {
-            setName(newValue);
-            setNameError(false);
-        }
-    }, []);
-
     // save category
     const saveSubCategoryList = async () => {
         setLoadingStatus(true);
-        if (!file) {
+        if (!files) {
             setLoadingStatus(false);
             setFileError("File is required!");
             return false;
         }
-        let formData = new FormData();
-        formData.append('image', file);
+        const formData = new FormData();
+        for (let i = 0; i < files.length; i++) {
+            formData.append('images', files[i]);
+        }
         const config = {
             headers: { 'content-type': 'multipart/form-data' }
         };
@@ -217,7 +216,7 @@ export default function SubCategoryList(props) {
             setToastMsg(true);
             setLoadingStatus(false);
             setRowUpdate(!rowUpdate);
-            setFile();
+            setFiles();
         }
         else {
             setLoadingStatus(false);

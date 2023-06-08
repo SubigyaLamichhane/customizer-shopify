@@ -108,7 +108,7 @@ export default function Products(props) {
                     setDeleteVal({ category_name: `${category.name}`, category_id: `${category.id}` });
                     deleteModalHandle();
                 }}>Delete </Button>
-                <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={category.id} onClick={() => navigate(`/subCategory/?id=${category.id}`)}>Add Art Category </Button></a>
+                <a href={void 0} style={{ marginLeft: "8px" }}><Button primary id={category.id} onClick={() => navigate(`/subCategory/?id=${category.id}`)}>Add Art Sub Category </Button></a>
             </div>
             ]
         )

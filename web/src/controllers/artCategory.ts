@@ -95,6 +95,7 @@ const createArtSubCategoryByArtId = async (req: Request, res: Response) => {
     try {
         let art_category_id: any = req.params.art_category_id;
         let name: string = req.body.name;
+        let child_list: string = req.body.child_list;
         let query: string = `SELECT * FROM art_category WHERE id=${art_category_id}`;
         mysqlConnection.query(query, function (error: any, results_1: any, fields: any) {
             if (error) throw error;
@@ -102,6 +103,7 @@ const createArtSubCategoryByArtId = async (req: Request, res: Response) => {
                 mysqlConnection.query('INSERT INTO art_sub_category SET ?', {
                     art_category_id: art_category_id,
                     name: name,
+                    child_list: child_list
                 }, function (error: any, results: any, fields: any) {
                     if (error) throw error;
                     res.status(201).send({
@@ -136,7 +138,7 @@ const getArtSubCategoryByIdAndSubId = async (req: Request, res: Response) => {
             if (err) throw err;
             if (result_1.length > 0) {
                 data.push(result_1[0]);
-                let query_2: string = `SELECT * FROM art_sub_category WHERE art_category_id=${req.params.category_id}`;
+                let query_2: string = `SELECT * FROM art_sub_category WHERE id=${req.params.sub_category_id} LIMIT 1`;
                 mysqlConnection.query(query_2, function (err: any, result_2: any) {
                     if (err) throw err;
                     if (result_2.length > 0) {
@@ -246,33 +248,67 @@ const getArtSubCategorySubList = async (req: Request, res: Response) => {
 // Create art sub category list by art sub category id (art_sub_category_id)
 const createArtSubCategoryListBySubCategoryId = async (req: Request, res: Response) => {
     try {
-        let name: string = req.body.name;
-        let image: any = await req.file;
-        let uploadedFilePath: any = image ? FILE_PATH + image.filename : null;
-        let query: string = `SELECT * FROM art_sub_category WHERE id=${req.params.art_sub_category_id}`;
-        mysqlConnection.query(query, function (error: any, results_1: any, fields: any) {
-            if (error) throw error;
-            if (results_1.length > 0) {
-                mysqlConnection.query('INSERT INTO art_sub_category_list SET ?', {
-                    art_sub_category_id: req.params.art_sub_category_id,
-                    name: name,
-                    image: uploadedFilePath
-                }, function (error: any, results: any, fields: any) {
+        let files: any = await req.files;
+        if (files) {
+            for (let i = 0; i < files.length; i++) {
+                let image = files[i];
+                let uploadedFilePath: any = image ? FILE_PATH + image.filename : null;
+                let query: string = `SELECT * FROM art_sub_category WHERE id=${req.params.art_sub_category_id}`;
+                mysqlConnection.query(query, function (error: any, results_1: any, fields: any) {
                     if (error) throw error;
-                    res.status(201).send({
-                        "status": true,
-                        "message": "Created art category list!",
-                        "data": results
-                    });
-                });
-            } else {
-                res.status(404).send({
-                    "status": false,
-                    "message": `Invalid art sub category id ${req.params.art_sub_category_id}`,
-                    "data": [],
+                    if (results_1.length > 0) {
+                        mysqlConnection.query('INSERT INTO art_sub_category_list SET ?', {
+                            art_sub_category_id: req.params.art_sub_category_id,
+                            image: uploadedFilePath,
+                            child_list: "art_image"
+                        }, function (error: any, results: any, fields: any) {
+                            if (error) throw error;
+                            // res.status(201).send({
+                            //     "status": true,
+                            //     "message": "Created art category list!",
+                            //     "data": results
+                            // });
+                        });
+                    } else {
+                        res.status(404).send({
+                            "status": false,
+                            "message": `Invalid art sub category id ${req.params.art_sub_category_id}`,
+                            "data": [],
+                        });
+                    }
                 });
             }
-        });
+            res.status(201).send({
+                "status": true,
+                "message": "Created art category list!",
+            });
+        } else {
+            let name: string = req.body.name;
+            let query: string = `SELECT * FROM art_sub_category WHERE id=${req.params.art_sub_category_id}`;
+            mysqlConnection.query(query, function (error: any, results_1: any, fields: any) {
+                if (error) throw error;
+                if (results_1.length > 0) {
+                    mysqlConnection.query('INSERT INTO art_sub_category_list SET ?', {
+                        art_sub_category_id: req.params.art_sub_category_id,
+                        name: name,
+                        child_list: "art_sub_category"
+                    }, function (error: any, results: any, fields: any) {
+                        if (error) throw error;
+                        res.status(201).send({
+                            "status": true,
+                            "message": "Created art category list!",
+                            "data": results
+                        });
+                    });
+                } else {
+                    res.status(404).send({
+                        "status": false,
+                        "message": `Invalid art sub category id ${req.params.art_sub_category_id}`,
+                        "data": [],
+                    });
+                }
+            });
+        }
     } catch (error: any) {
         res.status(404).send({
             "status": false,
@@ -323,33 +359,40 @@ const getArtSubCategorySubListById = async (req: Request, res: Response) => {
 // Create art sub category sub list by art sub category list id (art_sub_category_list_id)
 const createArtSubCategorySubListBySubCategoryListId = async (req: Request, res: Response) => {
     try {
-        let image: any = await req.file;
-        let fileName: string = image.filename;
-        let uploadedFilePath: any = image ? FILE_PATH + fileName : null;
-        let query: string = `SELECT * FROM art_sub_category_list WHERE id=${req.params.art_sub_category_list_id}`;
-        mysqlConnection.query(query, function (error, results_1, fields) {
-            if (error) throw error;
-            if (results_1.length > 0) {
-                mysqlConnection.query('INSERT INTO art_sub_category_sub_list SET ?', {
-                    art_sub_category_list_id: req.params.art_sub_category_list_id,
-                    image: uploadedFilePath
-                }, function (error: any, results: any, fields: any) {
+        let files: any = await req.files;
+        if (files) {
+            for (let i = 0; i < files.length; i++) {
+                let image = files[i];
+                let uploadedFilePath: any = image ? FILE_PATH + image.filename : null;
+                let query: string = `SELECT * FROM art_sub_category_list WHERE id=${req.params.art_sub_category_list_id}`;
+                mysqlConnection.query(query, function (error, results_1, fields) {
                     if (error) throw error;
-                    res.status(201).send({
-                        "status": true,
-                        "message": "Created art sub category list!",
-                        "data": results,
-                        "image": image
-                    });
-                });
-            } else {
-                res.status(404).send({
-                    "status": false,
-                    "message": `Invalid art sub category list id! ${req.params.art_sub_category_list_id}`,
-                    "data": [],
+                    if (results_1.length > 0) {
+                        mysqlConnection.query('INSERT INTO art_sub_category_sub_list SET ?', {
+                            art_sub_category_list_id: req.params.art_sub_category_list_id,
+                            image: uploadedFilePath
+                        }, function (error: any, results: any, fields: any) {
+                            if (error) throw error;
+                            // res.status(201).send({
+                            //     "status": true,
+                            //     "message": "Created art sub category list!",
+                            //     "data": results,
+                            // });
+                        });
+                    } else {
+                        res.status(404).send({
+                            "status": false,
+                            "message": `Invalid art sub category list id! ${req.params.art_sub_category_list_id}`,
+                            "data": [],
+                        });
+                    }
                 });
             }
-        });
+            res.status(201).send({
+                "status": true,
+                "message": "Created art sub category list!",
+            });
+        }
     } catch (error: any) {
         res.status(404).send({
             "status": false,

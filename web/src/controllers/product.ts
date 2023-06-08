@@ -105,6 +105,13 @@ const getProductById = async (req: Request, res: Response) => {
     }
 };
 
+// let query_1 = `SELECT COUNT(id)  AS count FROM product_mappings WHERE product_id=122`
+// mysqlConnection.query(query_1, function (error: any, result_1: any) {
+//     if (result_1[0].count == 0) {
+
+//     }
+// });
+
 // Delete map product by id
 const deleteMapProductId = async (req: Request, res: Response) => {
     try {
@@ -113,10 +120,24 @@ const deleteMapProductId = async (req: Request, res: Response) => {
         mysqlConnection.query(query, function (error: any, results: any) {
             if (error) throw error;
             if (results.affectedRows > 0) {
-                res.status(200).send({
-                    "status": true,
-                    "message": "Deleted success!",
-                    "data": results
+                let query_1 = `SELECT COUNT(id)  AS count FROM product_mappings WHERE product_id=${req.params.product_id}`
+                mysqlConnection.query(query_1, function (error: any, result_1: any) {
+                    if (result_1[0].count == 0) {
+                        let query_2: any = `UPDATE products SET is_mapped = 0 WHERE id = ${req.params.product_id}`
+                        mysqlConnection.query(query_2, function (error: any, result_2: any) {
+                            if (error) throw error;
+                            res.status(200).send({
+                                "status": true,
+                                "message": "Deleted success!",
+                                "data": result_2
+                            });
+                        });
+                    } else {
+                        res.status(200).send({
+                            "status": true,
+                            "message": "Deleted success!",
+                        });
+                    }
                 });
             } else {
                 res.status(404).send({

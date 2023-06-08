@@ -12,6 +12,7 @@ import {
     FormLayout,
     Text,
     TextField,
+    Select,
     DropZone,
     Toast,
     Filters,
@@ -19,7 +20,7 @@ import {
     Icon,
     ButtonGroup
 } from '@shopify/polaris';
-import { ChevronLeftMinor, AlertMinor } from '@shopify/polaris-icons';
+import { ChevronLeftMinor, AlertMinor, NoteMinor } from '@shopify/polaris-icons';
 import ReactPaginate from "react-paginate";
 import React, { useEffect, useState, useCallback } from "react";
 import { useAuthenticatedFetch } from "../hooks";
@@ -36,7 +37,6 @@ export default function SubCategoryList(props) {
     const [toastErrStatus, setToastErrStatus] = useState(false);
     const [rows, setRows] = useState([]);
     const [subCategory, setSubCategory] = useState([]);
-    const [subCategoryImage, setSubCategoryImage] = useState("");
     const [rowUpdate, setRowUpdate] = useState(false);
     const [pageNumber, setPageNumber] = useState(0);
     const [dataCount, setDataCount] = useState(0);
@@ -46,7 +46,7 @@ export default function SubCategoryList(props) {
     const urlParams = new URLSearchParams(window.location.search);
     const categoryId = urlParams.get("id");
     const subCategoryId = urlParams.get("sub_category_id");
-    const [isImage, setIsImage] = useState(0);
+    const [childList, setChildList] = useState("");
 
     const [name, setName] = useState("");
     const [categoryName, setCategoryName] = useState("");
@@ -56,6 +56,17 @@ export default function SubCategoryList(props) {
     const deleteModalHandle = useCallback(() => setDeleteModal(!deleteModal), [deleteModal]);
     const [deleteVal, setDeleteVal] = useState({ category_name: "", category_id: 0 });
 
+    // selete option
+    const [selected, setSelected] = useState('art_image');
+    const handleSelectChange = useCallback(
+        (value) => setSelected(value),
+        [],
+    );
+    const options = [
+        { label: 'Art Image', value: 'art_image' },
+        { label: 'Art Category', value: 'art_sub_category' },
+    ];
+
     // call use effect
     useEffect(async () => {
         const response = await fetch(`${API_URL}/get-art-sub-category/${categoryId}/${subCategoryId}`);
@@ -64,8 +75,8 @@ export default function SubCategoryList(props) {
         setSubCategory(categoryData.data[0].sub_category[0].sub_category_list);
         setCategoryName(categoryData.data[0].name);
         setSubCategoryName(categoryData.data[0].sub_category[0].name);
-        if (categoryData.data[0].sub_category[0].sub_category_list) {
-            setSubCategoryImage(categoryData.data[0].sub_category[0].sub_category_list[0].image)
+        if (categoryData.data[0].sub_category) {
+            setChildList(categoryData.data[0].sub_category[0].child_list);
         }
         setLoadingStatus(false);
     }, [rowUpdate]);
@@ -146,47 +157,51 @@ export default function SubCategoryList(props) {
     }
 
     // file upload code
-    const [file, setFile] = useState();
+    const [files, setFiles] = useState([]);
     const [fileError, setFileError] = useState("");
     const handleDropZoneDrop = useCallback(
         (_dropFiles, acceptedFiles, _rejectedFiles) => {
             const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
+            console.log('acceptedFiles[0].type', acceptedFiles[0].type);
             if (validImageTypes.includes(acceptedFiles[0].type)) {
                 if (acceptedFiles[0].size < 2000000) {
-                    setFile((file) => acceptedFiles[0]);
-                    setFileError("");
+                    setFiles((files) => [...files, ...acceptedFiles]),
+                        setFileError("");
                 } else {
-                    setFile();
                     setFileError(`“${acceptedFiles[0].name}” is too large. Try a file size less than 2MB.`)
                 }
             } else {
-                setFile();
                 setFileError(`“${acceptedFiles[0].name}” is not supported. File type must be .gif, .jpg, .png or .svg.`)
             }
         },
-        []
+        [],
     );
 
     const validImageTypes = ['image/gif', 'image/jpeg', 'image/png', 'image/svg+xml'];
-    const fileUpload = !file && <DropZone.FileUpload />;
-    const uploadedFile = file && (
+
+    const fileUpload = files ? files.length == 0 && <DropZone.FileUpload /> : "";
+    const uploadedFile = files && (
         <div style={{ padding: '0' }}>
-            <LegacyStack alignment="center">
-                <Thumbnail
-                    size="small"
-                    alt={file.name}
-                    source={
-                        validImageTypes.includes(file.type)
-                            ? window.URL.createObjectURL(file)
-                            : NoteMinor
-                    }
-                />
-                <div>
-                    {file.name}{' '}
-                    <Text variant="bodySm" as="p">
-                        {file.size} bytes
-                    </Text>
-                </div>
+            <LegacyStack vertical>
+                {files.map((file, index) => (
+                    <LegacyStack alignment="center" key={index}>
+                        <Thumbnail
+                            size="small"
+                            alt={file.name}
+                            source={
+                                validImageTypes.includes(file.type)
+                                    ? window.URL.createObjectURL(file)
+                                    : NoteMinor
+                            }
+                        />
+                        <div>
+                            {file.name}{' '}
+                            <Text variant="bodySm" as="p">
+                                {file.size} bytes
+                            </Text>
+                        </div>
+                    </LegacyStack>
+                ))}
             </LegacyStack>
         </div>
     );
@@ -212,7 +227,8 @@ export default function SubCategoryList(props) {
             return false;
         }
         let data = {
-            name: name
+            name: name,
+            // child_list: selected
         };
         const response = await fetch(`${API_URL}/create-art-sub-category-list/${subCategoryId}`, {
             method: 'POST',
@@ -242,13 +258,15 @@ export default function SubCategoryList(props) {
     // save category
     const saveSubCategoryList = async () => {
         setLoadingStatus(true);
-        if (!file) {
+        if (!files) {
             setLoadingStatus(false);
-            setFileError("File is required!");
+            setFilesError("File is required!");
             return false;
         }
-        let formData = new FormData();
-        formData.append('image', file);
+        const formData = new FormData();
+        for (let i = 0; i < files.length; i++) {
+            formData.append('images', files[i]);
+        }
         const config = {
             headers: { 'content-type': 'multipart/form-data' }
         };
@@ -264,7 +282,7 @@ export default function SubCategoryList(props) {
             setToastMsg(true);
             setLoadingStatus(false);
             setRowUpdate(!rowUpdate);
-            setFile();
+            setFiles();
         }
         else {
             setLoadingStatus(false);
@@ -318,7 +336,7 @@ export default function SubCategoryList(props) {
                 }
                 <div className="header">
                     <div className="header_link">
-                        <Link to={"/subCategory?id="+categoryId} >
+                        <Link to={"/subCategory?id=" + categoryId} >
                             <span><Icon source={ChevronLeftMinor} color="base" /></span>
                             <span className="link_text">Go Back</span>
                         </Link>
@@ -339,7 +357,20 @@ export default function SubCategoryList(props) {
                                         </ul>
                                     </div>
                                     <div className="header_btns">
-                                        <a href={void 0} onClick={() => changePreviewHandle("category")} style={{ marginLeft: "8px" }}>
+                                        {
+                                            (childList == "art_sub_category") ?
+                                                <a href={void 0} onClick={() => changePreviewHandle("category")} style={{ marginLeft: "8px" }}>
+                                                    <Button primary>
+                                                        Add Art Category
+                                                    </Button>
+                                                </a> :
+                                                <a href={void 0} onClick={() => changePreviewHandle("list")} style={{ marginLeft: "8px" }}>
+                                                    <Button primary>
+                                                        Add Art
+                                                    </Button>
+                                                </a>
+                                        }
+                                        {/* <a href={void 0} onClick={() => changePreviewHandle("category")} style={{ marginLeft: "8px" }}>
                                             <Button primary>
                                                 Add Art Category
                                             </Button>
@@ -348,7 +379,7 @@ export default function SubCategoryList(props) {
                                             <Button primary>
                                                 Add Art
                                             </Button>
-                                        </a>
+                                        </a> */}
                                     </div>
                                 </div>
                             </LegacyCard.Section>
@@ -370,7 +401,7 @@ export default function SubCategoryList(props) {
                                         'action',
                                     ]}
                                     headings={[
-                                        <h1 className='Polaris-Heading'>{subCategoryImage ? "Art Image" : "Title"}</h1>,
+                                        <h1 className='Polaris-Heading'>{(childList == "art_category") ? "Title" : "Art Image"}</h1>,
                                         <h1 className='Polaris-Heading'>Actions</h1>
                                     ]}
                                     rows={allCategoryTableData}
@@ -421,6 +452,12 @@ export default function SubCategoryList(props) {
                                             placeholder='Please enter value'
                                             error={nameError && "Can not be empty!"}
                                         />
+                                        {/* <Select
+                                            label="Selete child list"
+                                            options={options}
+                                            onChange={handleSelectChange}
+                                            value={selected}
+                                        /> */}
                                     </FormLayout>
                                 </Form>
                             </LegacyStack>

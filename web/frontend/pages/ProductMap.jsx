@@ -176,7 +176,7 @@ export default function ProductMap(props) {
     deleteModalHandle();
     setLoadingStatus(true);
     const deleteId = deleteVal.id;
-    const response = await fetch(`${API_URL}/delete-map-product/${deleteId}`, {
+    const response = await fetch(`${API_URL}/delete-map-product/${deleteId}/${product_id}`, {
       method: "DELETE",
       headers: { 'content-type': 'multipart/form-data' }
     });

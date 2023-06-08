@@ -26,9 +26,9 @@ artCategoryRouter.post("/create-art-category", upload.single('background_image')
 artCategoryRouter.post("/create-art-sub-category/:art_category_id", createArtSubCategoryByArtId);
 artCategoryRouter.get("/get-art-sub-category/:category_id/:sub_category_id", getArtSubCategoryByIdAndSubId);
 artCategoryRouter.get("/get-art-sub-category-sub-list/:category_id/:sub_category_id/:sub_category_list_id", getArtSubCategorySubList);
-artCategoryRouter.post("/create-art-sub-category-list/:art_sub_category_id", upload.single('image'), createArtSubCategoryListBySubCategoryId);
+artCategoryRouter.post("/create-art-sub-category-list/:art_sub_category_id", upload.array("images"), createArtSubCategoryListBySubCategoryId);
 artCategoryRouter.get("/get-art-sub-category-sub-list/:id", getArtSubCategorySubListById);
-artCategoryRouter.post("/create-art-sub-category-sub-list/:art_sub_category_list_id", upload.single('image'), createArtSubCategorySubListBySubCategoryListId);
+artCategoryRouter.post("/create-art-sub-category-sub-list/:art_sub_category_list_id", upload.array('images'), createArtSubCategorySubListBySubCategoryListId);
 artCategoryRouter.delete("/delete-art-category/:id", deleteArtCategoryById);
 artCategoryRouter.delete("/delete-art-sub-category/:id", deleteArtSubCategoryById);
 artCategoryRouter.delete("/delete-art-sub-category-list/:id", deleteArtSubCategoryListById);

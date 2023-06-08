@@ -13,7 +13,7 @@ import {
 prodRouter.post("/add-product", addProduct);
 prodRouter.get("/get-product-list", getProductList);
 prodRouter.get("/get-product/:id", getProductById);
-prodRouter.delete("/delete-map-product/:id", deleteMapProductId);
+prodRouter.delete("/delete-map-product/:id/:product_id", deleteMapProductId);
 prodRouter.post("/map-product/:id", upload.single('image'), mapProductById);
 prodRouter.delete("/delete-product/:id", deleteProductById);
 
