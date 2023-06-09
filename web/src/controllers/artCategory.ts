@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import mysqlConnection from "../config/mySqlConnection.js";
-const FILE_PATH = process.env.HOST + "/assets/public/uploads/";
+import dotenv from "dotenv";
+dotenv.config();
+const FILE_PATH = `${process.env.APP_URL}${process.env.FILE_UPLOAD_PATH}`;
 
 // Get art category list
 const getArtCategoryList = (req: Request, res: Response) => {
@@ -66,12 +68,14 @@ const createArtCategory = async (req: Request, res: Response) => {
     try {
         let session_id: string = res.locals.shopify.session.id;
         let name: string = req.body.name;
+        let background_color: string = req.body.background_color;
         let image: any = await req.file;
         let uploadedFilePath: any = FILE_PATH + image.filename;
         mysqlConnection.query('INSERT INTO art_category SET ?', {
             session_id: session_id,
             name: name,
-            background_image: uploadedFilePath
+            background_image: uploadedFilePath,
+            background_color: background_color
         }, function (error: any, results: any, fields: any) {
             if (error) throw error;
             let artCategoryId: number = results.insertId;

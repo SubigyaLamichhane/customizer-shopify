@@ -24,6 +24,11 @@ import textSettingRouter from "./src/routes/textSetting.js";
 
 console.log(process.env.BACKEND_PORT, 'hello', process.env.PORT);
 
+import dotenv from 'dotenv';
+dotenv.config();
+console.log(process.env.APP_URL);
+
+
 // local environment
 const PORT = process.env.BACKEND_PORT || process.env.PORT;
 const APP_URL = process.env.HOST;

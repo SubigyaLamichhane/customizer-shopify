@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import mysqlConnection from "../config/mySqlConnection.js";
-const FILE_PATH = process.env.HOST + "/assets/public/uploads/";
+import dotenv from "dotenv";
+dotenv.config();
+const FILE_PATH = `${process.env.APP_URL}${process.env.FILE_UPLOAD_PATH}`;
 
 // Create text font color setting
 const createTextFontColor = async (req: Request, res: Response) => {

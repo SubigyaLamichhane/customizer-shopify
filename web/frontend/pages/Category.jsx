@@ -25,6 +25,7 @@ import { useAuthenticatedFetch } from "../hooks";
 import dummyImage from "../assets/images/dummy-image.jpg";
 import { useNavigate } from "react-router-dom";
 import { AlertMinor } from '@shopify/polaris-icons';
+import { SketchPicker } from 'react-color'
 
 export default function Products(props) {
     const API_URL = props.API_URL;
@@ -42,6 +43,7 @@ export default function Products(props) {
     const usersPerPage = 10;
     const pagesVisited = pageNumber * usersPerPage;
 
+    const [color, setColor] = useState("");
     const [name, setName] = useState("");
     const [nameError, setNameError] = useState(false);
     const [deleteModal, setDeleteModal] = useState(false);
@@ -81,6 +83,12 @@ export default function Products(props) {
             setNameError(false);
         }
     }, []);
+
+    // handle color
+    const handleChangeComplete = (color) => {
+        console.log(color.hex);
+        setColor(color.hex);
+    };
 
     // call use effect
     useEffect(async () => {
@@ -210,6 +218,11 @@ export default function Products(props) {
             setNameError(true);
             return false;
         }
+        if (color === "") {
+            setLoadingStatus(false);
+            setColorError(true);
+            return false;
+        }
         if (!file) {
             setLoadingStatus(false);
             setFileError("File is required!");
@@ -219,6 +232,7 @@ export default function Products(props) {
         let formData = new FormData()
         formData.append('name', name);
         formData.append('background_image', file);
+        formData.append('background_color', color);
         // formData.append('level', level);
         const config = {
             headers: { 'content-type': 'multipart/form-data' }
@@ -344,7 +358,7 @@ export default function Products(props) {
                                             autoComplete="off"
                                             placeholder='Please enter value'
                                             error={nameError && "Can not be empty!"}
-                                        />
+                                        />                                        
                                         <DropZone allowMultiple={false} label="Choose File for image" onDrop={handleDropZoneDrop}>
                                             {uploadedFile}
                                             {fileUpload}
@@ -357,6 +371,11 @@ export default function Products(props) {
                                                 </div>
                                             }
                                         </DropZone>
+                                        <p>Background Color</p>
+                                        <SketchPicker
+                                            color={color}
+                                            onChange={handleChangeComplete}
+                                        />
                                         {/* <Button submit>Submit</Button> */}
                                     </FormLayout>
                                 </Form>

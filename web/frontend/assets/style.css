@@ -287,3 +287,19 @@ ul.breadcrumb li a:hover {
   height: '14px';
   border-radius: '2px';
 }
+
+.sketch-picker {
+  width: 100% !important;
+}
+
+.sketch-picker > div:first-child {
+  padding-bottom: 25% !important;
+}
+
+button.Polaris-Modal-CloseButton {
+  right: 10px !important;
+}
+
+button.Polaris-Modal-CloseButton:hover {
+  background: none !important;
+}

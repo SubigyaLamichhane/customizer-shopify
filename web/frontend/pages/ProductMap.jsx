@@ -32,6 +32,8 @@ import { useState, useCallback, useEffect } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthenticatedFetch } from '../hooks';
 import ReactCrop from 'react-image-crop'
+import 'react-image-crop/dist/ReactCrop.css'
+
 export default function ProductMap(props) {
   const API_URL = props.API_URL;
   const fetch = useAuthenticatedFetch();

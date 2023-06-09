@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
 import mysqlConnection from "../config/mySqlConnection.js";
-const FILE_PATH = process.env.HOST + "/assets/public/uploads/";
 import gm from "gm";
+import dotenv from "dotenv";
+dotenv.config();
+const FILE_PATH = `${process.env.APP_URL}${process.env.FILE_UPLOAD_PATH}`;
 
 // Get art category list for front end side
 const getArtCategoryList = async (req: Request, res: Response) => {
