@@ -3,12 +3,13 @@ import { join } from "path";
 import { readFileSync } from "fs";
 import express, { Request, Response, Express } from "express";
 import serveStatic from "serve-static";
-
 import shopify from "./shopify.js";
 import productCreator from "./product-creator.js";
 import GDPRWebhookHandlers from "./gdpr.js";
 import mysqlConnection from "./mySqlConnection.js";
 import cors from "cors";
+import dotenv from 'dotenv';
+dotenv.config();
 
 // use body-parser for fetch request body
 import bodyParser from "body-parser";
@@ -22,27 +23,16 @@ import settingRouter from "./src/routes/setting.js";
 import prodRouter from "./src/routes/product.js";
 import textSettingRouter from "./src/routes/textSetting.js";
 
-console.log(process.env.BACKEND_PORT, 'hello', process.env.PORT);
-
-import dotenv from 'dotenv';
-dotenv.config();
-console.log(process.env.APP_URL);
-
+console.log(process.env.BACKEND_PORT, 'process.env.PORT', process.env.PORT);
 
 // local environment
-const PORT = process.env.BACKEND_PORT || process.env.PORT;
-const APP_URL = process.env.HOST;
-const FILE_PATH = process.env.HOST + "/assets/public/uploads/";
-
-// production environment
-// const PORT = 3000;
-// const APP_URL = "https://staging.whattocookai.com/";
-// const FILE_PATH = "https://staging.whattocookai.com/assets/";
+const PORT = process.env.PORT;
+const FILE_PATH = `${process.env.APP_URL}${process.env.FILE_UPLOAD_PATH}`;
 
 const STATIC_PATH =
     process.env.NODE_ENV === "production"
-        ? `${process.cwd()}/frontend/dist`
-        : `${process.cwd()}/frontend/`;
+        ? `${process.cwd() + process.env.STATIC_PATH_1}`
+        : `${process.cwd() + process.env.STATIC_PATH_2}`;
 
 const app: Express = express();
 
@@ -74,6 +64,7 @@ app.post(
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
+app.use(express.static('public'));
 
 // ...................................
 // Front end api's.
