@@ -296,7 +296,7 @@ const createArtSubCategoryListBySubCategoryId = async (req: Request, res: Respon
                     mysqlConnection.query('INSERT INTO art_sub_category_list SET ?', {
                         art_sub_category_id: req.params.art_sub_category_id,
                         name: name,
-                        child_list: "art_sub_category"
+                        child_list: "art_image"
                     }, function (error: any, results: any, fields: any) {
                         if (error) throw error;
                         res.status(201).send({
