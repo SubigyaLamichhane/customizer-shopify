@@ -3,8 +3,8 @@ import mysqlConnection from "../config/mySqlConnection.js";
 import gm from "gm";
 import dotenv from "dotenv";
 dotenv.config();
-const FILE_PATH = "https://staging.whattocookai.com/assets/";
-// const FILE_PATH = `${process.env.APP_URL}${process.env.FILE_UPLOAD_PATH}`;
+// const FILE_PATH = "https://staging.whattocookai.com/assets/";
+const FILE_PATH = `${process.env.APP_URL}${process.env.FILE_UPLOAD_PATH}`;
 
 // Get art category list for front end side
 const getArtCategoryList = async (req: Request, res: Response) => {
@@ -76,7 +76,7 @@ const getArtSubCategory = async (req: Request, res: Response) => {
             if (err) throw err;
             if (result_1.length > 0) {
                 data.push(result_1[0]);
-                let query_2: string = `SELECT * FROM art_sub_category WHERE art_category_id=${req.params.category_id}`;
+                let query_2: string = `SELECT * FROM art_sub_category WHERE id=${req.params.sub_category_id}  LIMIT 1`;
                 mysqlConnection.query(query_2, function (err: any, result_2: any) {
                     if (err) throw err;
                     if (result_2.length > 0) {
@@ -127,7 +127,7 @@ const getArtSubCategorySubList = async (req: Request, res: Response) => {
             if (err) throw err;
             if (result_1.length > 0) {
                 data.push(result_1[0]);
-                let query_2: string = `SELECT * FROM art_sub_category WHERE art_category_id=${req.params.category_id}`;
+                let query_2: string = `SELECT * FROM art_sub_category WHERE art_category_id=${req.params.category_id} LIMIT 1`;
                 mysqlConnection.query(query_2, function (err: any, result_2: any) {
                     if (err) throw err;
                     if (result_2.length > 0) {
