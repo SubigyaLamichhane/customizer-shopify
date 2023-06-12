@@ -26,13 +26,12 @@ console.log(process.env.BACKEND_PORT, 'hello', process.env.PORT);
 
 import dotenv from 'dotenv';
 dotenv.config();
-console.log(process.env.APP_URL);
-
 
 // local environment
-const PORT = process.env.BACKEND_PORT || process.env.PORT;
-const APP_URL = process.env.HOST;
-const FILE_PATH = process.env.HOST + "/assets/public/uploads/";
+const PORT = 3000;
+const FILE_PATH = "https://staging.whattocookai.com/assets/";
+// const APP_URL = process.env.HOST;
+// const FILE_PATH = process.env.HOST + "/assets/public/uploads/";
 
 // production environment
 // const PORT = 3000;
@@ -41,8 +40,8 @@ const FILE_PATH = process.env.HOST + "/assets/public/uploads/";
 
 const STATIC_PATH =
     process.env.NODE_ENV === "production"
-        ? `${process.cwd()}/frontend/dist`
-        : `${process.cwd()}/frontend/`;
+        ? `${process.cwd()}/web/frontend/dist`
+        : `${process.cwd()}/web/frontend/`;
 
 const app: Express = express();
 
