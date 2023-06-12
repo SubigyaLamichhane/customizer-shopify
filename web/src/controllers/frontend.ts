@@ -127,7 +127,7 @@ const getArtSubCategorySubList = async (req: Request, res: Response) => {
             if (err) throw err;
             if (result_1.length > 0) {
                 data.push(result_1[0]);
-                let query_2: string = `SELECT * FROM art_sub_category WHERE art_category_id=${req.params.category_id} LIMIT 1`;
+                let query_2: string = `SELECT * FROM art_sub_category WHERE id=${req.params.sub_category_id} LIMIT 1`;
                 mysqlConnection.query(query_2, function (err: any, result_2: any) {
                     if (err) throw err;
                     if (result_2.length > 0) {
