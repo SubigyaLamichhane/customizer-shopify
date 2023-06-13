@@ -308,6 +308,28 @@ const convertFile = async (req: Request, res: Response) => {
     }
 };
 
+// Get all text fonts for front end side
+const getAllFonts = async (req: Request, res: Response) => {
+    try {
+        let shop_url: any = req.query.shop_url;
+        let query: string = `SELECT * FROM text_font_list WHERE session_id='${shop_url}'`;
+        mysqlConnection.query(query, function (error: any, results: any, fields: any) {
+            if (error) throw error;
+            res.status(200).send({
+                "status": true,
+                "message": "Data fetched!",
+                "data": results
+            });
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": false,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
+};
+
 export {
     getArtCategoryList,
     getArtCategoryById,
@@ -317,5 +339,6 @@ export {
     getTextOutlineColors,
     getTextFontList,
     getTextSubFontList,
-    convertFile
+    convertFile,
+    getAllFonts
 };

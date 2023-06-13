@@ -10,6 +10,7 @@ import {
     getTextOutlineColors,
     getTextFontList,
     getTextSubFontList,
+    getAllFonts,
     convertFile
 } from "../controllers/frontend.js";
 
@@ -32,6 +33,7 @@ frontendRouter.get("/get-text-outline-colors", getTextOutlineColors);
  */
 frontendRouter.get("/get-text-font-list", getTextFontList);
 frontendRouter.get("/get-text-sub-font-list/:id", getTextSubFontList);
+frontendRouter.get("/get-all-fonts", getAllFonts);
 
 // Convert pdf/ai/eps/jpg/jpeg/psd file into png formate
 frontendRouter.post("/convert-file", upload.single('image'), convertFile);
