@@ -3,7 +3,7 @@ import mysqlConnection from "../config/mySqlConnection.js";
 import gm from "gm";
 import dotenv from "dotenv";
 dotenv.config();
-// const FILE_PATH = "https://staging.whattocookai.com/assets/";
+// const FILE_PATH = "http://staging.whattocookai.com/api/uploads/public/uploads/";
 const FILE_PATH = `${process.env.APP_URL}${process.env.FILE_UPLOAD_PATH}`;
 
 // Get art category list for front end side

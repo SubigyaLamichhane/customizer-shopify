@@ -239,6 +239,14 @@ export default function ProductMap(props) {
         </div>
         <Layout>
           <Layout.Section>
+          {/* <canvas id="canvas" width=400 height=300></canvas> */}
+            <canvas id='canvas' style={{ width: "200", height: "300px"}}></canvas>
+            <h1>Test Canvas</h1>
+          </Layout.Section>
+          <h1>Test</h1>
+          <hr/>
+        <br/><br/><br/>
+          <Layout.Section>
             <LegacyCard sectioned>
               <Grid>
                 <Grid.Cell columnSpan={{ xs: 6, sm: 3, md: 3, lg: 6, xl: 6 }}>

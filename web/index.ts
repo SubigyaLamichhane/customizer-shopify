@@ -1,6 +1,6 @@
 // @ts-check
-import { join } from "path";
-import { readFileSync } from "fs";
+import path, { join } from "path";
+import { readFileSync, readFile } from "fs";
 import express, { Request, Response, Express } from "express";
 import serveStatic from "serve-static";
 
@@ -22,26 +22,20 @@ import settingRouter from "./src/routes/setting.js";
 import prodRouter from "./src/routes/product.js";
 import textSettingRouter from "./src/routes/textSetting.js";
 
-console.log(process.env.BACKEND_PORT, 'hello', process.env.PORT);
-
 import dotenv from 'dotenv';
 dotenv.config();
+const __dirname = path.resolve();
+console.log(process.env.BACKEND_PORT, 'port', process.env.PORT);
 
-// local environment
-const PORT = 3000;
-const FILE_PATH = "https://staging.whattocookai.com/assets/";
-// const APP_URL = process.env.HOST;
-// const FILE_PATH = process.env.HOST + "/assets/public/uploads/";
-
-// production environment
 // const PORT = 3000;
-// const APP_URL = "https://staging.whattocookai.com/";
-// const FILE_PATH = "https://staging.whattocookai.com/assets/";
+const PORT = process.env.BACKEND_PORT || process.env.PORT;
+// const FILE_PATH = "https://staging.whattocookai.com/api/uploads/public/uploads/";
+const FILE_PATH = `${process.env.APP_URL}${process.env.FILE_UPLOAD_PATH}`;
 
 const STATIC_PATH =
     process.env.NODE_ENV === "production"
-        ? `${process.cwd()}/web/frontend/dist`
-        : `${process.cwd()}/web/frontend/`;
+        ? `${process.cwd()}/frontend/dist`
+        : `${process.cwd()}/frontend/`;
 
 const app: Express = express();
 
@@ -73,8 +67,14 @@ app.post(
 app.use(express.json());
 app.use(bodyParser.json());
 app.use(cors());
+
 // Serve static files from the "public" folder
-app.use(express.static('public'));
+app.get("/api/uploads/*", async (req, res, _next) => {
+    let newPath = req.originalUrl.replace("/api/uploads", ".");
+    res.sendFile(path.join(__dirname, newPath));
+    // url = https://4d4f-103-21-55-66.ngrok-free.app/api/uploads/public/uploads/dummy-image.jpg
+});
+
 // ...................................
 // Front end api's.
 app.use("/api/front-end", frontendRouter);
@@ -187,7 +187,7 @@ app.use("/api", textSettingRouter);
 // ...................................
 
 app.use(serveStatic(STATIC_PATH, { index: false }));
-
+console.log('STATIC_PATH', STATIC_PATH)
 app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
     return res
         .status(200)
@@ -197,11 +197,17 @@ app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
 
 app.listen(PORT);
 
-// make changes on server
-// replace some lines 
-// cb(null, path.join(__dirname, '/public/uploads/')); = cb(null, path.join(__dirname, '/web/public/uploads/'));
-// uploadedFilePath: string  = "https://staging.whattocookai.com/assets/" + image.filename;
-// const PORT = process.env.BACKEND_PORT || process.env.PORT; = const PORT = 3000;
+// Make changes on server
+// file name = /web/src/config/uploadFile.ts
+// const STORAGE_PATH = "/web/public/uploads/";
+
+// file name = /web/src/controllers/ (all controllers)
+// const FILE_PATH = "http://staging.whattocookai.com/api/uploads/public/uploads/";
+
+// file name = index.ts
+// const PORT = process.env.BACKEND_PORT || process.env.PORT; to const PORT = 3000;
 // `${process.cwd()}/frontend/dist` = `${process.cwd()}/web/frontend/dist`
 // `${process.cwd()}/frontend/` = `${process.cwd()}/web/frontend/`
-// "data": destination + fileName = "http://customizer.sketchthemes.com:8080/customizer-shopify-app/web/public/uploads/" + fileName
+
+// file name = /web/frontend/App.jsx
+// const API_URL = "https://staging.whattocookai.com/api";

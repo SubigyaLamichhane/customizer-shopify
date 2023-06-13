@@ -2,8 +2,10 @@ import { Request, Response } from "express";
 import mysqlConnection from "../config/mySqlConnection.js";
 import dotenv from "dotenv";
 dotenv.config();
-const FILE_PATH = "https://staging.whattocookai.com/assets/";
-// const FILE_PATH = `${process.env.APP_URL}${process.env.FILE_UPLOAD_PATH}`;
+// const FILE_PATH = "http://staging.whattocookai.com/api/uploads/public/uploads/";
+const FILE_PATH = `${process.env.APP_URL}${process.env.FILE_UPLOAD_PATH}`;
+
+console.log('FILE_PATH',FILE_PATH)
 
 // Get art category list
 const getArtCategoryList = (req: Request, res: Response) => {
