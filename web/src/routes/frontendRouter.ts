@@ -11,6 +11,7 @@ import {
     getTextFontList,
     getTextSubFontList,
     getAllFonts,
+    getArtList,
     convertFile
 } from "../controllers/frontend.js";
 
@@ -21,6 +22,7 @@ frontendRouter.get("/get-art-category-list", getArtCategoryList);
 frontendRouter.get("/get-art-category/:id", getArtCategoryById);
 frontendRouter.get("/get-art-sub-category/:category_id/:sub_category_id", getArtSubCategory);
 frontendRouter.get("/get-art-sub-category-sub-list/:category_id/:sub_category_id/:sub_category_list_id", getArtSubCategorySubList);
+frontendRouter.get("/get-art-list", getArtList);
 
 /**
  * API for section (Text Color Section)

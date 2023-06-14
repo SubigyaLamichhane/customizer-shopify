@@ -312,7 +312,11 @@ const convertFile = async (req: Request, res: Response) => {
 const getAllFonts = async (req: Request, res: Response) => {
     try {
         let shop_url: any = req.query.shop_url;
+        let searchQuery: any = req.query.name;
         let query: string = `SELECT * FROM text_font_list WHERE session_id='${shop_url}'`;
+        if (req.query.name) {
+            query = `SELECT * FROM text_font_list WHERE session_id='${shop_url}' AND name LIKE '%${searchQuery}%'`;
+        }
         mysqlConnection.query(query, function (error: any, results: any, fields: any) {
             if (error) throw error;
             res.status(200).send({
@@ -320,6 +324,72 @@ const getAllFonts = async (req: Request, res: Response) => {
                 "message": "Data fetched!",
                 "data": results
             });
+        });
+    } catch (error: any) {
+        res.status(404).send({
+            "status": false,
+            "message": "Something went wrong!",
+            "data": []
+        });
+    }
+};
+
+// Get art sub category sub list by id's (category_id/sub_category_id/sub_category_list_id) for front end side
+const getArtList = async (req: Request, res: Response) => {
+    try {
+        let shop_url: any = req.query.shop_url;
+        let searchQuery: any = req.query.name;
+        let query_1: string = `SELECT * FROM art_category WHERE session_id='${shop_url}' AND name LIKE '%${searchQuery}%'`;
+        var data: any = [];
+        mysqlConnection.query(query_1, function (err: any, result_1: any) {
+            if (err) throw err;
+            if (result_1.length > 0) {
+                data.push(result_1[0]);
+                let query_2: string = `SELECT * FROM art_sub_category WHERE id=${req.params.sub_category_id} LIMIT 1`;
+                mysqlConnection.query(query_2, function (err: any, result_2: any) {
+                    if (err) throw err;                    
+                    if (result_2.length > 0) {
+                        data[0].sub_category = result_2;
+                        let query_3: string = `SELECT * FROM art_sub_category_list WHERE art_sub_category_id=${req.params.sub_category_id}`;
+                        mysqlConnection.query(query_3, function (err: any, result_3: any) {
+                            if (err) throw err;
+                            if (result_3.length > 0) {
+                                data[0].sub_category[0].sub_category_list = result_3;
+                                let query_4: string = `SELECT * FROM art_sub_category_sub_list WHERE art_sub_category_list_id=${req.params.sub_category_list_id}`;
+                                mysqlConnection.query(query_4, function (err: any, result_4: any) {
+                                    if (err) throw err;
+                                    if (result_4.length > 0) {
+                                        data[0].sub_category[0].sub_category_list[0].sub_category_sub_list = result_4;
+                                    }
+                                    res.status(200).send({
+                                        "status": true,
+                                        "message": "Data fetch",
+                                        "data": data
+                                    });
+                                });
+                            } else {
+                                res.status(404).send({
+                                    "status": false,
+                                    "message": `Invalid art sub category sub list id ${req.params.sub_category_id}`,
+                                    "data": [],
+                                });
+                            }
+                        });
+                    } else {
+                        res.status(404).send({
+                            "status": false,
+                            "message": `Invalid art sub category id ${req.params.sub_category_id}`,
+                            "data": [],
+                        });
+                    }
+                });
+            } else {
+                res.status(404).send({
+                    "status": false,
+                    "message": `Invalid art category id ${req.params.category_id}`,
+                    "data": [],
+                });
+            }
         });
     } catch (error: any) {
         res.status(404).send({
@@ -339,6 +409,7 @@ export {
     getTextOutlineColors,
     getTextFontList,
     getTextSubFontList,
-    convertFile,
-    getAllFonts
+    getAllFonts,
+    getArtList,
+    convertFile
 };
