@@ -7,7 +7,7 @@ import serveStatic from "serve-static";
 import shopify from "./shopify.js";
 import productCreator from "./product-creator.js";
 import GDPRWebhookHandlers from "./gdpr.js";
-import mysqlConnection from "./mySqlConnection.js";
+import { mysqlConnection } from "./src/config/mySqlConnection.js";
 import cors from "cors";
 
 // use body-parser for fetch request body
@@ -198,18 +198,113 @@ app.use("/*", shopify.ensureInstalledOnShop(), async (_req, res, _next) => {
 
 app.listen(PORT);
 
-// Make changes on server
-// file name = /web/src/config/uploadFile.ts
-// const STORAGE_PATH = "/web/public/uploads/";
+/*
+Make changes on server
 
-// file name = /web/src/controllers/ (all controllers)
-// const FILE_PATH = "http://staging.whattocookai.com/api/uploads/public/uploads/";
+1) file name = /web/src/config/uploadFile.ts
+const STORAGE_PATH = "/web/public/uploads/";
 
-// file name = index.ts
-// const PORT = process.env.BACKEND_PORT || process.env.PORT; to const PORT = 3000;
-// `${process.cwd()}/frontend/dist` = `${process.cwd()}/web/frontend/dist`
-// `${process.cwd()}/frontend/` = `${process.cwd()}/web/frontend/`
-// const __dirname = path.resolve(); to const __dirname = path.resolve()  + "/web";
+2) file name = /web/src/controllers/ (all controllers)
+const FILE_PATH = "http://staging.whattocookai.com/api/uploads/public/uploads/";
 
-// file name = /web/frontend/App.jsx
-// const API_URL = "https://staging.whattocookai.com/api";
+3) file name = index.ts
+const PORT = process.env.BACKEND_PORT || process.env.PORT; to const PORT = 3000;
+`${process.cwd()}/frontend/dist` = `${process.cwd()}/web/frontend/dist`
+`${process.cwd()}/frontend/` = `${process.cwd()}/web/frontend/`
+const __dirname = path.resolve(); to const __dirname = path.resolve()  + "/web";
+
+4) file name = /web/frontend/App.jsx
+const API_URL = "https://staging.whattocookai.com/api";
+
+5) file name = package.json of root
+"deploy": "shopify app deploy",
+"serve": "cross-env NODE_ENV=production ts-node web/index.ts",
+"start": "npm run serve"
+
+6) file name = web/src/config/mySqlConnection.js
+import mysql from "mysql";
+
+const mysqlConnection = mysql.createConnection({
+   host: '127.0.0.1',
+   user: 'root',
+   password: '9QJcdfJgr3s901e8',
+   database: 'customizer'
+});
+mysqlConnection.connect(function (err) {
+   if (err) throw err;
+   else {
+       console.log('Connected to mysql!');
+   }
+});
+
+const queryPromise= (query) => {
+   return new Promise((resolve, reject) => {
+       mysqlConnection.query(query, function (err, result) {
+           if (err) reject(err);
+           resolve(result);
+       });
+   });
+}
+
+// function queryPromise(query: string): Promise<any> {
+//     return new Promise((resolve, reject) => {
+//         mysqlConnection.query(query, function (err: any, result: any) {
+//             if (err) reject(err);
+//             resolve(result);
+//         });
+//     });
+// }
+
+// export default mysqlConnection;
+
+export {
+   mysqlConnection,
+   queryPromise
+};
+
+7) file name = web/shopify.js
+import { BillingInterval, LATEST_API_VERSION } from "@shopify/shopify-api";
+import { shopifyApp } from "@shopify/shopify-app-express";
+// import { SQLiteSessionStorage } from "@shopify/shopify-app-session-storage-sqlite";
+import { MySQLSessionStorage } from '@shopify/shopify-app-session-storage-mysql';
+import { restResources } from "@shopify/shopify-api/rest/admin/2023-01";
+
+// const DB_PATH = `${process.cwd()}/database.sqlite`;
+
+// The transactions with Shopify will always be marked as test transactions, unless NODE_ENV is production.
+// See the ensureBilling helper to learn more about billing in this template.
+const billingConfig = {
+  "My Shopify One-Time Charge": {
+    // This is an example configuration that would do a one-time charge for $5 (only USD is currently supported)
+    amount: 5.0,
+    currencyCode: "USD",
+    interval: BillingInterval.OneTime,
+  },
+};
+
+const shopify = shopifyApp({
+  api: {
+    apiVersion: LATEST_API_VERSION,
+    restResources,
+    billing: undefined, // or replace with billingConfig above to enable example billing
+  },
+  auth: {
+    path: "/api/auth",
+    callbackPath: "/api/auth/callback",
+  },
+  webhooks: {
+    path: "/api/webhooks",
+  },
+  // This should be replaced with your preferred storage strategy
+  sessionStorage: MySQLSessionStorage.withCredentials(
+    'localhost',
+    'customizer',
+    'root',
+    '12345',
+  ),
+  // sessionStorage: new SQLiteSessionStorage(DB_PATH),
+});
+
+export default shopify;
+
+*/
