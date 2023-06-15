@@ -308,7 +308,7 @@ const convertFile = async (req: Request, res: Response) => {
     }
 };
 
-// Get all text fonts for front end side
+// Get all text fonts by search for front end side
 const getAllFonts = async (req: Request, res: Response) => {
     try {
         let shop_url: any = req.query.shop_url;
@@ -334,63 +334,99 @@ const getAllFonts = async (req: Request, res: Response) => {
     }
 };
 
-// Get art sub category sub list by id's (category_id/sub_category_id/sub_category_list_id) for front end side
+// Get all art list by search for front end side
 const getArtList = async (req: Request, res: Response) => {
     try {
         let shop_url: any = req.query.shop_url;
         let searchQuery: any = req.query.name;
-        let query_1: string = `SELECT * FROM art_category WHERE session_id='${shop_url}' AND name LIKE '%${searchQuery}%'`;
+        let query_1: string = `SELECT * FROM art_category WHERE session_id='${shop_url}' AND name='${searchQuery}'`;
         var data: any = [];
-        mysqlConnection.query(query_1, function (err: any, result_1: any) {
+        mysqlConnection.query(query_1, async function (err: any, result_1: any) {
             if (err) throw err;
             if (result_1.length > 0) {
-                data.push(result_1[0]);
-                let query_2: string = `SELECT * FROM art_sub_category WHERE id=${req.params.sub_category_id} LIMIT 1`;
-                mysqlConnection.query(query_2, function (err: any, result_2: any) {
-                    if (err) throw err;                    
+                for (let item_1 of result_1) {
+                    let query_2: string = `SELECT * FROM art_sub_category WHERE art_category_id=${item_1.id}`;
+                    let result_2 = await queryPromise(query_2);
                     if (result_2.length > 0) {
-                        data[0].sub_category = result_2;
-                        let query_3: string = `SELECT * FROM art_sub_category_list WHERE art_sub_category_id=${req.params.sub_category_id}`;
-                        mysqlConnection.query(query_3, function (err: any, result_3: any) {
-                            if (err) throw err;
+                        for (let item_2 of result_2) {
+                            let query_3: string = `SELECT * FROM art_sub_category_list WHERE art_sub_category_id=${item_2.id}`;
+                            let result_3 = await queryPromise(query_3);
                             if (result_3.length > 0) {
-                                data[0].sub_category[0].sub_category_list = result_3;
-                                let query_4: string = `SELECT * FROM art_sub_category_sub_list WHERE art_sub_category_list_id=${req.params.sub_category_list_id}`;
-                                mysqlConnection.query(query_4, function (err: any, result_4: any) {
-                                    if (err) throw err;
-                                    if (result_4.length > 0) {
-                                        data[0].sub_category[0].sub_category_list[0].sub_category_sub_list = result_4;
+                                for (let item_3 of result_3) {
+                                    if (item_3.image != null) {
+                                        data.push(item_3);
+                                    } else {
+                                        let query_4: string = `SELECT * FROM art_sub_category_sub_list WHERE art_sub_category_list_id=${item_3.id}`;
+                                        let result_4 = await queryPromise(query_4);
+                                        if (result_4.length > 0) {
+                                            data.push(result_4);
+                                        }
                                     }
-                                    res.status(200).send({
-                                        "status": true,
-                                        "message": "Data fetch",
-                                        "data": data
-                                    });
-                                });
-                            } else {
-                                res.status(404).send({
-                                    "status": false,
-                                    "message": `Invalid art sub category sub list id ${req.params.sub_category_id}`,
-                                    "data": [],
-                                });
+                                }
                             }
-                        });
-                    } else {
-                        res.status(404).send({
-                            "status": false,
-                            "message": `Invalid art sub category id ${req.params.sub_category_id}`,
-                            "data": [],
-                        });
+                        }
                     }
+                }
+                return res.status(200).send({
+                    "status": true,
+                    "message": "Data fetched!",
+                    "data": data
                 });
             } else {
-                res.status(404).send({
-                    "status": false,
-                    "message": `Invalid art category id ${req.params.category_id}`,
-                    "data": [],
-                });
+                let query_2: string = `SELECT * FROM art_sub_category WHERE session_id='${shop_url}' AND name='${searchQuery}'`;
+                let result_2 = await queryPromise(query_2);
+                if (result_2.length > 0) {
+                    for (let item_2 of result_2) {
+                        let query_3: string = `SELECT * FROM art_sub_category_list WHERE art_sub_category_id=${item_2.id}`;
+                        let result_3 = await queryPromise(query_3);
+                        if (result_3.length > 0) {
+                            for (let item_3 of result_3) {
+                                if (item_3.image != null) {
+                                    data.push(item_3);
+                                } else {
+                                    let query_4: string = `SELECT * FROM art_sub_category_sub_list WHERE art_sub_category_list_id=${item_3.id}`;
+                                    let result_4 = await queryPromise(query_4);
+                                    if (result_4.length > 0) {
+                                        data.push(result_4);
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    return res.status(200).send({
+                        "status": true,
+                        "message": "Data fetched!",
+                        "data": data
+                    });
+                } else {
+                    let query_3: string = `SELECT * FROM art_sub_category_list WHERE session_id='${shop_url}' AND name='${searchQuery}'`;
+                    let result_3 = await queryPromise(query_3);
+                    if (result_3.length > 0) {
+                        for (let item_3 of result_3) {
+                            let query_4: string = `SELECT * FROM art_sub_category_sub_list WHERE art_sub_category_list_id=${item_3.id}`;
+                            let result_4 = await queryPromise(query_4);
+                            if (result_4.length > 0) {
+                                data.push(result_4);
+                            }
+                        }
+                    }
+                    return res.status(200).send({
+                        "status": true,
+                        "message": "Data fetched!",
+                        "data": data
+                    });
+                }
             }
         });
+
+        function queryPromise(query: string): Promise<any> {
+            return new Promise((resolve, reject) => {
+                mysqlConnection.query(query, function (err: any, result: any) {
+                    if (err) reject(err);
+                    resolve(result);
+                });
+            });
+        }
     } catch (error: any) {
         res.status(404).send({
             "status": false,
