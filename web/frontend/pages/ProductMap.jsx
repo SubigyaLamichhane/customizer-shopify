@@ -28,7 +28,7 @@ import {
   NoteMinor, AlertMinor
 } from '@shopify/polaris-icons';
 import { TitleBar } from '@shopify/app-bridge';
-import { useState, useCallback, useEffect } from 'react';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { Link, useNavigate } from "react-router-dom";
 import { useAuthenticatedFetch } from '../hooks';
 import ReactCrop from 'react-image-crop'
@@ -48,6 +48,7 @@ export default function ProductMap(props) {
   const [lookName, setLookName] = useState('Front');
   const [lookNameError, setLookNameError] = useState(false);
   const [image, setImage] = useState([]);
+  const imageRef = useRef(null);
   const [crop, setCrop] = useState({
     unit: 'px', // Can be 'px' or '%'
     x: 50,
@@ -136,14 +137,18 @@ export default function ProductMap(props) {
   }
 
   // save product mapping
-  const saveProductMapping = async () => {
+  const saveProductMapping = async () => {    
     setLoadingStatus(true);
     if (lookName === "") {
       setLoadingStatus(false);
       setLookNameError(true);
       return false;
     }
-    let formData = new FormData()
+    let imgRef = imageRef.current;
+    crop.image_width = imgRef.width;
+    crop.image_height = imgRef.height;
+
+    let formData = new FormData();
     let fileData = file ? file : image;
     formData.append('look_name', lookName);
     formData.append('image', fileData);
@@ -268,7 +273,7 @@ export default function ProductMap(props) {
                   <LegacyCard sectioned>
                     <div className="product_img">
                       <ReactCrop crop={crop} onChange={c => { setCrop(c); console.log('crop', crop) }}>
-                        <img style={{ transform: `scale(1) rotate(0deg)` }} src={file ? window.URL.createObjectURL(file) : image} alt={title} />
+                        <img ref={imageRef} style={{ transform: `scale(1) rotate(0deg)` }} src={file ? window.URL.createObjectURL(file) : image} alt={title} />
                       </ReactCrop>
                     </div>
                   </LegacyCard>

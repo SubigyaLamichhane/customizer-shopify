@@ -1,7 +1,9 @@
 import { Request, Response } from "express";
-import mysqlConnection from "../config/mySqlConnection.js";
+import { mysqlConnection, queryPromise } from "../config/mySqlConnection.js";
 import gm from "gm";
 import dotenv from "dotenv";
+import { rejects } from "assert";
+import shopify from "../../shopify.js";
 dotenv.config();
 // const FILE_PATH = "http://staging.whattocookai.com/api/uploads/public/uploads/";
 const FILE_PATH = `${process.env.APP_URL}${process.env.FILE_UPLOAD_PATH}`;
@@ -418,19 +420,47 @@ const getArtList = async (req: Request, res: Response) => {
                 }
             }
         });
-
-        function queryPromise(query: string): Promise<any> {
-            return new Promise((resolve, reject) => {
-                mysqlConnection.query(query, function (err: any, result: any) {
-                    if (err) reject(err);
-                    resolve(result);
-                });
-            });
-        }
     } catch (error: any) {
         res.status(404).send({
             "status": false,
             "message": "Something went wrong!",
+            "data": []
+        });
+    }
+};
+
+// Get product data by product_id front end side
+const getProduct = async (req: Request, res: Response) => {
+    try {
+        let shop_url: any = req.query.shop_url;
+        let productId: any = req.params.id;
+        let data: any = [];
+        let query: any = `SELECT * FROM shopify_sessions WHERE id='${shop_url}'`
+        let result = await queryPromise(query);
+        const productData = await shopify.api.rest.Product.find({
+            session: result[0],
+            id: req.params.id,
+        });
+        let query_1: string = `SELECT * FROM products WHERE session_id='${shop_url}' AND product_id='${productId}'`;
+        let result_1 = await queryPromise(query_1);
+        if (result_1.length > 0) {
+            data.push(result_1[0]);
+            data[0].shopify_product = productData;
+            let query_2: string = `SELECT * FROM product_mappings WHERE session_id='${shop_url}' AND product_id='${result_1[0].id}'`;
+            let result_2 = await queryPromise(query_2);
+            if (result_2.length > 0) {
+                data[0].product_map = result_2;
+            }
+            return res.status(200).send({
+                "status": true,
+                "message": "Data fetched!",
+                "data": data
+            });
+        }
+    } catch (error: any) {
+        return res.status(404).send({
+            "status": false,
+            "message": "Something went wrong!" + error,
             "data": []
         });
     }
@@ -447,5 +477,6 @@ export {
     getTextSubFontList,
     getAllFonts,
     getArtList,
+    getProduct,
     convertFile
 };

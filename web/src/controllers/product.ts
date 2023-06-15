@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import mysqlConnection from "../config/mySqlConnection.js";
+import { mysqlConnection, queryPromise } from "../config/mySqlConnection.js";
 import dotenv from "dotenv";
 dotenv.config();
 // const FILE_PATH = "http://staging.whattocookai.com/api/uploads/public/uploads/";

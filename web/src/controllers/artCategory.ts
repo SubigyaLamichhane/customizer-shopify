@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import mysqlConnection from "../config/mySqlConnection.js";
+import { mysqlConnection, queryPromise } from "../config/mySqlConnection.js";
 import dotenv from "dotenv";
 dotenv.config();
 // const FILE_PATH = "http://staging.whattocookai.com/api/uploads/public/uploads/";
@@ -9,6 +9,7 @@ console.log('FILE_PATH',FILE_PATH)
 
 // Get art category list
 const getArtCategoryList = (req: Request, res: Response) => {
+    console.log('res.locals.shopify.session',res.locals.shopify.session)
     try {
         let query: string = `SELECT * FROM art_category WHERE session_id='${res.locals.shopify.session.id}'`;
         mysqlConnection.query(query, function (err: any, result: any) {

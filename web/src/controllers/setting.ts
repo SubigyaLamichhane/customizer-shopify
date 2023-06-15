@@ -1,5 +1,5 @@
 import { Request, Response } from "express";
-import mysqlConnection from "../config/mySqlConnection.js";
+import { mysqlConnection, queryPromise } from "../config/mySqlConnection.js";
 
 // Get setting
 const getSetting = async (req: Request, res: Response) => {

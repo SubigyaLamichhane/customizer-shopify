@@ -25,6 +25,7 @@ import textSettingRouter from "./src/routes/textSetting.js";
 import dotenv from 'dotenv';
 dotenv.config();
 const __dirname = path.resolve();
+// const __dirname = path.resolve()  + "/web";
 console.log(process.env.BACKEND_PORT, 'port', process.env.PORT);
 
 // const PORT = 3000;
@@ -208,6 +209,7 @@ app.listen(PORT);
 // const PORT = process.env.BACKEND_PORT || process.env.PORT; to const PORT = 3000;
 // `${process.cwd()}/frontend/dist` = `${process.cwd()}/web/frontend/dist`
 // `${process.cwd()}/frontend/` = `${process.cwd()}/web/frontend/`
+// const __dirname = path.resolve(); to const __dirname = path.resolve()  + "/web";
 
 // file name = /web/frontend/App.jsx
 // const API_URL = "https://staging.whattocookai.com/api";
