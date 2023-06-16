@@ -1,7 +1,7 @@
 // @ts-check
 import path, { join } from "path";
 import { readFileSync, readFile } from "fs";
-import express, { Request, Response, Express } from "express";
+import express, { Request, Response, Express, NextFunction } from "express";
 import serveStatic from "serve-static";
 
 import shopify from "./shopify.js";
@@ -45,20 +45,31 @@ app.get(shopify.config.auth.path, shopify.auth.begin());
 app.get(
     shopify.config.auth.callbackPath,
     shopify.auth.callback(),
-    // async (req: Request, res: Response) => {
-    //     const page = new shopify.api.rest.Page({
-    //         session: res.locals.shopify.session,
-    //     });
-    //     page.title = "Customizer";
-    //     page.body_html = "<h2>Customizer</h2>\n<p><strong>customize you product!</strong>.</p>";
-    //     const response = await page.save({
-    //         update: true,
-    //     });
-    //     console.log('callbackPath',response)
-    //     // return true;
-    // },
-    shopify.redirectToShopifyOrAppRoot()
+    // Create page on shopify and add default entry for customization setting
+    async (req: Request, res: Response, next: NextFunction) => {
+        try {
+            const page = new shopify.api.rest.Page({
+                session: res.locals.shopify.session,
+            });
+            page.title = "Customizer";
+            page.body_html = readFileSync('./store-frontend/customizer.html', 'utf-8');
+            const response = await page.save({
+                update: true,
+            });
+            let query: string = `UPDATE shopify_sessions SET is_pages_created = '1', page_id = ${page.id} WHERE id='${res.locals.shopify.session.id}'`;
+            mysqlConnection.query(query, function (error, result) {
+                if (error) throw error;
+                next(); // Call next() after sending the response
+            });
+        } catch (error) {
+            next(); // Call next() after sending the response
+        }
+    },
+    (req: Request, res: Response, next: NextFunction) => {
+        shopify.redirectToShopifyOrAppRoot()(req, res, next); // Call shopify.redirectToShopifyOrAppRoot()
+    }
 );
+
 app.post(
     shopify.config.webhooks.path,
     // @ts-ignore
