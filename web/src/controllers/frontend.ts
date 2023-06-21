@@ -12,7 +12,7 @@ const FILE_PATH = `${process.env.APP_URL}${process.env.FILE_UPLOAD_PATH}`;
 const getArtCategoryList = async (req: Request, res: Response) => {
     try {
         let shop_url: any = req.query.shop_url;
-        let query: string = `SELECT * FROM art_category WHERE session_id='${shop_url}'`;
+        let query: string = `SELECT * FROM art_category WHERE session_id='${shop_url}' OR session_id IS NULL`;
         mysqlConnection.query(query, function (err: any, result: any) {
             if (err) throw err
             res.status(201).send({

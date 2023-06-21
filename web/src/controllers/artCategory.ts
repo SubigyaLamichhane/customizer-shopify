@@ -5,11 +5,8 @@ dotenv.config();
 // const FILE_PATH = "http://staging.whattocookai.com/api/uploads/public/uploads/";
 const FILE_PATH = `${process.env.APP_URL}${process.env.FILE_UPLOAD_PATH}`;
 
-console.log('FILE_PATH',FILE_PATH)
-
 // Get art category list
 const getArtCategoryList = (req: Request, res: Response) => {
-    console.log('res.locals.shopify.session',res.locals.shopify.session)
     try {
         let query: string = `SELECT * FROM art_category WHERE session_id='${res.locals.shopify.session.id}'`;
         mysqlConnection.query(query, function (err: any, result: any) {
@@ -101,6 +98,7 @@ const createArtCategory = async (req: Request, res: Response) => {
 // Create art sub category
 const createArtSubCategoryByArtId = async (req: Request, res: Response) => {
     try {
+        let session_id: string = res.locals.shopify.session.id;
         let art_category_id: any = req.params.art_category_id;
         let name: string = req.body.name;
         let child_list: string = req.body.child_list;
@@ -109,6 +107,7 @@ const createArtSubCategoryByArtId = async (req: Request, res: Response) => {
             if (error) throw error;
             if (results_1.length > 0) {
                 mysqlConnection.query('INSERT INTO art_sub_category SET ?', {
+                    session_id: session_id,
                     art_category_id: art_category_id,
                     name: name,
                     child_list: child_list
@@ -256,6 +255,7 @@ const getArtSubCategorySubList = async (req: Request, res: Response) => {
 // Create art sub category list by art sub category id (art_sub_category_id)
 const createArtSubCategoryListBySubCategoryId = async (req: Request, res: Response) => {
     try {
+        let session_id: string = res.locals.shopify.session.id;
         let files: any = await req.files;
         if (files) {
             for (let i = 0; i < files.length; i++) {
@@ -266,6 +266,7 @@ const createArtSubCategoryListBySubCategoryId = async (req: Request, res: Respon
                     if (error) throw error;
                     if (results_1.length > 0) {
                         mysqlConnection.query('INSERT INTO art_sub_category_list SET ?', {
+                            session_id: session_id,
                             art_sub_category_id: req.params.art_sub_category_id,
                             image: uploadedFilePath,
                             child_list: "art_image"
@@ -297,6 +298,7 @@ const createArtSubCategoryListBySubCategoryId = async (req: Request, res: Respon
                 if (error) throw error;
                 if (results_1.length > 0) {
                     mysqlConnection.query('INSERT INTO art_sub_category_list SET ?', {
+                        session_id: session_id,
                         art_sub_category_id: req.params.art_sub_category_id,
                         name: name,
                         child_list: "art_image"
@@ -367,6 +369,7 @@ const getArtSubCategorySubListById = async (req: Request, res: Response) => {
 // Create art sub category sub list by art sub category list id (art_sub_category_list_id)
 const createArtSubCategorySubListBySubCategoryListId = async (req: Request, res: Response) => {
     try {
+        let session_id: string = res.locals.shopify.session.id;
         let files: any = await req.files;
         if (files) {
             for (let i = 0; i < files.length; i++) {
@@ -377,6 +380,7 @@ const createArtSubCategorySubListBySubCategoryListId = async (req: Request, res:
                     if (error) throw error;
                     if (results_1.length > 0) {
                         mysqlConnection.query('INSERT INTO art_sub_category_sub_list SET ?', {
+                            session_id: session_id,
                             art_sub_category_list_id: req.params.art_sub_category_list_id,
                             image: uploadedFilePath
                         }, function (error: any, results: any, fields: any) {
