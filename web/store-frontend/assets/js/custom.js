@@ -1,6 +1,7 @@
 
-
-let canvasObj = {};
+const STORE_API_URL = 'https://staging.whattocookai.com/';
+const STORE_URL = 'offline_prakash-test-1.myshopify.com';
+var active_font_family = ''
 var edit_art = false;
 
 function ChooseSettingtab(tab, name){
@@ -22,6 +23,8 @@ function ChooseSettingtab(tab, name){
     $('.art_header .back_btn').attr("current-option","");
 	$('.art_header .back_btn').attr("level",0);
 	$('.art_header h4').text("Artwork Categories");
+	$('ul.parent li').show();
+	showFont(null,'allFonts','All');
 
 	canvas.discardActiveObject();
     canvas.renderAll();
@@ -47,6 +50,8 @@ $('.close_content_tab').click(function(){
 	$('.top_layer').css("display","block");
 	$('.child_layer').css("display","none");
 	$('.art_design_wrapper>.parent ul').removeClass("active_art_tab");
+	$('ul.parent li').show();
+	showFont(null,'allFonts','All');
 });
 
 // greek translate letters
@@ -123,7 +128,13 @@ function addGreekLetter(letter){
 	$("#textContent").val(new_text);
 }
 
-$(".open_child_options").click(function (){
+$(document).on("click", ".open_child_options",async function (){
+// $(".open_child_options").click(async function (){
+	console.log("click worked!")
+	$(this).parent().siblings("li").hide();
+	var catId = $(this).attr('data-id');
+	await subArtCategory(catId)
+
 	var child_tab = $(this).next();
 	var child_level = $(child_tab).attr("level");
 	if(child_tab.length == 1){
@@ -137,6 +148,7 @@ $(".open_child_options").click(function (){
 		$('.art_header .back_btn').attr("current-option",heading_text);
 		$('.art_header .back_btn').attr("level",child_level);
 		$(child_tab).addClass("active_art_tab");
+		$(this).parent().parent().css("overflow","hidden");
 	}
 })
 
@@ -153,6 +165,8 @@ $(".art_header .back_btn").click(function() {
 		var get_level = $(this).attr("level");
 		var pre_menu_text = $('.'+current_attr+"_child").attr("parent_menu");
 		var current_level = get_level-1;
+
+		$('.'+current_attr+"_child").parent().siblings("li").show();
 		
 		if(current_level < 1){
 			$('.'+current_attr+'_child').removeClass("active_art_tab");
@@ -160,6 +174,7 @@ $(".art_header .back_btn").click(function() {
 			$('.art_header h4').text("Artwork Categories");
 			$('.art_header .back_btn').attr("current-option", "");
 			$('.art_header .back_btn').attr("level", 0);
+			$('ul.parent').css("overflow","auto");
 		}else{
 			$('.'+current_attr+'_child').removeClass("active_art_tab");
 			$('.art_header h4').text(pre_menu_text);
@@ -169,6 +184,7 @@ $(".art_header .back_btn").click(function() {
 	    	pre_menu_text = pre_menu_text.replace("__", "_");
 			$('.art_header .back_btn').attr("current-option", pre_menu_text);
 			$(this).attr("level", current_level);
+			$('.'+pre_menu_text+'_child').css("overflow","auto");
 		}
 	}
 });
@@ -207,7 +223,7 @@ setTimeout(function(){
       $el.css(option, fontOptions[option]);
     });
     var h = $el.outerHeight(), w = $el.outerWidth();
-    // $el.remove();
+    $el.remove();
     return { height: h, width: w };
   };
 },3500); 
@@ -216,16 +232,17 @@ setTimeout(function(){
 
 
 // fonts js
-var fonts_name = 'ABeeZee|Abel|Aclonica|Acme|Actor|Adamina|Akronim|Aladin|Alata|Alatsi|Aldrich|Alef|Alegreya|Aleo|Alice|Alike|Allan|Allerta|Allura|Almarai|Almendra|Amarante|Amaranth|Amethysta|Amiko|Amiri|Amita|Anaheim|Andada|Andika|Angkor|Antic|Anton|Antonio|Arapey|Arbutus|Archivo|Arimo|Arizonia|Armata|Arsenal|Artifika|Arvo|Arya|Asap|Asar|Asset|Assistant|Astloch|Asul|Athiti|Atma|Aubrey|Audiowide|Average|B612|Bahiana|Bahianita|Ballet|Balthazar|Bangers|Barlow|Barriecito|Barrio|Basic|Baskervville|Battambang|Baumans|Bayon|Belgrano|Bellefair|Belleza|Bellota|BenchNine|Benne|Bentham|Bevan|Bilbo|BioRhyme|Biryani|Bitter|Blinker|Bokor|Bonbon|Boogaloo|Brawler|Buda|Buenard|Bungee|Butcherman|Cabin|Cagliostro|Cairo|Caladea|Calistoga|Calligraffitti|Cambay|Cambo|Candal|Cantarell|Capriola|Cardo|Carme|Castoro|Catamaran|Caudex|Caveat|Changa|Chango|Charm|Charmonman|Chathura|Chenla|Chewy|Chicle|Chilanka|Chivo|Chonburi|Cinzel|Coda|Codystar|Coiny|Combo|Comfortaa|Commissioner|Condiment|Content|Convergence|Cookie|Copse|Corben|Cormorant|Courgette|Cousine|Coustard|Creepster|Crushed|Cuprum|Cutive|Damion|Dangrek|Dekko|Delius|Devonshire|Dhurjati|Diplomata|Dokdo|Domine|Dorsa|Dosis|DotGothic16|Dynalight|Eater|Economica|Eczar|Electrolize|Elsie|Engagement|Englebert|Enriqueta|Epilogue|Esteban|Ewert|Exo|Fahkwang|Farro|Farsan|Fascinate|Fasthand|Faustina|Federant|Federo|Felipa|Fenix|Flamenco|Flavors|Fondamento|Forum|Fraunces|Freehand|Fresca|Frijole|Fruktur|Gabriela|Gaegu|Gafata|Galada|Galdeano|Galindo|Gayathri|Gelasio|Geo|Geostar|Gidugu|Girassol|Glegoo|Goldman|Gorditas|Gotu|Graduate|Grandstander|Grenze|Griffy|Gruppo|Gudea|Gugi|Gupter|Gurajada|Habibi|Halant|Hanalei|Handlee|Hanuman|Harmattan|Heebo|Hind|Homenaje|Iceberg|Iceland|Imbue|Imprima|Inconsolata|Inder|Inika|Inter|Italiana|Italianno|Itim|Jaldi|Jomhuria|Jomolhari|Jost|Jua|Judson|Julee|Junge|Jura|K2D|Kadwa|Kalam|Kameron|Kanit|Kantumruy|Karantina|Karla|Karma|Katibeh|Kavivanar|Kavoon|Kenia|Khand|Khmer|Khula|Knewave|KoHo|Kodchasan|Kosugi|Koulen|Kranky|Kreon|Kristi|Krub|Kufam|Kurale|Lacquer|Laila|Lalezar|Lancelot|Langar|Lateef|Lato|Ledger|Lekton|Lemon|Lemonada|Lexend|Limelight|Literata|Livvic|Lobster|Lora|Lusitana|Lustria|Macondo|Mada|Magra|Maitree|Mako|Mali|Mallanna|Mandali|Manjari|Manrope|Mansalva|Manuale|Marcellus|Margarine|Marmelad|Martel|Marvel|Mate|McLaren|Meddon|MedievalSharp|Megrim|Merienda|Merriweather|Metal|Metamorphous|Metrophobic|Michroma|Milonga|Miltonian|Mina|Miniver|Mirza|Mitr|Modak|Mogra|Molengo|Molle|Monda|Monofett|Monoton|Montaga|Montez|Montserrat|Moul|Moulpali|Mukta|Mulish|MuseoModerno|NTR|Neucha|Neuton|Newsreader|Niconne|Niramit|Nobile|Nokora|Norican|Nosifer|Notable|Numans|Nunito|Offside|Oi|Oldenburg|Oranienbaum|Orbitron|Oregano|Orienta|Oswald|Overlock|Overpass|Ovo|Oxanium|Oxygen|Pacifico|Padauk|Palanquin|Pangolin|Paprika|Parisienne|Pattaya|Pavanam|Peddana|Peralta|Petrona|Philosopher|Piazzolla|Piedra|Plaster|Play|Playball|Podkova|Poly|Pompiere|Poppins|Prata|Preahvihear|Pridi|Prociono|Prompt|Puritan|Quando|Quantico|Quattrocento|Questrial|Quicksand|Quintessential|Qwigley|Radley|Rajdhani|Rakkas|Raleway|Ramabhadra|Ramaraja|Rambla|Ranchers|Rancho|Ranga|Rasa|Rationale|Recursive|Redressed|Revalia|Ribeye|Righteous|Risque|Roboto|Rochester|Rokkitt|Romanesco|Rosario|Rosarivo|Rowdies|Rubik|Ruda|Rufina|Ruluko|Ruthie|Rye|Sacramento|Sahitya|Sail|Saira|Salsa|Sanchez|Sancreek|Sansita|Sarabun|Sarala|Sarina|Sarpanch|Satisfy|Scada|Scheherazade|Schoolbell|Sen|Sevillana|Shanti|Share|Shojumaru|Shrikhand|Siemreap|Signika|Simonetta|Sintony|Skranji|Slackey|Smokum|Smythe|Sniglet|Snippet|Sofia|Solway|Sora|Spartan|Spectral|Spinnaker|Spirax|Sriracha|Srisakdi|Staatliches|Stalemate|Stick|Stoke|Strait|Stylish|Sumana|Sunflower|Sunshiney|Sura|Suranna|Suravaram|Suwannaphum|Syncopate|Syne|Tajawal|Tangerine|Taprom|Tauri|Taviraj|Teko|Telex|Texturina|Thasadith|Tienne|Tillana|Timmana|Tinos|Tomorrow|Trirong|Trispace|Trocchi|Trochut|Truculenta|Trykker|Ubuntu|Ultra|UnifrakturCook|UnifrakturMaguntia|Unkempt|Unlock|Unna|VT323|Varela|Varta|Vibes|Vibur|Vidaloka|Viga|Voces|Volkhov|Vollkorn|Voltaire|Wallpoet|Warnes|Wellfleet|Yantramanav|Yellowtail|Yesteryear|Yrsa|Zeyada|'
+// var fonts_name = 'ABeeZee|Abel|Aclonica|Acme|Actor|Adamina|Akronim|Aladin|Alata|Alatsi|Aldrich|Alef|Alegreya|Aleo|Alice|Alike|Allan|Allerta|Allura|Almarai|Almendra|Amarante|Amaranth|Amethysta|Amiko|Amiri|Amita|Anaheim|Andada|Andika|Angkor|Antic|Anton|Antonio|Arapey|Arbutus|Archivo|Arimo|Arizonia|Armata|Arsenal|Artifika|Arvo|Arya|Asap|Asar|Asset|Assistant|Astloch|Asul|Athiti|Atma|Aubrey|Audiowide|Average|B612|Bahiana|Bahianita|Ballet|Balthazar|Bangers|Barlow|Barriecito|Barrio|Basic|Baskervville|Battambang|Baumans|Bayon|Belgrano|Bellefair|Belleza|Bellota|BenchNine|Benne|Bentham|Bevan|Bilbo|BioRhyme|Biryani|Bitter|Blinker|Bokor|Bonbon|Boogaloo|Brawler|Buda|Buenard|Bungee|Butcherman|Cabin|Cagliostro|Cairo|Caladea|Calistoga|Calligraffitti|Cambay|Cambo|Candal|Cantarell|Capriola|Cardo|Carme|Castoro|Catamaran|Caudex|Caveat|Changa|Chango|Charm|Charmonman|Chathura|Chenla|Chewy|Chicle|Chilanka|Chivo|Chonburi|Cinzel|Coda|Codystar|Coiny|Combo|Comfortaa|Commissioner|Condiment|Content|Convergence|Cookie|Copse|Corben|Cormorant|Courgette|Cousine|Coustard|Creepster|Crushed|Cuprum|Cutive|Damion|Dangrek|Dekko|Delius|Devonshire|Dhurjati|Diplomata|Dokdo|Domine|Dorsa|Dosis|DotGothic16|Dynalight|Eater|Economica|Eczar|Electrolize|Elsie|Engagement|Englebert|Enriqueta|Epilogue|Esteban|Ewert|Exo|Fahkwang|Farro|Farsan|Fascinate|Fasthand|Faustina|Federant|Federo|Felipa|Fenix|Flamenco|Flavors|Fondamento|Forum|Fraunces|Freehand|Fresca|Frijole|Fruktur|Gabriela|Gaegu|Gafata|Galada|Galdeano|Galindo|Gayathri|Gelasio|Geo|Geostar|Gidugu|Girassol|Glegoo|Goldman|Gorditas|Gotu|Graduate|Grandstander|Grenze|Griffy|Gruppo|Gudea|Gugi|Gupter|Gurajada|Habibi|Halant|Hanalei|Handlee|Hanuman|Harmattan|Heebo|Hind|Homenaje|Iceberg|Iceland|Imbue|Imprima|Inconsolata|Inder|Inika|Inter|Italiana|Italianno|Itim|Jaldi|Jomhuria|Jomolhari|Jost|Jua|Judson|Julee|Junge|Jura|K2D|Kadwa|Kalam|Kameron|Kanit|Kantumruy|Karantina|Karla|Karma|Katibeh|Kavivanar|Kavoon|Kenia|Khand|Khmer|Khula|Knewave|KoHo|Kodchasan|Kosugi|Koulen|Kranky|Kreon|Kristi|Krub|Kufam|Kurale|Lacquer|Laila|Lalezar|Lancelot|Langar|Lateef|Lato|Ledger|Lekton|Lemon|Lemonada|Lexend|Limelight|Literata|Livvic|Lobster|Lora|Lusitana|Lustria|Macondo|Mada|Magra|Maitree|Mako|Mali|Mallanna|Mandali|Manjari|Manrope|Mansalva|Manuale|Marcellus|Margarine|Marmelad|Martel|Marvel|Mate|McLaren|Meddon|MedievalSharp|Megrim|Merienda|Merriweather|Metal|Metamorphous|Metrophobic|Michroma|Milonga|Miltonian|Mina|Miniver|Mirza|Mitr|Modak|Mogra|Molengo|Molle|Monda|Monofett|Monoton|Montaga|Montez|Montserrat|Moul|Moulpali|Mukta|Mulish|MuseoModerno|NTR|Neucha|Neuton|Newsreader|Niconne|Niramit|Nobile|Nokora|Norican|Nosifer|Notable|Numans|Nunito|Offside|Oi|Oldenburg|Oranienbaum|Orbitron|Oregano|Orienta|Oswald|Overlock|Overpass|Ovo|Oxanium|Oxygen|Pacifico|Padauk|Palanquin|Pangolin|Paprika|Parisienne|Pattaya|Pavanam|Peddana|Peralta|Petrona|Philosopher|Piazzolla|Piedra|Plaster|Play|Playball|Podkova|Poly|Pompiere|Poppins|Prata|Preahvihear|Pridi|Prociono|Prompt|Puritan|Quando|Quantico|Quattrocento|Questrial|Quicksand|Quintessential|Qwigley|Radley|Rajdhani|Rakkas|Raleway|Ramabhadra|Ramaraja|Rambla|Ranchers|Rancho|Ranga|Rasa|Rationale|Recursive|Redressed|Revalia|Ribeye|Righteous|Risque|Roboto|Rochester|Rokkitt|Romanesco|Rosario|Rosarivo|Rowdies|Rubik|Ruda|Rufina|Ruluko|Ruthie|Rye|Sacramento|Sahitya|Sail|Saira|Salsa|Sanchez|Sancreek|Sansita|Sarabun|Sarala|Sarina|Sarpanch|Satisfy|Scada|Scheherazade|Schoolbell|Sen|Sevillana|Shanti|Share|Shojumaru|Shrikhand|Siemreap|Signika|Simonetta|Sintony|Skranji|Slackey|Smokum|Smythe|Sniglet|Snippet|Sofia|Solway|Sora|Spartan|Spectral|Spinnaker|Spirax|Sriracha|Srisakdi|Staatliches|Stalemate|Stick|Stoke|Strait|Stylish|Sumana|Sunflower|Sunshiney|Sura|Suranna|Suravaram|Suwannaphum|Syncopate|Syne|Tajawal|Tangerine|Taprom|Tauri|Taviraj|Teko|Telex|Texturina|Thasadith|Tienne|Tillana|Timmana|Tinos|Tomorrow|Trirong|Trispace|Trocchi|Trochut|Truculenta|Trykker|Ubuntu|Ultra|UnifrakturCook|UnifrakturMaguntia|Unkempt|Unlock|Unna|VT323|Varela|Varta|Vibes|Vibur|Vidaloka|Viga|Voces|Volkhov|Vollkorn|Voltaire|Wallpoet|Warnes|Wellfleet|Yantramanav|Yellowtail|Yesteryear|Yrsa|Zeyada|'
 
-const font_array = fonts_name.split("|");
-var font_html = ``;
-for(var i = 0; font_array.length-1 > i; i++){
-  font_html += `<li onClick="changeTextFont('`+font_array[i]+`')"><span class="active_text" style="font-family:`+font_array[i]+`">Test</span><small style="font-family:Abel">`+font_array[i]+`</small></li>`;
-}
-setTimeout(function(){
-   $('ul#allFonts').html(font_html);
-}, 500);
+// const font_array = fonts_name.split("|");
+// var font_html = ``;
+// for(var i = 0; font_array.length-1 > i; i++){
+//   font_html += `<li onClick="changeTextFont('`+font_array[i]+`')"><span class="active_text" style="font-family:`+font_array[i]+`">Test</span><small style="font-family:Abel">`+font_array[i]+`</small></li>`;
+// }
+// setTimeout(function(){
+//    $('ul#allFonts').html(font_html);
+//    $('ul#allFonts').show();
+// }, 500);
 
 function openFontsTab(){
 	$('.all_font_list_wrapper').css("display","block");
@@ -235,87 +252,6 @@ $('.close_font_tab').click(function(){
 });
 $('.back_font_btn').click(function(){
 	$('.all_font_list_wrapper').css("display","none");
-})
-
-// Rendering color box
-
-	let colorsdata = [
-		{color_name: 'White' , color_code: "#ffffff"},
-		{color_name: 'Natural', color_code: "#ae4a60"},
-		{color_name: 'Black' , color_code:'#000000' },
-		{color_name: 'Ash' , color_code:"#B2BEB5" },
-		{color_name: 'Light Steel'  , color_code: '#b0c4de' },
-		{color_name: 'Pebble', color_code:'#e2bea3' },
-		{color_name: 'Oxford Gray', color_code: '#8292A0' },
-		{color_name: 'Smoke Gray' , color_code: '#848884' },
-		{color_name: 'Charcoal Heather', color_code: '#36454f' },
-		{color_name: 'Navy' , color_code:  '#000080'},
-		{color_name: 'Deep Royal' , color_code: '#4169e1' },
-		{color_name: 'Carolina Blue', color_code:'#7BAFD4' },
-		{color_name: 'Light Blue', color_code: '#ADD8E6'},
-		{color_name: 'Aquatic Blue', color_code:'#00FFFF' },
-		{color_name: 'Blue Horizon', color_code: '#8eb3d1' },
-		{color_name: 'Stonewashed Blue', color_code:'#6b8da9' },
-		{color_name: 'Denim Blue' , color_code: '#6F8FAF'},
-		{color_name: 'Sapphire' , color_code:'#0F52BA'  },
-		{color_name: 'Teal' , color_code: '#008080' },
-		{color_name: 'Lavender' , color_code: '#E6E6FA'},
-		{color_name: 'Purple' , color_code:'#A020F0' },
-		{color_name: 'Deep Red', color_code:  '#850101' },
-		{color_name: 'Cardinal', color_code: '#C41E3A' },
-		{color_name: 'Maroon' , color_code: '#800000'},
-		{color_name: 'Wow Pink' , color_code: '#C24D78' },
-		{color_name: 'Pink' , color_code: '#FFC0CB' },
-		{color_name: 'Pale pink' , color_code: '#FFB6C1' },
-		{color_name: 'Charisma Coral', color_code: '#ee9489' },
-		{color_name: 'Gold', color_code:'#FFD700' },
-		{color_name: 'Yellow', color_code:'#FFFF00' },
-		{color_name: 'Daffodil Yellow' , color_code:'#FFDC82' },
-		{color_name: 'Candy Orange' , color_code:'#FFD09A' },
-		{color_name: 'Orange' , color_code:'#FFA500' },
-		{color_name: 'Safety Orange', color_code: '#FF7900' },
-		{color_name: 'Deep Forest' , color_code:'#228B22'  },
-		{color_name: 'Fatigue Green' , color_code: '#758062' },
-		{color_name: 'Kelly Green', color_code:'#4CBB17' },
-		{color_name: 'Clean Mint', color_code:'#3EB489'  },
-		{color_name: 'Stonewashed Green', color_code:'#74809a' },
-		{color_name: 'Lime', color_code:'#32CD32' },
-		{color_name: 'Safety Green', color_code: '#F2FB3E' },
-		{color_name: 'Sand', color_code: '#c2b280'  },
-		{color_name: 'Dark Chocolate', color_code: '#7B3F00' }
-	  ]
-
-// Append all color for text color
-colorsdata.forEach((item)=>{
-	if(item.color_name == 'Black'){
-		$('.text_body_color  .all_colors_list').append(` <div class="color_box" style="background-color: ${item.color_code};">
-			<input type="radio" name="text_color_input" class="text_color_input" data-color-code='${item.color_code}' data-color-name='${item.color_name}' onclick="changeTextColor('${item.color_code}','${item.color_name}')" checked />
-			<span class="check_icon"><i class="fa fa-check"></i></span>
-			<span class="box_outline"></span>
-		</div>`);	
-	}else{
-		$('.text_body_color  .all_colors_list').append(` <div class="color_box" style="background-color: ${item.color_code};">
-			<input type="radio" name="text_color_input" class="text_color_input" data-color-code='${item.color_code}' data-color-name='${item.color_name}' onclick="changeTextColor('${item.color_code}','${item.color_name}')" />
-			<span class="check_icon"><i class="fa fa-check"></i></span>
-			<span class="box_outline"></span>
-		</div>`);	
-	}
-	
-})
-
-// Append all color for text outline
-$('.outline_color_container  .all_outline_colors_list').append(`  <div class="color_box" style="background-color: transparent;border:1px solid #cacaca">
-	<span class="color_none_icon">X</span>
-	<input type="radio" name="text_outline_input" class="text_color_input" data-color-code="#00000000" data-color-name="none" onclick="changeTxtOutlineColor('#00000000', 'none')" checked />
-	<span class="check_icon"><i class="fa fa-check"></i></span>
-	<span class="box_outline"></span>
-</div>`);
-colorsdata.forEach((item)=>{
-	$('.outline_color_container  .all_outline_colors_list').append(`  <div class="color_box" style="background-color: ${item.color_code};">
-	<input type="radio" name="text_outline_input" class="text_color_input" data-color-code="${item.color_code}" data-color-name="${item.color_name}" onclick="changeTxtOutlineColor('${item.color_code}','${item.color_name}')" />
-	<span class="check_icon"><i class="fa fa-check"></i></span>
-	<span class="box_outline"></span>
-</div>`);	
 })
 
 
@@ -329,19 +265,21 @@ $('.close_color_tab').click(function(){
 $('.back_color_btn').click(function(){
 	$('.text_color_wrapper').css("display","none");
 });
-$('.color_box>input[name="text_color_input"]').hover(function() {
+
+$(document).on('hover','.color_box>input[name="text_color_input"]', function(){
+	var color_code = $(this).attr('data-color-code');
+	var color_name = $(this).attr('data-color-name');
+	$('.selected_color>.color_box').css('background-color',color_code);
+	$('.selected_color>.color_name').text(color_name);
+})
+$(document).on('mouseenter','.color_box>input[name="text_color_input"]', function(){
 	var color_code = $(this).attr('data-color-code');
 	var color_name = $(this).attr('data-color-name');
 	$('.selected_color>.color_box').css('background-color',color_code);
 	$('.selected_color>.color_name').text(color_name);
 });
-$(".color_box>input[name='text_color_input']").mouseenter(function() {
-    var color_code = $(this).attr('data-color-code');
-	var color_name = $(this).attr('data-color-name');
-	$('.selected_color>.color_box').css('background-color',color_code);
-	$('.selected_color>.color_name').text(color_name);
-}).mouseleave(function() {
-    var selected_color = $(".color_box>input[name='text_color_input']:checked").attr('data-color-code');
+$(document).on('mouseleave','.color_box>input[name="text_color_input"]', function(){
+	var selected_color = $(".color_box>input[name='text_color_input']:checked").attr('data-color-code');
     var selected_name = $(".color_box>input[name='text_color_input']:checked").attr('data-color-name');
     $('.selected_color>.color_box').css('background-color',selected_color);
 	$('.selected_color>.color_name').text(selected_name);
@@ -358,23 +296,43 @@ $('.close_outline_tab').click(function(){
 $('.back_outline_btn').click(function(){
 	$('.text_outline_wrapper').css("display","none");
 });
-$('.color_box>input[name="text_outline_input"]').hover(function() {
+
+$(document).on('hover','.color_box>input[name="text_outline_input"]', function(){
 	var color_code = $(this).attr('data-color-code');
 	var color_name = $(this).attr('data-color-name');
 	$('.selected_outline_color>.color_box').css('background-color',color_code);
 	$('.selected_outline_color>.color_name').text(color_name);
-});
-$(".color_box>input[name='text_outline_input']").mouseenter(function() {
-    var color_code = $(this).attr('data-color-code');
+})
+$(document).on('mouseenter','.color_box>input[name="text_outline_input"]', function(){
+	var color_code = $(this).attr('data-color-code');
 	var color_name = $(this).attr('data-color-name');
 	$('.selected_outline_color>.color_box').css('background-color',color_code);
 	$('.selected_outline_color>.color_name').text(color_name);
-}).mouseleave(function() {
-    var selected_color = $(".color_box>input[name='text_outline_input']:checked").attr('data-color-code');
+})
+$(document).on('mouseleave','.color_box>input[name="text_outline_input"]', function(){
+	var selected_color = $(".color_box>input[name='text_outline_input']:checked").attr('data-color-code');
     var selected_name = $(".color_box>input[name='text_outline_input']:checked").attr('data-color-name');
     $('.selected_outline_color>.color_box').css('background-color',selected_color);
 	$('.selected_outline_color>.color_name').text(selected_name);
-});
+})
+
+// $('.color_box>input[name="text_outline_input"]').hover(function() {
+// 	var color_code = $(this).attr('data-color-code');
+// 	var color_name = $(this).attr('data-color-name');
+// 	$('.selected_outline_color>.color_box').css('background-color',color_code);
+// 	$('.selected_outline_color>.color_name').text(color_name);
+// });
+// $(".color_box>input[name='text_outline_input']").mouseenter(function() {
+//     var color_code = $(this).attr('data-color-code');
+// 	var color_name = $(this).attr('data-color-name');
+// 	$('.selected_outline_color>.color_box').css('background-color',color_code);
+// 	$('.selected_outline_color>.color_name').text(color_name);
+// }).mouseleave(function() {
+//     var selected_color = $(".color_box>input[name='text_outline_input']:checked").attr('data-color-code');
+//     var selected_name = $(".color_box>input[name='text_outline_input']:checked").attr('data-color-name');
+//     $('.selected_outline_color>.color_box').css('background-color',selected_color);
+// 	$('.selected_outline_color>.color_name').text(selected_name);
+// });
 
 
 // Text shape js
@@ -518,7 +476,7 @@ document.addEventListener("DOMContentLoaded", function () {
         pips: {mode: 'steps'}
       });
       var pips = window.clickPipsSlider.querySelectorAll('.noUi-value');
-      function clickOnPip() {
+      function clickOnPipOutline() {
         var value = Number(this.getAttribute('data-value'));
         window.clickPipsSlider.noUiSlider.set(value);
         $("#textOutlineThickness").val(value);
@@ -526,7 +484,7 @@ document.addEventListener("DOMContentLoaded", function () {
       }
       for (var i = 0; i < pips.length; i++) {
         pips[i].style.cursor = 'pointer';
-        pips[i].addEventListener('click', clickOnPip);
+        pips[i].addEventListener('click', clickOnPipOutline);
       }
       window.clickPipsSlider.noUiSlider.on('change', function (values, handle) {
 	    $("#textOutlineThickness").val(parseInt(values[0]));
@@ -534,6 +492,30 @@ document.addEventListener("DOMContentLoaded", function () {
 	    changeTextOutlineThick();
 	  });
 
+
+    // text shape slider
+    //   window.shapeSettingSlider = document.getElementById('shapeSettingsSlider');
+    //   noUiSlider.create(window.shapeSettingSlider, {
+    //     range: {
+    //       min: 0,
+    //       max: 10
+    //     },
+    //     start: [2],
+    //     step: 2,
+    //     pips: {mode: 'steps'}
+    //   });
+    //   var pips = window.shapeSettingSlider.querySelectorAll('.noUi-value');
+    //   function clickOnPipShape() {
+    //     var value = Number(this.getAttribute('data-value'));
+    //     window.shapeSettingSlider.noUiSlider.set(value);
+    //   }
+    //   for (var i = 0; i < pips.length; i++) {
+    //     pips[i].style.cursor = 'pointer';
+    //     pips[i].addEventListener('click', clickOnPipShape);
+    //   }
+    //   window.shapeSettingSlider.noUiSlider.on('change', function (values, handle) {
+    //   	// add code when change the val
+	//   });
 
 
 	  // Art Rotation slider
@@ -565,3 +547,631 @@ document.addEventListener("DOMContentLoaded", function () {
 	    changeImageInputValue(parseInt(values[0]))
 	  });
 });
+
+
+let current_height = 0
+let text_boxheight = 0
+
+// function when we change txt val in input
+$('#textContent').on('input', function() {
+
+	console.log(this.scrollHeight)
+        if(current_height !== this.scrollHeight){
+          current_height = this.scrollHeight        
+          text_boxheight = text_boxheight + 20
+          // $(this).height(this.scrollHeight);
+          $(this).height(text_boxheight);
+        }
+      
+        var textareaValue = $('#textContent').val();
+        var lineBreakCount = 0;
+    
+        var index = textareaValue.indexOf('\n');
+        while (index !== -1) {
+          lineBreakCount++;
+          index = textareaValue.indexOf('\n', index + 1);
+        }
+        $(this).height(20 * (lineBreakCount+1));
+        console.log("Line break count: " + lineBreakCount);
+});
+// This focus will work when added text and need to blank input field. then it will work
+$('#textContent').on('focus', function() {
+
+	console.log(this.scrollHeight)
+        if(current_height !== this.scrollHeight){
+          current_height = this.scrollHeight        
+          text_boxheight = text_boxheight + 20
+          // $(this).height(this.scrollHeight);
+          $(this).height(text_boxheight);
+        }
+      
+        var textareaValue = $('#textContent').val();
+        var lineBreakCount = 0;
+    
+        var index = textareaValue.indexOf('\n');
+        while (index !== -1) {
+          lineBreakCount++;
+          index = textareaValue.indexOf('\n', index + 1);
+        }
+        $(this).height(20 * (lineBreakCount+1));
+        console.log("Line break count: " + lineBreakCount);
+    
+});
+
+// This focus will work when added text and need to blank input field. then it will work
+$(document).on('focus','#editTextContent', function() {
+	console.log(this.scrollHeight)
+        if(current_height !== this.scrollHeight){
+          current_height = this.scrollHeight        
+          text_boxheight = text_boxheight + 20
+          // $(this).height(this.scrollHeight);
+          $(this).height(text_boxheight);
+        }
+      
+        var textareaValue = $('#editTextContent').val();
+        var lineBreakCount = 0;
+    
+        var index = textareaValue.indexOf('\n');
+        while (index !== -1) {
+          lineBreakCount++;
+          index = textareaValue.indexOf('\n', index + 1);
+        }
+        $(this).height(20 * (lineBreakCount+1));
+        console.log("Line break count: " + lineBreakCount);
+});
+// function when we change txt val in input
+$(document).on('input','#editTextContent', function() {
+	console.log(this.scrollHeight)
+        if(current_height !== this.scrollHeight){
+          current_height = this.scrollHeight        
+          text_boxheight = text_boxheight + 20
+          // $(this).height(this.scrollHeight);
+          $(this).height(text_boxheight);
+        }
+      
+        var textareaValue = $('#editTextContent').val();
+        var lineBreakCount = 0;
+    
+        var index = textareaValue.indexOf('\n');
+        while (index !== -1) {
+          lineBreakCount++;
+          index = textareaValue.indexOf('\n', index + 1);
+        }
+        $(this).height(20 * (lineBreakCount+1));
+        console.log("Line break count: " + lineBreakCount);
+});
+
+// text font size increased functionality
+$('#textFontSize').on('input', function() {
+    var value = parseFloat($(this).val());
+    // Round the value to the nearest tenth
+    value = Math.round(value * 10) / 10;
+    $(this).val(value);
+  });
+
+
+
+// Call color API for text
+
+function getTextColor(){
+	$.ajax({
+        url: STORE_API_URL+'api/front-end/get-text-font-colors?shop_url='+STORE_URL,
+        beforeSend: function() {
+           $('.customiseLoader').css("display","flex");
+        },
+        success: function (response, status, xhr) {
+        if(response.status == true){
+        	var color_data = response.data;
+        	var textColorHtml = `<div class="color_box" style="background-color: #000">
+						<input type="radio" name="text_color_input" class="text_color_input" data-color-code='#000' data-color-name='Black' onclick="changeTextColor('#000000','Black')" checked />
+						<span class="check_icon"><i class="fa fa-check"></i></span>
+						<span class="box_outline"></span>
+					</div>`;
+        	for(var i = 0; i < color_data.length; i++){
+        		if(color_data[i].color_name == 'Black'){
+					// we skip this color because it is already taken by-default
+				}else{
+					var check_icon_color = "#fff";
+					if(color_data[i].name.toLowerCase() == 'white'){
+						check_icon_color = "#000";
+					}
+					textColorHtml += ` <div class="color_box" style="background-color: ${color_data[i].color};">
+						<input type="radio" name="text_color_input" class="text_color_input" data-color-code='${color_data[i].color}' data-color-name='${color_data[i].name}' onclick="changeTextColor('${color_data[i].color}','${color_data[i].name}')" />
+						<span class="check_icon" style="color:`+check_icon_color+`"><i class="fa fa-check"></i></span>
+						<span class="box_outline"></span>
+					</div>`;	
+				}        		 
+        	}
+        	$('.text_body_color .all_colors_list').html(textColorHtml);
+        
+        }
+       $('.customiseLoader').css("display","none");
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log("Error => ",errorMessage);
+        $('.customiseLoader').css("display","none");
+      }
+    })
+}
+
+getTextColor();
+
+// Call text outline color API
+
+function getTextOutlineColor(){
+	$.ajax({
+        url: STORE_API_URL+'api/front-end/get-text-outline-colors?shop_url='+STORE_URL,
+        beforeSend: function() {
+           $('.customiseLoader').css("display","flex");
+        },
+        success: function (response, status, xhr) {
+        if(response.status == true){
+        	var color_data = response.data;
+        	var textOutlineColorHtml = `<div class="color_box" style="background-color: transparent;border:1px solid #cacaca">
+					<span class="color_none_icon">X</span>
+					<input type="radio" name="text_outline_input" class="text_color_input" data-color-code="#00000000" data-color-name="none" onclick="changeTxtOutlineColor('#00000000', 'none')" checked />
+					<span class="check_icon"><i class="fa fa-check"></i></span>
+					<span class="box_outline"></span>
+				</div>`;
+        	for(var i = 0; i < color_data.length; i++){
+				var check_icon_color = "#fff";
+				if(color_data[i].name.toLowerCase() == 'white'){
+					check_icon_color = "#000";
+				}
+				textOutlineColorHtml += `<div class="color_box" style="background-color: ${color_data[i].color};">
+					<input type="radio" name="text_outline_input" class="text_color_input" data-color-code="${color_data[i].color}" data-color-name="${color_data[i].name}" onclick="changeTxtOutlineColor('${color_data[i].color}','${color_data[i].name}')" />
+					<span class="check_icon"><i class="fa fa-check"></i></span>
+					<span class="box_outline"></span>
+				</div>`;	
+				     		 
+        	}
+        	$('.outline_color_container  .all_outline_colors_list').html(textOutlineColorHtml);
+        
+        }
+       $('.customiseLoader').css("display","none");
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log("Error => ",errorMessage);
+        $('.customiseLoader').css("display","none");
+      }
+    })
+}
+
+getTextOutlineColor();
+
+
+// call all font family api
+function getAllFontAPI(){
+	$.ajax({
+        url: STORE_API_URL+'api/front-end/get-all-fonts?shop_url='+STORE_URL,
+        beforeSend: function() {
+           $('.customiseLoader').css("display","flex");
+        },
+        success: function (response, status, xhr) {
+        if(response.status == true){
+        	all_font = response.data;
+        	console.log("font family data => ", all_font);
+        	if(all_font.length > 0){
+        		var all_font_list = ``;
+        		var css_font_face = ``;
+        		
+        		for(var i = 0; i < all_font.length; i++){
+        			all_font_list += `<li onclick="changeTextFont('`+all_font[i].name+`','`+all_font[i].image+`')"><span class="active_text" style="font-family:`+all_font[i].name+`">Test</span><small style="font-family:Abel">`+all_font[i].name+`</small></li>`;
+        			css_font_face += `@font-face {font-family: '`+all_font[i].name+`'; src: url('`+all_font[i].image+`');}`
+        			if(i==0){
+        				active_font_family = all_font[i].name;
+        				$('#defaultFont').attr('font-name',all_font[i].name);
+        				$('#defaultFont').attr('font-url',all_font[i].image);
+        			}
+        		}
+
+        		$('ul#allFonts').html(all_font_list);
+        		var newStyle = document.createElement('style');
+				newStyle.appendChild(document.createTextNode(css_font_face));
+				document.head.appendChild(newStyle);
+				$('ul#allFonts').show();
+
+        	}else{
+        		console.log("Empty font Category!")
+        	}
+        	
+        
+        }
+       $('.customiseLoader').css("display","none");
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log("Error => ",errorMessage);
+        $('.customiseLoader').css("display","none");
+      }
+    })
+} 
+
+getAllFontAPI();
+
+var colors = ["rgb(153, 72, 155)", "rgb(56, 81, 163)", "rgb(92, 179, 170)", "rgb(240, 81, 35)", "rgb(54, 153, 99)"];
+
+function getRandomColor() {
+	var getRandomColor = colors[Math.floor(Math.random() * colors.length)];
+	return getRandomColor;
+} 
+
+// Call font category API
+
+function getFontCategoryAPI(){
+	$.ajax({
+        url: STORE_API_URL+'api/front-end/get-text-font-list?shop_url='+STORE_URL,
+        beforeSend: function() {
+           $('.customiseLoader').css("display","flex");
+        },
+        success: function (response, status, xhr) {
+        if(response.status == true){
+        	var font_cat_data = response.data;
+        	if(font_cat_data.length > 0){
+        		var font_cat_option = ``;
+        		var font_cat_list = ``;
+        		
+        		let last_bg_color = '';
+        		let color_count = 1;
+        		for(var i = 0; i < font_cat_data.length; i++){
+        			
+        			let bg_color = colors[color_count];
+        			color_count++;
+        			if(color_count > colors.length){
+        				color_count = 0;
+        			}
+        			var cat_id_name = font_cat_data[i].name.toLowerCase();
+        			cat_id_name = cat_id_name.trim();
+        			cat_id_name = cat_id_name.replaceAll(" ", "");
+        			cat_id_name = cat_id_name+"Fonts";
+        			font_cat_option += `<li onclick="showFont('`+font_cat_data[i].id+`','`+cat_id_name+`','`+font_cat_data[i].name+`')" category_id="`+font_cat_data[i].id+`" category_element_id="`+cat_id_name+`" style="background-color:`+bg_color+`">`+font_cat_data[i].name+`</li>`;
+        			font_cat_list += `<ul id="`+cat_id_name+`" class="font_list"></ul>`;
+        			last_bg_color = bg_color;
+        		}
+
+        		$('#fontCategory').append(font_cat_option);
+        		$('.fontCategoryList').append(font_cat_list);
+
+
+        	}else{
+        		console.log("Empty font Category!")
+        	}
+        	console.log("category data data => ", font_cat_data);
+        
+        }
+       $('.customiseLoader').css("display","none");
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log("Error => ",errorMessage);
+        $('.customiseLoader').css("display","none");
+      }
+    })
+}
+
+getFontCategoryAPI();
+
+// open fonts category lists
+function showFont(cat_id, ele_id, name){
+	if(ele_id == 'fontCategory'){
+		$('.font_cat_link').hide();
+	}else{
+		$('.font_cat_link').show();
+	}
+
+	$('.font_list').hide();
+	$('.font_header>h4').text(name);
+	console.log("elemrnt id => ", ele_id);
+	if( ($('#'+ele_id+'>li').length == 0) && (ele_id != 'fontCategory')){
+		$.ajax({
+	        url: STORE_API_URL+'api/front-end/get-text-sub-font-list/'+cat_id+'?shop_url='+STORE_URL,
+	        beforeSend: function() {
+	           $('.customiseLoader').css("display","flex");
+	        },
+	        success: function (response, status, xhr) {
+	        if(response.status == true){
+	        	var font_data = response.data;
+	        	if(font_data.length > 0){
+	        		var font_option = ``;
+
+	        		let font_text = truncateString(canvas.getActiveObject().text, 10);
+        			
+	        		for(var i = 0; i < font_data.length; i++){
+	        			var cat_id_name = font_data[i].name.toLowerCase();
+	        			cat_id_name = cat_id_name.trim();
+	        			cat_id_name = cat_id_name.replaceAll(" ", "");
+	        			cat_id_name = cat_id_name+"Fonts";
+	        			font_option += `<li onclick="changeTextFont('`+font_data[i].name+`','`+font_data[i].image+`')"><span class="active_text" style="font-family:`+font_data[i].name+`">`+font_text+`</span><small style="font-family:Abel">`+font_data[i].name+`</small></li>`;
+	        		}
+
+	        		$('#'+ele_id).append(font_option);
+
+	        	}else{
+	        		console.log("Empty font Category!")
+	        	}	        
+	        }
+	       $('.customiseLoader').css("display","none");
+	       $('#'+ele_id).show();
+	      },
+	      error: function (jqXhr, textStatus, errorMessage) {
+	        console.log("Error => ",errorMessage);
+	        $('.customiseLoader').css("display","none");
+	      }
+	    })
+	}else{
+		$('#'+ele_id).show();
+	}
+	
+	
+	
+}
+
+// call search font API when hit enter button
+$("#serachFont").keypress(function(e) {
+    if(e.which == 13){
+    	var search_val = $(this).val();
+    	$(this).val('');
+    	$('.font_header>h4').text(search_val);
+    	$('.font_list').hide();
+        $.ajax({
+	        url: STORE_API_URL+'api/front-end/get-all-fonts?shop_url='+STORE_URL+'&name='+search_val,
+	        beforeSend: function() {
+	           $('.customiseLoader').css("display","flex");
+	        },
+	        success: function (response, status, xhr) {
+	        if(response.status == true){
+	        	var font_data = response.data;
+	        	if(font_data.length > 0){
+	        		var font_option = ``;
+
+	        		let font_text = truncateString(canvas.getActiveObject().text, 10);
+        			
+	        		for(var i = 0; i < font_data.length; i++){
+	        			
+	        			font_option += `<li onclick="changeTextFont('`+font_data[i].name+`','`+font_data[i].image+`')"><span class="active_text" style="font-family:`+font_data[i].name+`">`+font_text+`</span><small style="font-family:Abel">`+font_data[i].name+`</small></li>`;
+	        		}
+
+	        		$('#searchFonts').html(font_option);
+
+	        	}else{
+	        		console.log("Empty font Category!");
+	        		$('#searchFonts').html(`<li>No match found!</li>`);
+	        	}	        
+	        }
+	       $('.customiseLoader').css("display","none");
+	       $('#searchFonts').show();
+	       $('.font_cat_link').show();
+	      },
+	      error: function (jqXhr, textStatus, errorMessage) {
+	        console.log("Error => ",errorMessage);
+	        $('.customiseLoader').css("display","none");
+	      }
+	    })
+    }
+});
+
+// Art category API
+
+function mainArtCategory(){
+	$.ajax({
+        url: STORE_API_URL+'api/front-end/get-art-category-list?shop_url='+STORE_URL,
+        beforeSend: function() {
+           $('.customiseLoader').css("display","flex");
+        },
+        success: function (response, status, xhr) {
+        if(response.status == true){
+        	
+        	var data = response.data;
+        	if(data.length > 0){
+        		var art_category_html = '';
+        		for(var i = 0; i < data.length; i++){
+        			var randomColor = getRandomColor();
+        			let parent_class_name = data[i].name.replace(/[^a-zA-Z0-9 ]/g, "");
+		    		parent_class_name = parent_class_name.trim().toLowerCase().replaceAll(" ", "_");
+		    		parent_class_name = parent_class_name.replace("__", "_");
+        		    art_category_html += '<li><div class="open_child_options title_image" data-id="'+data[i].id+'" style="background-color: '+data[i].background_color+'"><img loading="lazy" src="'+data[i].background_image+'" /><span>'+data[i].name+'</span></div><ul class="child_1 art_category_option '+parent_class_name+'_child" level="1" parent_menu="Artwork Categories"></ul></li>';
+        		} 
+
+        		$('.art_design_wrapper>ul.parent').html(art_category_html);
+
+        		console.log("Art Categories html => ", art_category_html);
+        	}else{
+        		console.log("Empty Art Category!")
+        	}
+        }
+       $('.customiseLoader').css("display","none");
+      },
+      error: function (jqXhr, textStatus, errorMessage) {
+        console.log("Error => ",errorMessage);
+        $('.customiseLoader').css("display","none");
+      }
+    })
+}
+
+mainArtCategory();
+
+
+function subArtCategory(id){
+	var id_array = id.split("/");
+	console.log("Id is => ", id_array);
+	if(id_array.length == 3){
+		$.ajax({
+	        url: STORE_API_URL+'api/front-end/get-art-sub-category-sub-list/'+id+'?shop_url='+STORE_URL,
+	        beforeSend: function() {
+	           $('.customiseLoader').css("display","flex");
+	        },
+	        success: function (response, status, xhr) {
+	        if(response.status == true){
+	        	console.log("=> ", response.data);
+	        	
+	        	var data = response.data;
+
+	        	console.log(data[0].sub_category)
+	        	if(data[0].sub_category != undefined){
+		        	if(data[0].sub_category.length > 0){
+		        		sub_data = data[0].sub_category;
+
+		        		if(sub_data[0].sub_category_list != undefined){
+		        			if(sub_data[0].sub_category_list.length > 0){
+				        		sub_cat_data = sub_data[0].sub_category_list;
+
+				        		let parent_class_name = sub_cat_data[0].name.replace(/[^a-zA-Z0-9 ]/g, "");
+							    parent_class_name = parent_class_name.trim().toLowerCase().replaceAll(" ", "_");
+							    parent_class_name = parent_class_name.replace("__", "_");
+							    console.log("class name => ", parent_class_name);
+
+				        		if(sub_cat_data[0].sub_category_sub_list != undefined){
+				        			if(sub_cat_data[0].sub_category_sub_list.length > 0){
+				        				
+				        				var sub_cat_art = sub_cat_data[0].sub_category_sub_list;
+				        				var art_category_html = '';
+						        		for(var i = 0; i < sub_cat_art.length; i++){
+						        		    
+						        		    art_category_html += `<li onclick="addArtDesign('`+sub_cat_art[i].image+`')"><span><img loading="lazy" src="`+sub_cat_art[i].image+`" /></span></li>`;
+						        		} 
+
+						        		$('.art_design_wrapper>ul.parent ul.'+parent_class_name+'_child').html(art_category_html);
+						        		console.log("Art Categories html => ", art_category_html);
+
+				        			}else{
+						        		console.log("Empty Art Category!")
+						        	}
+			        			}
+				        	}
+		        		}
+		        	}else{
+		        		console.log("Empty Art Category!")
+		        	}
+		        }
+	        }
+	       $('.customiseLoader').css("display","none");
+	      },
+	      error: function (jqXhr, textStatus, errorMessage) {
+	        console.log("Error => ",errorMessage);
+	        $('.customiseLoader').css("display","none");
+	      }
+	    })
+	}else if(id_array.length == 2){
+		$.ajax({
+	        url: STORE_API_URL+'api/front-end/get-art-sub-category/'+id+'?shop_url='+STORE_URL,
+	        beforeSend: function() {
+	           $('.customiseLoader').css("display","flex");
+	        },
+	        success: function (response, status, xhr) {
+	        if(response.status == true){
+	        	console.log("=> ", response.data);
+	        	
+	        	var data = response.data;
+
+	        	console.log(data[0].sub_category)
+	        	if(data[0].sub_category != undefined){
+		        	if(data[0].sub_category.length > 0){
+		        		sub_data = data[0].sub_category;
+
+
+		        		let parent_class_name = sub_data[0].name.replace(/[^a-zA-Z0-9 ]/g, "");
+					    parent_class_name = parent_class_name.trim().toLowerCase().replaceAll(" ", "_");
+					    parent_class_name = parent_class_name.replace("__", "_");
+					    console.log("class name => ", parent_class_name);
+		        		if(sub_data[0].sub_category_list != undefined){
+		        			if(sub_data[0].sub_category_list.length > 0){
+
+				        		sub_cat_data = sub_data[0].sub_category_list;
+
+					        		var art_category_html = '';
+					        		for(var i = 0; i < sub_cat_data.length; i++){
+					        		    
+
+					        		    var cat_class = "art_category_option";
+					        		    if(sub_cat_data[i].child_list == 'art_image'){
+					        		    	cat_class = "art_img_option";
+					        		    }
+
+					        		    if(sub_cat_data[i].image == null){
+					        		    let art_class_name = sub_cat_data[i].name.replace(/[^a-zA-Z0-9 ]/g, "");
+					        		    art_class_name = art_class_name.trim().toLowerCase().replaceAll(" ", "_");
+					        		    art_class_name = art_class_name.replace("__", "_");
+					        		    
+				        		    	var data_id = data[0].id+"/"+sub_data[0].id+"/"+sub_cat_data[i].id;
+					        		    art_category_html += '<li><div class="open_child_options art_sub_title" data-id='+data_id+'>'+sub_cat_data[i].name+'</div><ul class="child_3 '+cat_class+' '+art_class_name+'_child" level="3" parent_menu="'+sub_data[0].name+'"></ul></li>';
+					        			}else{
+					        		    art_category_html += `<li onclick="addArtDesign('`+sub_cat_data[i].image+`')"><span><img loading="lazy" src="`+sub_cat_data[i].image+`" /></span></li>`;
+					        			}
+					        		} 
+
+					        		$('.art_design_wrapper>ul.parent ul.'+parent_class_name+'_child').html(art_category_html);
+					        		console.log("Art Categories html => ", art_category_html);
+				        		
+				        	}else{
+				        		console.log("Empty Art Category!")
+				        	}
+		        		}
+			        		
+		        		
+		        	}else{
+		        		console.log("Empty Art Category!")
+		        	}
+		        }
+	        }
+	       $('.customiseLoader').css("display","none");
+	      },
+	      error: function (jqXhr, textStatus, errorMessage) {
+	        console.log("Error => ",errorMessage);
+	        $('.customiseLoader').css("display","none");
+	      }
+	    })
+	}else{
+		$.ajax({
+	        url: STORE_API_URL+'api/front-end/get-art-category/'+id+'?shop_url='+STORE_URL,
+	        beforeSend: function() {
+	           $('.customiseLoader').css("display","flex");
+	        },
+	        success: function (response, status, xhr) {
+	        if(response.status == true){
+	        	console.log("=> ", response.data);
+	        	
+	        	var data = response.data;
+
+	        	let parent_class_name = data[0].name.replace(/[^a-zA-Z0-9 ]/g, "");
+			    parent_class_name = parent_class_name.trim().toLowerCase().replaceAll(" ", "_");
+			    parent_class_name = parent_class_name.replace("__", "_");
+			    console.log("class name => ", parent_class_name);
+
+	        	console.log(data[0].sub_category)
+	        	if(data[0].sub_category != undefined){
+		        	if(data[0].sub_category.length > 0){
+		        		sub_data = data[0].sub_category;
+		        		
+			        		var art_category_html = '';
+			        		for(var i = 0; i < sub_data.length; i++){
+			        		    let art_class_name = sub_data[i].name.replace(/[^a-zA-Z0-9 ]/g, "");
+			        		    art_class_name = art_class_name.trim().toLowerCase().replaceAll(" ", "_");
+			        		    art_class_name = art_class_name.replace("__", "_");
+
+			        		    var cat_class = "art_category_option";
+			        		    if(sub_data[i].child_list == 'art_image'){
+			        		    	cat_class = "art_img_option";
+			        		    }
+			        		    
+			        		    var data_id = data[0].id+"/"+sub_data[i].id;
+			        		    art_category_html += '<li><div class="open_child_options art_sub_title" data-id='+data_id+'>'+sub_data[i].name+'</div><ul class="child_2 '+cat_class+' '+art_class_name+'_child" level="2" parent_menu="'+data[0].name+'"></ul></li>';
+			        		} 
+
+			        		$('.art_design_wrapper>ul.parent ul.'+parent_class_name+'_child').html(art_category_html);
+			        		console.log("Art Categories html => ", art_category_html);
+		        		
+		        	}else{
+		        		console.log("Empty Art Category!")
+		        	}
+		        }
+	        }
+	       $('.customiseLoader').css("display","none");
+	      },
+	      error: function (jqXhr, textStatus, errorMessage) {
+	        console.log("Error => ",errorMessage);
+	        $('.customiseLoader').css("display","none");
+	      }
+	    })
+	}
+	
+}
+
+
