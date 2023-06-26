@@ -260,7 +260,7 @@ export default function SubCategoryList(props) {
         setLoadingStatus(true);
         if (!files) {
             setLoadingStatus(false);
-            setFilesError("File is required!");
+            setFileError("File is required!");
             return false;
         }
         const formData = new FormData();

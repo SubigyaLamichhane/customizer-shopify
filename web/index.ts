@@ -9,6 +9,7 @@ import productCreator from "./product-creator.js";
 import GDPRWebhookHandlers from "./gdpr.js";
 import { mysqlConnection } from "./src/config/mySqlConnection.js";
 import cors from "cors";
+import axios from "axios";
 
 // use body-parser for fetch request body
 import bodyParser from "body-parser";
@@ -52,7 +53,8 @@ app.get(
                 session: res.locals.shopify.session,
             });
             page.title = "Customizer";
-            page.body_html = readFileSync('./store-frontend/customizer.html', 'utf-8');
+            // page.body_html = readFileSync('./store-frontend/customizer.html', 'utf-8');
+            page.body_html = `<iframe title="customizer" src="/apps/load-customizer-page" id="sketch-customizer-app" allow="clipboard-read; clipboard-write" context="Main" style="position: relative; border: none; width: 100%; flex: 1 1 0%; display: flex;"></iframe>`;
             const response = await page.save({
                 update: true,
             });
@@ -90,6 +92,29 @@ app.get("/api/uploads/*", async (req, res, _next) => {
 // ...................................
 // Front end api's.
 app.use("/api/front-end", frontendRouter);
+
+// Load customizer html file
+app.get('/api/load-customizer-page', async (req: Request, res: Response) => {
+    try {     
+        // Replace with the actual URL of the HTML file
+        const url: string = 'http://staging.whattocookai.com:8080/customizer/index.html';
+        const response = await axios.get(url);
+
+        return res
+        .status(200)
+        .set("Content-Type", "text/html")
+        .send(response.data);
+
+        // for test by local file
+        // return res
+        // .status(200)
+        // .set("Content-Type", "text/html")
+        // .send(readFileSync('./store-frontend/customizer.html', 'utf-8'));
+    } catch (error: any) {
+        console.error('Error retrieving HTML file:', error);
+        res.status(500).send('Error retrieving HTML file');
+    }
+});
 
 // Convert pdf/ai/eps/jpg/jpeg/psd file into png formate
 app.post("/api/convert-file", upload.single('image'), async (req: Request, res: Response) => {
@@ -171,7 +196,8 @@ app.get("/api/page/create", async (req: Request, res: Response) => {
         session: res.locals.shopify.session,
     });
     page.title = "Customizer";
-    page.body_html = readFileSync('./store-frontend/customizer.html', 'utf-8');
+    // page.body_html = readFileSync('./store-frontend/customizer.html', 'utf-8');
+    page.body_html = `<iframe title="customizer" src="/apps/load-customizer-page" id="sketch-customizer-app" allow="clipboard-read; clipboard-write" context="Main" style="position: relative; border: none; width: 100%; flex: 1 1 0%; display: flex;"></iframe>`;
     const response = await page.save({
         update: true,
     });
@@ -180,7 +206,7 @@ app.get("/api/page/create", async (req: Request, res: Response) => {
         if (error) throw error;
         res.status(201).send({
             "status": true,
-            "message": "Setting updated!",
+            "message": "Page created!",
             "data": result,
             "page": page
         });
