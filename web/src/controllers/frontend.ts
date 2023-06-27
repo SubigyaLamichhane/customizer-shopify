@@ -4,6 +4,8 @@ import gm from "gm";
 import dotenv from "dotenv";
 import { rejects } from "assert";
 import shopify from "../../shopify.js";
+import axios from "axios";
+
 dotenv.config();
 // const FILE_PATH = "http://staging.whattocookai.com/api/uploads/public/uploads/";
 const FILE_PATH = `${process.env.APP_URL}${process.env.FILE_UPLOAD_PATH}`;
@@ -466,6 +468,24 @@ const getProduct = async (req: Request, res: Response) => {
     }
 };
 
+const handlePhpApi = async (req: Request, res: Response) => {
+    try {
+        let url: any = req.url;
+        url = url.replace("/handlePhpApi?url=", "");
+        const response = await axios.get(url, { responseType: "arraybuffer" });
+        return res.
+            status(200)
+            .set("Content-Type", "image/png")
+            .send(response.data);
+    } catch (error: any) {
+        return res.status(500).send({
+            "status": false,
+            "message": "Error retrieving image!" + error,
+            "data":     []
+        });
+    }
+};
+
 export {
     getArtCategoryList,
     getArtCategoryById,
@@ -478,5 +498,6 @@ export {
     getAllFonts,
     getArtList,
     getProduct,
-    convertFile
+    convertFile,
+    handlePhpApi
 };

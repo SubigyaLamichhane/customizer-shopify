@@ -13,7 +13,8 @@ import {
     getAllFonts,
     getArtList,
     getProduct,
-    convertFile
+    convertFile,
+    handlePhpApi
 } from "../controllers/frontend.js";
 
 /**
@@ -42,5 +43,8 @@ frontendRouter.get("/get-all-fonts", getAllFonts);
 
 // Convert pdf/ai/eps/jpg/jpeg/psd file into png formate
 frontendRouter.post("/convert-file", upload.single('image'), convertFile);
+
+// Handle php api
+frontendRouter.get("/handlePhpApi", handlePhpApi);
 
 export default frontendRouter;
