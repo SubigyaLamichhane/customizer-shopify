@@ -1,0 +1,28 @@
+#sketch-add-to-cart-btn {
+    background-color: rgba(var(--color-button),var(--alpha-button-background));
+    color: rgb(var(--color-button-text));
+    margin: 20px;
+    padding: 10px;
+    width: -webkit-fill-available;
+    font-size: 1.4rem;
+    line-height: calc(1 + .2 / var(--font-body-scale));
+    letter-spacing: .07rem;
+}
+
+#sketch-add-to-cart-btn:hover {
+    box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+}
+
+#sketch-customize-btn {
+    background-color: rgba(var(--color-button),var(--alpha-button-background));
+    color: rgb(var(--color-button-text));
+    padding: 10px;
+    width: -webkit-fill-available;
+    font-size: 1.4rem;
+    line-height: calc(1 + .2 / var(--font-body-scale));
+    letter-spacing: .07rem;
+}
+
+#sketch-customize-btn:hover {
+    box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
+}

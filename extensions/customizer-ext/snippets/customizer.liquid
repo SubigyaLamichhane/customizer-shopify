@@ -1,0 +1,10 @@
+<script>
+  const APP_URL = "https://bean-speakers-import-donna.trycloudflare.com";
+  const SHOP_URL = "offline_" + Shopify.shop;
+  var tempCurrency = "{{ shop.money_format }}";
+  const CURRENCY = tempCurrency.split('{')[0];
+  const SHOP_THEME = Shopify.theme.name;
+  const PAGE_HANDLE = "{{ page.handle }}";
+  const HANDLE = "{{ template | handle }}";
+  const PRODUCT = {{ product | json }};
+</script>>

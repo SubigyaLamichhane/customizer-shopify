@@ -1,11 +1,11 @@
 import { Request, Response } from "express";
 import { mysqlConnection, queryPromise } from "../config/mySqlConnection.js";
 import gm from "gm";
-import dotenv from "dotenv";
 import { rejects } from "assert";
 import shopify from "../../shopify.js";
 import axios from "axios";
-
+import { writeFile } from "fs";
+import dotenv from "dotenv";
 dotenv.config();
 // const FILE_PATH = "http://staging.whattocookai.com/api/uploads/public/uploads/";
 const FILE_PATH = `${process.env.APP_URL}${process.env.FILE_UPLOAD_PATH}`;
@@ -481,7 +481,70 @@ const handlePhpApi = async (req: Request, res: Response) => {
         return res.status(500).send({
             "status": false,
             "message": "Error retrieving image!" + error,
-            "data":     []
+            "data": []
+        });
+    }
+};
+
+// Create product variant and add to cart
+const addToCart = async (req: Request, res: Response) => {
+    try {
+        let shop_url: any = req.query.shop_url;
+        let productId: any = req.body.product_id;
+        let query: any = `SELECT * FROM shopify_sessions WHERE id='${shop_url}'`;
+        const result = await queryPromise(query);
+        const session = result[0];
+
+        const imageData = req.body.imageData;
+        const base64Data = imageData.replace(/^data:image\/png;base64,/, '');
+        const fileName = `${Date.now()}.png`;
+        const filePath = `public/uploads/${fileName}`;
+
+        // Save the image to the server
+        writeFile(filePath, base64Data, 'base64', async (err) => {
+            if (err) {
+                console.error(err);
+                return res.status(500).json({ error: 'Failed to upload image.' });
+            }
+
+            const variant = new shopify.api.rest.Variant({ session: session });
+            variant.product_id = productId;
+            variant.option1 = `Customizer_${Date.now()}`; // variant name
+            variant.price = "1.00";
+            await variant.save({
+                update: true,
+            });
+            let variantId: any = variant.id;
+
+            // Added image for the variant
+            const image = new shopify.api.rest.Image({ session: session });
+            image.product_id = productId;
+            image.variant_ids = [variantId];
+            image.filename = fileName;
+            image.src = `${FILE_PATH}${fileName}`;
+            await image.save({
+                update: true,
+            });
+
+            // Update inventory
+            const inventory_level = new shopify.api.rest.InventoryLevel({ session: session });
+            await inventory_level.adjust({
+                body: { "location_id": 63770296460, "inventory_item_id": 43721372303500, "available_adjustment": 25 },
+            });
+
+            return res.status(200).send({
+                status: true,
+                message: "Variant created successfully!",
+                variant: variant,
+                // inventory: updatedInventoryLevel,
+                image: image,
+            });
+        });
+    } catch (error: any) {
+        return res.status(404).send({
+            status: false,
+            message: "Something went wrong! " + error,
+            data: [],
         });
     }
 };
@@ -499,5 +562,6 @@ export {
     getArtList,
     getProduct,
     convertFile,
-    handlePhpApi
+    handlePhpApi,
+    addToCart
 };

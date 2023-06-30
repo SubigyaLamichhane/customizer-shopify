@@ -14,7 +14,8 @@ import {
     getArtList,
     getProduct,
     convertFile,
-    handlePhpApi
+    handlePhpApi,
+    addToCart
 } from "../controllers/frontend.js";
 
 /**
@@ -46,5 +47,8 @@ frontendRouter.post("/convert-file", upload.single('image'), convertFile);
 
 // Handle php api
 frontendRouter.get("/handlePhpApi", handlePhpApi);
+
+// API for add to cart
+frontendRouter.post("/add-to-cart", addToCart);
 
 export default frontendRouter;
