@@ -491,10 +491,10 @@ const addToCart = async (req: Request, res: Response) => {
     try {
         let shop_url: any = req.query.shop_url;
         let productId: any = req.body.product_id;
+        let price: any = req.body.price;
         let query: any = `SELECT * FROM shopify_sessions WHERE id='${shop_url}'`;
         const result = await queryPromise(query);
         const session = result[0];
-
         const imageData = req.body.imageData;
         const base64Data = imageData.replace(/^data:image\/png;base64,/, '');
         const fileName = `${Date.now()}.png`;
@@ -509,12 +509,14 @@ const addToCart = async (req: Request, res: Response) => {
 
             const variant = new shopify.api.rest.Variant({ session: session });
             variant.product_id = productId;
-            variant.option1 = `Customizer_${Date.now()}`; // variant name
-            variant.price = "1.00";
+            variant.option1 = `customizer_${Date.now()}`; // variant name
+            variant.price = price;
+            variant.published = false;
             await variant.save({
                 update: true,
             });
             let variantId: any = variant.id;
+            let inventoryItemId: any = variant.inventory_item_id;
 
             // Added image for the variant
             const image = new shopify.api.rest.Image({ session: session });
@@ -526,17 +528,24 @@ const addToCart = async (req: Request, res: Response) => {
                 update: true,
             });
 
-            // Update inventory
+            // Get location data
+            const location = await shopify.api.rest.Location.all({ session: session });
+            const location_id = location.map((item) => {
+                if (item.active == true) {
+                    return item.id;
+                }
+            });
+
+            // Update product inventory
             const inventory_level = new shopify.api.rest.InventoryLevel({ session: session });
             await inventory_level.adjust({
-                body: { "location_id": 63770296460, "inventory_item_id": 43721372303500, "available_adjustment": 25 },
+                body: { "location_id": location_id[0], "inventory_item_id": inventoryItemId, "available_adjustment": 2 },
             });
 
             return res.status(200).send({
                 status: true,
                 message: "Variant created successfully!",
                 variant: variant,
-                // inventory: updatedInventoryLevel,
                 image: image,
             });
         });

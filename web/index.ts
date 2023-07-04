@@ -54,7 +54,7 @@ app.get(
             });
             page.title = "Customizer";
             // page.body_html = readFileSync('./store-frontend/customizer.html', 'utf-8');
-            page.body_html = `<iframe title="customizer" src="/apps/load-customizer-page" id="sketch-customizer-app" allow="clipboard-read; clipboard-write" context="Main" style="position: relative; border: none; width: 100%; flex: 1 1 0%; display: flex;"></iframe>`;
+            page.body_html = `<iframe title="customizer" src="/apps/load-customizer-page" id="sketch-customizer-app" allow="clipboard-read; clipboard-write" context="Main" style="position: relative; border: none; width: 100%; min-height: 100vh; flex: 1 1 0%; display: flex;"></iframe><button id="sketch-add-to-cart-btn">Add To Cart</button>`;
             const response = await page.save({
                 update: true,
             });
@@ -95,15 +95,15 @@ app.use("/api/front-end", frontendRouter);
 
 // Load customizer html file
 app.get('/api/load-customizer-page', async (req: Request, res: Response) => {
-    try {     
+    try {
         // Replace with the actual URL of the HTML file
         const url: string = 'http://staging.whattocookai.com:8080/customizer/index.html';
         const response = await axios.get(url);
 
         return res
-        .status(200)
-        .set("Content-Type", "text/html")
-        .send(response.data);
+            .status(200)
+            .set("Content-Type", "text/html")
+            .send(response.data);
 
         // for test by local file
         // return res
@@ -197,7 +197,7 @@ app.get("/api/page/create", async (req: Request, res: Response) => {
     });
     page.title = "Customizer";
     // page.body_html = readFileSync('./store-frontend/customizer.html', 'utf-8');
-    page.body_html = `<iframe title="customizer" src="/apps/load-customizer-page" id="sketch-customizer-app" allow="clipboard-read; clipboard-write" context="Main" style="position: relative; border: none; width: 100%; flex: 1 1 0%; display: flex;"></iframe>`;
+    page.body_html = `<iframe title="customizer" src="/apps/load-customizer-page" id="sketch-customizer-app" allow="clipboard-read; clipboard-write" context="Main" style="position: relative; border: none; width: 100%; min-height: 100vh; flex: 1 1 0%; display: flex;"></iframe><button id="sketch-add-to-cart-btn">Add To Cart</button>`;
     const response = await page.save({
         update: true,
     });

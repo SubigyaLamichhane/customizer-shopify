@@ -1,3 +1,6 @@
+@import url('https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap');
+@import url('https://netdna.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css');
+
 #sketch-add-to-cart-btn {
     background-color: rgba(var(--color-button),var(--alpha-button-background));
     color: rgb(var(--color-button-text));
@@ -26,3 +29,29 @@
 #sketch-customize-btn:hover {
     box-shadow: 0 12px 16px 0 rgba(0, 0, 0, 0.24), 0 17px 50px 0 rgba(0, 0, 0, 0.19);
 }
+
+/* button loader css start */
+.spinner {
+    display: inline-block;
+    /* opacity: 0;
+    width: 0; */
+    width: 30px;
+    -webkit-transition: opacity 0.25s, width 0.25s;
+    -moz-transition: opacity 0.25s, width 0.25s;
+    -o-transition: opacity 0.25s, width 0.25s;
+    transition: opacity 0.25s, width 0.25s;
+}
+
+.has-spinner.active {
+    cursor:progress;
+}
+
+.has-spinner.active .spinner {
+    opacity: 1;
+    width: auto;
+}
+
+.has-spinner.btn.active .spinner {
+    min-width: 20px;
+}
+/* button loader css end */
