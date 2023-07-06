@@ -238,27 +238,37 @@ app.listen(PORT);
 /*
 Make changes on server
 
-1) file name = /web/src/config/uploadFile.ts
+1) file name = .env file
+set below data in root .env file
+server
+SHOPIFY_API_KEY=6026d4d1b63ac09361bc6d2c1dd2b3f1
+SHOPIFY_CUSTOMIZER_EXT_ID=c8a80097-d76a-4a78-9aeb-0d89f6c92838
+
+local
+SHOPIFY_API_KEY=ff637734f49147493a975da2f4d09ae9
+SHOPIFY_CUSTOMIZER_EXT_ID=f7aa27d0-b9ac-49e7-a4b4-8f3daebf33c1
+
+2) file name = /web/src/config/uploadFile.ts
 const STORAGE_PATH = "/web/public/uploads/";
 
-2) file name = /web/src/controllers/ (all controllers)
+3) file name = /web/src/controllers/ (all controllers)
 const FILE_PATH = "http://staging.whattocookai.com/api/uploads/public/uploads/";
 
-3) file name = index.ts
+4) file name = index.ts
 const PORT = process.env.BACKEND_PORT || process.env.PORT; to const PORT = 3000;
 `${process.cwd()}/frontend/dist` = `${process.cwd()}/web/frontend/dist`
 `${process.cwd()}/frontend/` = `${process.cwd()}/web/frontend/`
 const __dirname = path.resolve(); to const __dirname = path.resolve()  + "/web";
 
-4) file name = /web/frontend/App.jsx
+5) file name = /web/frontend/App.jsx
 const API_URL = "https://staging.whattocookai.com/api";
 
-5) file name = package.json of root
+6) file name = package.json of root
 "deploy": "shopify app deploy",
 "serve": "cross-env NODE_ENV=production ts-node web/index.ts",
 "start": "npm run serve"
 
-6) file name = web/src/config/mySqlConnection.js
+7) file name = web/src/config/mySqlConnection.js
 import mysql from "mysql";
 
 const mysqlConnection = mysql.createConnection({
@@ -299,7 +309,7 @@ export {
    queryPromise
 };
 
-7) file name = web/shopify.js
+8) file name = web/shopify.js
 import { BillingInterval, LATEST_API_VERSION } from "@shopify/shopify-api";
 import { shopifyApp } from "@shopify/shopify-app-express";
 // import { SQLiteSessionStorage } from "@shopify/shopify-app-session-storage-sqlite";
